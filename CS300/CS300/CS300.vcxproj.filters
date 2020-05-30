@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\GLDebug">
+      <UniqueIdentifier>{ca0ab472-1d3e-438d-aed6-b14871ac378e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{401b9893-9e1b-4e18-a5f5-695aa0a39aef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Window">
+      <UniqueIdentifier>{b86995c4-6e32-4eda-9925-d74843ed87b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Camera">
+      <UniqueIdentifier>{78087924-6fd1-4efe-a4c8-7da8ce5087f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameObject">
+      <UniqueIdentifier>{7e0c8191-4ce2-4712-8911-2add56cd408c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GOManager">
+      <UniqueIdentifier>{9414deca-b843-4edc-a8b9-2e246bcc838d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Texture">
+      <UniqueIdentifier>{2846e586-ce01-4568-89e5-2378e91b13d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shader">
+      <UniqueIdentifier>{a9b1be1a-3eba-4aa3-bda5-2ba539af046a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{bd52b1e4-a5f0-4380-98be-a627c25181e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\InputManger">
+      <UniqueIdentifier>{8a99789d-c2f4-47d9-9969-2736453dae3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Color">
+      <UniqueIdentifier>{99c7e5ac-b0a2-4577-b9ca-461aef9994e9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLDebug\OGLDebug.cpp">
+      <Filter>Source Files\GLDebug</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\Utilities.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\Window.cpp">
+      <Filter>Source Files\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader\Shader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameObject\GameObject.cpp">
+      <Filter>Source Files\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GOManager\GOManager.cpp">
+      <Filter>Source Files\GOManager</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\Model.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera\Camera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\Input.cpp">
+      <Filter>Source Files\InputManger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture\Texture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Color\Color.cpp">
+      <Filter>Source Files\Color</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Camera\Camera.h">
+      <Filter>Source Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CS300.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameObject\GameObject.h">
+      <Filter>Source Files\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GOManager\GOManager.h">
+      <Filter>Source Files\GOManager</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\Model.h">
+      <Filter>Source Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLDebug\OGLDebug.h">
+      <Filter>Source Files\GLDebug</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader\Shader.h">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture\Texture.h">
+      <Filter>Source Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utilities\Utilities.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\Window.h">
+      <Filter>Source Files\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input\Input.h">
+      <Filter>Source Files\InputManger</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Color\Color.h">
+      <Filter>Source Files\Color</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
