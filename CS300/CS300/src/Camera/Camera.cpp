@@ -112,7 +112,7 @@ void Camera::Render(Window& target, std::vector<GameObject*>& objects)
 		currentShader.SetUniform("m2w", glm::value_ptr(m2w_object));
 
 		//setting the texture of the object as active
-		objects[i]->mTexture.SetActiveTexture();
+		objects[i]->mMaterial.GetTexture().SetActiveTexture();
 
 		//if wireframe is on change the render mode
 		if (!mWireframe)//if wireframe is not togled on

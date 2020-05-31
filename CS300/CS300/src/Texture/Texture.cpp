@@ -45,7 +45,7 @@ the name of the image to loadf
 
 *
 **************************************************************************/
-Texture::Texture(const std::string & filename)
+Texture::Texture(std::string filename)
 {
 	//setting the member variables
 	mTexture = nullptr;

@@ -24,7 +24,7 @@ class Color
 {
 public:
 
-	Color(float r, float g, float b, float a);
+	Color(float r = 0.0F, float g = 0.0F, float b = 0.0F, float a = 0.0F);
 	Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
 	static Color White;

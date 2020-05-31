@@ -80,7 +80,9 @@
     <ClCompile Include="src\GLDebug\OGLDebug.cpp" />
     <ClCompile Include="src\GOManager\GOManager.cpp" />
     <ClCompile Include="src\Input\Input.cpp" />
+    <ClCompile Include="src\Light\Light.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Material\Material.cpp" />
     <ClCompile Include="src\Model\Model.cpp" />
     <ClCompile Include="src\Shader\Shader.cpp" />
     <ClCompile Include="src\Texture\Texture.cpp" />
@@ -95,6 +97,8 @@
     <ClInclude Include="src\GLDebug\OGLDebug.h" />
     <ClInclude Include="src\GOManager\GOManager.h" />
     <ClInclude Include="src\Input\Input.h" />
+    <ClInclude Include="src\Light\Light.h" />
+    <ClInclude Include="src\Material\Material.h" />
     <ClInclude Include="src\Model\Model.h" />
     <ClInclude Include="src\Shader\Shader.h" />
     <ClInclude Include="src\Texture\Texture.h" />

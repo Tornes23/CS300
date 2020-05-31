@@ -46,6 +46,12 @@
     <Filter Include="Source Files\Color">
       <UniqueIdentifier>{99c7e5ac-b0a2-4577-b9ca-461aef9994e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Material">
+      <UniqueIdentifier>{5355bf50-6296-4107-9cd7-e30b57cd4e0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Light">
+      <UniqueIdentifier>{70a99ec5-42c1-4cf7-8aa8-3564b2ec4c43}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -84,6 +90,12 @@
     <ClCompile Include="src\Color\Color.cpp">
       <Filter>Source Files\Color</Filter>
     </ClCompile>
+    <ClCompile Include="src\Light\Light.cpp">
+      <Filter>Source Files\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Material\Material.cpp">
+      <Filter>Source Files\Material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera\Camera.h">
@@ -121,6 +133,12 @@
     </ClInclude>
     <ClInclude Include="src\Color\Color.h">
       <Filter>Source Files\Color</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Material\Material.h">
+      <Filter>Source Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Light\Light.h">
+      <Filter>Source Files\Light</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

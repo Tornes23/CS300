@@ -31,7 +31,7 @@ The functions included are:
 #include <GLM/mat4x4.hpp>
 #include <GLM/vec4.hpp>
 #include "../Model/Model.h"
-#include "../Texture/Texture.h"
+#include "../Material/Material.h"
 #include <vector>
 
 struct GameObject
@@ -69,7 +69,7 @@ struct GameObject
 	glm::vec3 mUp;
 	glm::vec3 mRight;
 
-	Texture mTexture;
+	Material mMaterial;
 	Model mModel;
 
 	std::string mName;

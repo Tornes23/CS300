@@ -39,7 +39,7 @@ class Texture
 {
 public:
 
-	Texture(const std::string& filename);
+	Texture(std::string filename = "./src/Texture/resources/default.png");
 	void SetActiveTexture();
 	void UploadTexture(void* data);
 	void GenBuffers();
