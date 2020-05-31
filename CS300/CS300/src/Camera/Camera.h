@@ -35,6 +35,7 @@ The functions included are:
 #include <GLM/vec2.hpp>
 #include "../Window/Window.h"
 #include "../Shader/Shader.h"
+#include "../Light/Light.h"
 
 struct GameObject;
 
@@ -47,6 +48,7 @@ public:
 	void Update();
 	void DrawTriangle(GameObject* target);
 	void DrawNormals(GameObject* target);
+	void ApplyLight(GameObject* target);
 
 	glm::mat4x4 CreatePerspective();
 	glm::mat4x4 CreateCameraMat();
@@ -78,4 +80,5 @@ private:
 	float mFar;
 
 	std::vector<ShaderProgram> mShaders;
+	std::vector<Light> mLights;
 };

@@ -13,7 +13,7 @@ public:
 		Spotlight
 	};
 
-	Light(glm::vec3 position, glm::vec3 direction, Color ambient, Color diffuse, Color specular, LightType type);
+	Light(glm::vec3 position = glm::vec3(0,0,0), glm::vec3 direction = glm::vec3(0, 0, 1), Color ambient = Color::White, Color diffuse = Color::White, Color specular = Color::White, LightType type = LightType::Point);
 
 	const glm::vec3 GetPosition() const;
 	const glm::vec3 GetDirection() const;

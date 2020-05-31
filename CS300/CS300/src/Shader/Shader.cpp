@@ -191,6 +191,12 @@ void ShaderProgram::SetUniform(const std::string & name, float * values)
 	
 }
 
+void ShaderProgram::Use()
+{
+	// Bind the shader program and this object's VAO
+	glUseProgram(mHandle);
+}
+
 /**************************************************************************
 *!
 \fn     Shader::Shader

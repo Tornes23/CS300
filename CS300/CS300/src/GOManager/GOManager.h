@@ -32,11 +32,14 @@ class GameObjectManager
 	public:
 		//object container
 		std::vector<GameObject*> mObjects;
+		std::vector<GameObject*> mLevelObjects;
+		std::vector<GameObject*> mAllObjects;
 
 		//utility functions
 		void AddObject(GameObject* obj);
+		void AddLevelObject(GameObject* obj);
 		GameObject* CreateObject(glm::vec3 position, glm::vec3 scale, const char* name = "Box", Model::Shape shape = Model::Shape::Cube,
-							     bool active = false, std::string textureName = "./src/Texture/resources/default.png");
+							     bool active = false, glm::vec3 up = glm::vec3(0,1,0), std::string textureName = "./src/Texture/resources/default.png");
 		void Update();
 		GameObject* FindObject(const char* name = "Box");
 		GameObject* FindActiveObject();

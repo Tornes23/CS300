@@ -57,7 +57,7 @@ Camera::Camera()
 	glm::normalize(mRightVector);
 
 	//initializing all the vues to 0
-	mPosition = glm::vec3(0, 0, 0);
+	mPosition = glm::vec3(0, 0, 50);
 	mNear = 0.1F;
 	mFar = 100.0F;
 
@@ -90,9 +90,7 @@ void Camera::Render(Window& target, std::vector<GameObject*>& objects)
 	//getting the shader which will be used
 	ShaderProgram currentShader = GetShader();
 
-	// Bind the shader program and this object's VAO
-	glUseProgram(currentShader.GetHandle());
-	error = glGetError();
+	currentShader.Use();
 
 	//Setting the matrix uniforms
 	currentShader.SetUniform("view", glm::value_ptr(mCameraMatrix));
@@ -127,15 +125,21 @@ void Camera::Render(Window& target, std::vector<GameObject*>& objects)
 		if (mRenderNormals)
 		{
 			currentShader = GetNormalShader();
-			// Bind the glsl program and this object's VAO
-			glUseProgram(currentShader.GetHandle());
-			error = glGetError();
-			
-			currentShader.SetUniform("m2w", glm::value_ptr(m2w_object));
+
+			currentShader.Use();
+
+			glm::mat4x4 m2w_normal = objects[i]->GenerateNormalTransform();
+
+			currentShader.SetUniform("m2w", glm::value_ptr(m2w_normal));
 			currentShader.SetUniform("view", glm::value_ptr(mCameraMatrix));
 			currentShader.SetUniform("projection", glm::value_ptr(mPerspective));
 
 			DrawNormals(objects[i]);
+		}
+
+		if (mLighting)
+		{
+			ApplyLight(objects[i]);
 		}
 	}
 
@@ -158,6 +162,15 @@ The update function for the class
 **************************************************************************/
 void Camera::Update()
 {	
+
+#pragma region CAMERA MOVEMENT
+
+	//if (KeyDown(W))
+	//	mPosition +=;
+
+
+#pragma endregion
+
 #pragma region RENDER MODIFICATIONS
 
 	if (KeyTriggered(M))
@@ -234,6 +247,10 @@ void Camera::DrawNormals(GameObject* target)
 	glDrawArrays(GL_LINES, 0, target->mModel.GetNormalCount(mAveragedNormals));
 
 	error = glGetError();
+}
+
+void Camera::ApplyLight(GameObject * target)
+{
 }
 
 /**************************************************************************

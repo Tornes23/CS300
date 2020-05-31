@@ -63,7 +63,7 @@ if is active or not
 *
 **************************************************************************/
 GameObject::GameObject(glm::vec3 position, glm::vec3 scale, const char* name, Model::Shape shape
-						, std::string textureFile,  bool active) : mMaterial(textureFile), mModel(shape)
+						, std::string textureFile,  bool active, glm::vec3 up) : mMaterial(textureFile), mModel(shape)
 {
 #pragma region INITIALIZING THE VARIABLES
 	mPosition = position;
@@ -71,7 +71,7 @@ GameObject::GameObject(glm::vec3 position, glm::vec3 scale, const char* name, Mo
 	mName = name;
 
 	mForward = glm::vec3(1, 0, 0);
-	mUp = glm::vec3(0, 1, 0);
+	mUp = up;
 	mRight = glm::cross(mUp, mForward);
 
 	mActive = active;
@@ -318,14 +318,16 @@ returns the matrix
 **************************************************************************/
 glm::mat4x4 GameObject::GenerateNormalTransform()
 {
-	glm::mat4x4 inverse_m2w = GenerateInverseM2W();
+	mNormalTransform = glm::transpose(glm::inverse(mModel2World));
 
-	mNormalTransform = glm::mat4x4(
-						inverse_m2w[0][0], inverse_m2w[1][0], inverse_m2w[2][0], inverse_m2w[3][0],
-						inverse_m2w[0][1], inverse_m2w[1][1], inverse_m2w[2][1], inverse_m2w[3][1],
-						inverse_m2w[0][2], inverse_m2w[1][2], inverse_m2w[2][2], inverse_m2w[3][2],
-						inverse_m2w[0][3], inverse_m2w[1][3], inverse_m2w[2][3], inverse_m2w[3][3]
-						);
+	//glm::mat4x4 inverse_m2w = GenerateInverseM2W();
+	//
+	//mNormalTransform = glm::mat4x4(
+	//					inverse_m2w[0][0], inverse_m2w[1][0], inverse_m2w[2][0], inverse_m2w[3][0],
+	//					inverse_m2w[0][1], inverse_m2w[1][1], inverse_m2w[2][1], inverse_m2w[3][1],
+	//					inverse_m2w[0][2], inverse_m2w[1][2], inverse_m2w[2][2], inverse_m2w[3][2],
+	//					inverse_m2w[0][3], inverse_m2w[1][3], inverse_m2w[2][3], inverse_m2w[3][3]
+	//					);
 
 	return mNormalTransform;
 }

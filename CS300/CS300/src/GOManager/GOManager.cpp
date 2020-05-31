@@ -44,6 +44,13 @@ void GameObjectManager::AddObject(GameObject* obj)
 {
 	//adding the object to the container
 	mObjects.push_back(obj);
+	mAllObjects.push_back(obj);
+}
+
+void GameObjectManager::AddLevelObject(GameObject * obj)
+{
+	mAllObjects.push_back(obj);
+	mLevelObjects.push_back(obj);
 }
 
 /**************************************************************************
@@ -76,10 +83,10 @@ Returns the game Object
 
 *
 **************************************************************************/
-GameObject* GameObjectManager::CreateObject(glm::vec3 position, glm::vec3 scale, const char * name, Model::Shape shape, bool active, std::string textureName)
+GameObject* GameObjectManager::CreateObject(glm::vec3 position, glm::vec3 scale, const char * name, Model::Shape shape, bool active, glm::vec3 up, std::string textureName)
 {
 	//creating a object with the values and returning it
-	return new GameObject(position, scale, name, shape, textureName, active);
+	return new GameObject(position, scale, name, shape, textureName, active, up);
 }
 
 /**************************************************************************
@@ -268,7 +275,7 @@ returns a pointer to the object or null if was not found
 GameObject * GameObjectManager::FindObject(const char * name)
 {
 	//looping throught the vector
-	for (auto it = mObjects.begin(); it != mObjects.end(); it++)
+	for (auto it = mAllObjects.begin(); it != mAllObjects.end(); it++)
 	{
 		//if is the one we want
 		if ((*it)->mName == name)
@@ -317,7 +324,7 @@ The destructor of the class
 GameObjectManager::~GameObjectManager()
 {
 	//freeing the memory
-	for (auto it = mObjects.begin(); it != mObjects.end(); it++)
+	for (auto it = mAllObjects.begin(); it != mAllObjects.end(); it++)
 	{
 		(*it)->mModel.FreeBuffers();
 		delete *it;
@@ -325,6 +332,8 @@ GameObjectManager::~GameObjectManager()
 
 	//clearing the vector
 	mObjects.clear();
+	mLevelObjects.clear();
+	mAllObjects.clear();
 }
 
 

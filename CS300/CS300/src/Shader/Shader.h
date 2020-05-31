@@ -51,6 +51,8 @@ public:
 	void SetUniform(const std::string& name, int value);
 	void SetUniform(const std::string& name, float* values);
 
+	void Use();
+
 
 private:
 	Shader mFragment;

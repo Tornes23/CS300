@@ -31,3 +31,6 @@ necessary includes in the assignment
 #include "Utilities/Utilities.h"
 #include "Window/Window.h"
 #include "Input/Input.h"
+#include "Color/Color.h"
+#include "Material/Material.h"
+#include "Light/Light.h"
