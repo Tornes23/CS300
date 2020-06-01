@@ -43,12 +43,13 @@ class Camera
 {
 public:
 
-	Camera();
+	Camera(glm::vec3 direction = glm::vec3(0,0,-1));
 	void Render(std::vector<GameObject*>& objects);
 	void Update();
 	void DrawTriangle(GameObject* target);
 	void DrawNormals(GameObject* target);
 	void ApplyLight(GameObject* target);
+	void ComputeVectors();
 
 	glm::mat4x4 CreatePerspective();
 	glm::mat4x4 CreateCameraMat();
@@ -78,6 +79,9 @@ private:
 	//data for the camera and the transformations
 	float mNear;
 	float mFar;
+	float mRadius;
+
+	glm::vec3 mRotations;
 
 	std::vector<ShaderProgram> mShaders;
 	std::vector<Light> mLights;

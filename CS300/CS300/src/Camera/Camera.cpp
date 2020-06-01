@@ -46,20 +46,17 @@ The default Constructor of the class
 
 *
 **************************************************************************/
-Camera::Camera()
+Camera::Camera(glm::vec3 direction)
 {
-	//setting the view vector as the 0,0,-1
-	mView = glm::vec3(0, 0, -1);
+	mView = glm::normalize(direction);
 
 	mUp = glm::vec3(0, 1, 0);
 
-	mRightVector = glm::cross(mUp, mView);
-	glm::normalize(mRightVector);
-
 	//initializing all the vues to 0
-	mPosition = glm::vec3(0, 0, 50);
+	ComputeVectors();
 	mNear = 0.1F;
 	mFar = 100.0F;
+	mRadius = 50.0F;
 
 	mWireframe = false;
 	mRenderNormals = false;
@@ -164,9 +161,23 @@ void Camera::Update()
 
 #pragma region CAMERA MOVEMENT
 
-	//if (KeyDown(W))
-	//	mPosition +=;
+	if (KeyDown(W))
+		mRotations.y += 1.0F;
 
+	if (KeyDown(A))
+		mRotations.x -= 1.0F;
+
+	if (KeyDown(S))
+		mRotations.y -= 1.0F;
+
+	if (KeyDown(D))
+		mRotations.x += 1.0F;
+
+	if (KeyDown(Q))
+		mRadius -= 1.0F;
+
+	if (KeyDown(E))
+		mRadius += 1.0F;
 
 #pragma endregion
 
@@ -188,7 +199,9 @@ void Camera::Update()
 		mLighting = !mLighting;
 
 #pragma endregion
-	//updating the matrices and the fustrum
+
+	//updating the matrices and the vectors
+	ComputeVectors();
 	CreatePerspective();
 	CreateCameraMat();
 }
@@ -250,6 +263,15 @@ void Camera::DrawNormals(GameObject* target)
 
 void Camera::ApplyLight(GameObject * target)
 {
+}
+
+void Camera::ComputeVectors()
+{
+	float posX = sinf(glm::radians(mRotations.x)) * mRadius;
+	float posY = sinf(glm::radians(mRotations.y)) * mRadius;
+	float posZ = cosf(glm::radians(mRotations.z)) * mRadius;
+
+	mPosition = glm::vec3(posX, posY, posZ);
 }
 
 /**************************************************************************
@@ -369,8 +391,4 @@ ShaderProgram Camera::GetNormalShader()
 
 	return mShaders[2];//normals shader
 }
-
-
-
-
 

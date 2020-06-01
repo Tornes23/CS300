@@ -63,14 +63,14 @@ if is active or not
 *
 **************************************************************************/
 GameObject::GameObject(glm::vec3 position, glm::vec3 scale, const char* name, Model::Shape shape
-						, std::string textureFile,  bool active, glm::vec3 up) : mMaterial(textureFile), mModel(shape)
+						, std::string textureFile,  bool active, glm::vec3 up, glm::vec3 forward) : mMaterial(textureFile), mModel(shape)
 {
 #pragma region INITIALIZING THE VARIABLES
 	mPosition = position;
 	mScale = scale;
 	mName = name;
 
-	mForward = glm::vec3(1, 0, 0);
+	mForward = forward;
 	mUp = up;
 	mRight = glm::cross(mUp, mForward);
 
@@ -123,9 +123,9 @@ glm::mat4x4 GameObject::GenerateOrthogonal()
 	//Creating the matrix
 	mOrthogonal = glm::mat4x4(
 
-		mForward.x, mForward.y, mForward.z, 0,
+		mRight.x, mRight.y, mRight.z, 0,
 		mUp.x,      mUp.y,      mUp.z,      0,
-	   -mRight.x,  -mRight.y,  -mRight.z,   0,
+	    mForward.x,  mForward.y, mForward.z,   0,
 		0, 0, 0, 1
 	);
 
@@ -222,7 +222,7 @@ glm::mat4x4 GameObject::GenerateAxisAngleMetod(Axis rotationAxis, float amount)
 	}
 
 	//if we are rotating around Y axis of the object
-	if (rotationAxis == Axis::Z)
+	if (rotationAxis == Axis::Y)
 	{
 		//computing the angle of rotation
 		float angle = glm::pi<float>() / 180 * amount;
@@ -262,7 +262,7 @@ glm::mat4x4 GameObject::GenerateAxisAngleMetod(Axis rotationAxis, float amount)
 	}
 
 	//if we are rotating around Z axis of the object
-	if (rotationAxis == Axis::Y)
+	if (rotationAxis == Axis::Z)
 	{
 		//computing the angle of rotation
 		float angle = glm::pi<float>() / 180 * amount;

@@ -83,10 +83,10 @@ Returns the game Object
 
 *
 **************************************************************************/
-GameObject* GameObjectManager::CreateObject(glm::vec3 position, glm::vec3 scale, const char * name, Model::Shape shape, bool active, glm::vec3 up, std::string textureName)
+GameObject* GameObjectManager::CreateObject(glm::vec3 position, glm::vec3 scale, const char * name, Model::Shape shape, bool active, glm::vec3 up, glm::vec3 forward, std::string textureName)
 {
 	//creating a object with the values and returning it
-	return new GameObject(position, scale, name, shape, textureName, active, up);
+	return new GameObject(position, scale, name, shape, textureName, active, up, forward);
 }
 
 /**************************************************************************
@@ -115,43 +115,10 @@ void GameObjectManager::Update()
 
 #pragma region GAME OBJECT ROTATIONS
 
-#pragma region ROTATION AROUND X
-	if (KeyDown(Q))
-	{
-		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::X, 1.0F);
-
-		temp = glm::vec4(obj->mForward, 1.0F);
-
-		obj->mForward = axis_angle * temp;
-		obj->mForward = glm::normalize(obj->mForward);
-
-		temp = glm::vec4(obj->mUp, 1.0F);
-
-		obj->mUp = axis_angle * temp;
-		obj->mUp = glm::normalize(obj->mUp);
-	}
-
-	if (KeyDown(E))
-	{
-
-		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::X, -1.0F);
-
-		temp = glm::vec4(obj->mForward, 1.0F);
-
-		obj->mForward = axis_angle * temp;
-		obj->mForward = glm::normalize(obj->mForward);
-
-		temp = glm::vec4(obj->mUp, 1.0F);
-
-		obj->mUp = axis_angle * temp;
-		obj->mUp = glm::normalize(obj->mUp);
-	}
-#pragma endregion
-
 #pragma region ROTATION AROUND Y
 	if (KeyDown(Left))
 	{
-		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::Z, 1.0F);
+		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::Y, 1.0F);
 
 		temp = glm::vec4(obj->mForward, 1.0F);
 
@@ -166,7 +133,7 @@ void GameObjectManager::Update()
 
 	if (KeyDown(Right))
 	{
-		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::Z, -1.0F);
+		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::Y, -1.0F);
 
 		temp = glm::vec4(obj->mForward, 1.0F);
 
@@ -181,10 +148,10 @@ void GameObjectManager::Update()
 	}
 #pragma endregion
 
-#pragma region ROTATION AROUND Z
+#pragma region ROTATION AROUND X
 	if (KeyDown(Up))
 	{
-		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::Y, 1.0F);
+		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::X, 1.0F);
 
 		temp = glm::vec4(obj->mUp, 1.0F);
 
@@ -199,7 +166,7 @@ void GameObjectManager::Update()
 
 	if (KeyDown(Down))
 	{
-		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::Y, -1.0F);
+		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::X, -1.0F);
 
 		temp = glm::vec4(obj->mUp, 1.0F);
 
