@@ -154,6 +154,12 @@ void Window::SetQuit(bool close)
 	mQuit = close;
 }
 
+void Window::SwapBuffers()
+{
+	//swapping the front and back buffers
+	SDL_GL_SwapWindow(mWindow);
+}
+
 /**************************************************************************
 *!
 \fn     Window::DeleteContext

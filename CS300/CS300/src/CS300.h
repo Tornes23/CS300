@@ -20,7 +20,9 @@ necessary includes in the assignment
 #include <GL/glew.h>
 #include <GL/GL.h>
 #include <SDL2/SDL.h>
+#include <IMGUI/imgui.h>
 
+#include "Editor/Editor.h"
 #include "Camera/Camera.h"
 #include "GameObject/GameObject.h"
 #include "GLDebug/OGLDebug.h"

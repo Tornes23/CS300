@@ -51,6 +51,7 @@ public:
 	SDL_Window* GetSDLWindow() const;
 	SDL_GLContext GetContext() const;
 	void SetQuit(bool close);
+	void SwapBuffers();
 
 private:
 	//the necessary member variables

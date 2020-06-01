@@ -52,6 +52,12 @@
     <Filter Include="Source Files\Light">
       <UniqueIdentifier>{70a99ec5-42c1-4cf7-8aa8-3564b2ec4c43}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Editor">
+      <UniqueIdentifier>{66ae13c7-02c9-49ed-9435-5c54bc0bcdd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Editor\ImGUI">
+      <UniqueIdentifier>{4bf83fba-6e70-4978-8603-7c215aaea102}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -96,6 +102,27 @@
     <ClCompile Include="src\Material\Material.cpp">
       <Filter>Source Files\Material</Filter>
     </ClCompile>
+    <ClCompile Include="src\Editor\Editor.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\IMGUI\imgui.cpp">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\IMGUI\imgui_demo.cpp">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\IMGUI\imgui_draw.cpp">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\IMGUI\imgui_impl_opengl3.cpp">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\IMGUI\imgui_impl_sdl.cpp">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\IMGUI\imgui_widgets.cpp">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera\Camera.h">
@@ -139,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="src\Light\Light.h">
       <Filter>Source Files\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Editor\Editor.h">
+      <Filter>Source Files\Editor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

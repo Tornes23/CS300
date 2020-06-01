@@ -44,7 +44,7 @@ class Camera
 public:
 
 	Camera();
-	void Render(Window& target, std::vector<GameObject*>& objects);
+	void Render(std::vector<GameObject*>& objects);
 	void Update();
 	void DrawTriangle(GameObject* target);
 	void DrawNormals(GameObject* target);

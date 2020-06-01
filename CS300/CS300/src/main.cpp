@@ -28,6 +28,8 @@ int main()
 	Utils::InitSDL();
 
 	Window myWindow;
+	Editor myEditor(myWindow.GetSDLWindow(), myWindow.GetContext());
+
 	GameObjectManager myManager;
 	Camera myCamera;
 
@@ -47,14 +49,20 @@ int main()
 	myCamera.AddShader("./src/Shader/programs/Normals.vs"       , "./src/Shader/programs/Normals.fs"       );
 	myCamera.AddShader("./src/Shader/programs/NormalsAverage.vs", "./src/Shader/programs/NormalsAverage.fs");
 
+	bool demo = true;
+
 	while (!myWindow.IsClosed())
 	{
+		myEditor.StartFrame();
+
 		InputManager.StartFrame();
 
 		SDL_Event event;
 
 		while (SDL_PollEvent(&event))
 		{
+			myEditor.HandleEvent(&event);
+
 			switch (event.type)
 			{
 			case SDL_QUIT:
@@ -66,13 +74,18 @@ int main()
 			}
 		}
 
+		ImGui::ShowDemoWindow(&demo);
+
 		myWindow.Update();
 		myManager.Update();
 		myCamera.Update();
 
 		myWindow.Clear();
 		
-		myCamera.Render(myWindow ,myManager.mAllObjects);
+		myCamera.Render(myManager.mAllObjects);
+		myEditor.Render();
+		myWindow.SwapBuffers();
+
 
 	}
 

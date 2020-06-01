@@ -84,7 +84,7 @@ The game objects to render
 
 *
 **************************************************************************/
-void Camera::Render(Window& target, std::vector<GameObject*>& objects)
+void Camera::Render(std::vector<GameObject*>& objects)
 {
 	GLenum error = glGetError();
 	//getting the shader which will be used
@@ -146,9 +146,6 @@ void Camera::Render(Window& target, std::vector<GameObject*>& objects)
 	//unbinding the VAOs
 	glBindVertexArray(0);
 	glUseProgram(0);
-
-	//swapping the front and back buffers
-	SDL_GL_SwapWindow(target.GetSDLWindow());
 }
 
 /**************************************************************************
