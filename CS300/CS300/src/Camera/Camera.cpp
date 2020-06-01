@@ -88,13 +88,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 {
 	GLenum error = glGetError();
 	//getting the shader which will be used
-	ShaderProgram currentShader = GetShader();
-
-	currentShader.Use();
-
-	//Setting the matrix uniforms
-	currentShader.SetUniform("view", glm::value_ptr(mCameraMatrix));
-	currentShader.SetUniform("projection", glm::value_ptr(mPerspective));
+	
 
 	//for each object
 	for (unsigned i = 0; i < objects.size(); i++)
@@ -102,6 +96,14 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		//if is not active skip it
 		if (!(objects[i]->mActive))
 			continue;
+
+		ShaderProgram currentShader = GetShader();
+
+		currentShader.Use();
+
+		//Setting the matrix uniforms
+		currentShader.SetUniform("view", glm::value_ptr(mCameraMatrix));
+		currentShader.SetUniform("projection", glm::value_ptr(mPerspective));
 
 		//generate the model to world of the object
 		glm::mat4x4 m2w_object = objects[i]->GenerateM2W();
