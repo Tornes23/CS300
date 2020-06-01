@@ -56,7 +56,7 @@ Camera::Camera(glm::vec3 direction)
 	ComputeVectors();
 	mNear = 0.1F;
 	mFar = 100.0F;
-	mRadius = 50.0F;
+	mRadius = 25.0F;
 
 	mWireframe = false;
 	mRenderNormals = false;
@@ -267,9 +267,9 @@ void Camera::ApplyLight(GameObject * target)
 
 void Camera::ComputeVectors()
 {
-	float posX = sinf(glm::radians(mRotations.x)) * mRadius;
-	float posY = sinf(glm::radians(mRotations.y)) * mRadius;
-	float posZ = cosf(glm::radians(mRotations.z)) * mRadius;
+	float posX = (mRadius * cosf(glm::radians(mRotations.y))) * sinf(glm::radians(mRotations.x));
+	float posY = (mRadius * sinf(glm::radians(mRotations.y)));
+	float posZ = (mRadius * cosf(glm::radians(mRotations.y))) * cosf(glm::radians(mRotations.x));
 
 	mPosition = glm::vec3(posX, posY, posZ);
 }

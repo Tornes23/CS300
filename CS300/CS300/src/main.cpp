@@ -24,7 +24,7 @@ The functions included are:
 
 #undef main
 int main()
-{
+ {
 	Utils::InitSDL();
 	InputManager.Initialize();
 
@@ -32,17 +32,17 @@ int main()
 	Editor myEditor(myWindow.GetSDLWindow(), myWindow.GetContext());
 
 	GameObjectManager myManager;
-	Camera myCamera(glm::vec3(0, 0, 25));
+	Camera myCamera(glm::vec3(0, 0, 10));
 
 	Utils::InitGL(&myWindow);
 
 	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(50, 50, 1), "Floor", Model::Shape::Plane, true, glm::vec3(0, 0, 1), glm::vec3(0, 1, 0)));
 
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  25),  glm::vec3(10, 10, 10),  "Plane",    Model::Shape::Plane, true));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  25),  glm::vec3(10, 10, 10),  "Cube",     Model::Shape::Cube));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  25),  glm::vec3(5,  10,  5),  "Cone",     Model::Shape::Cone));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  25),  glm::vec3(5,  10,  5),  "Cylinder", Model::Shape::Cylinder));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  25),  glm::vec3(10, 10, 10),  "Sphere",   Model::Shape::Sphere));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Plane",    Model::Shape::Plane, true));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cube",     Model::Shape::Cube));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(5,  10,  5),  "Cone",     Model::Shape::Cone));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(5,  10,  5),  "Cylinder", Model::Shape::Cylinder));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Sphere",   Model::Shape::Sphere));
 
 	myCamera.AddShader("./src/Shader/programs/Texture.vs"       , "./src/Shader/programs/Texture.fs"       );
 	myCamera.AddShader("./src/Shader/programs/Mapping.vs"       , "./src/Shader/programs/Mapping.fs"       );
