@@ -23,6 +23,10 @@ The functions included are:
 - void Model::CreateCube();
 - void Model::CreatePlane();
 - void Model::BindBuffers();
+- void Model::BindModelBuffer();
+- void Model::BindNormalBuffer();
+- void Model::BindAverageBuffer();
+- void Model::GenBuffers();
 - void Model::FreeBuffers();
 - GLsizei Model::GetDrawElements() const;
 - GLsizei Model::GetNormalCount() const;
@@ -65,7 +69,11 @@ public:
 	void ComputeAverage();
 
 	void BindBuffers();
+	void BindNormalBuffer();
+	void BindAverageBuffer();
+	void BindModelBuffer();
 	void FreeBuffers();
+	void GenBuffers();
 
 	GLsizei GetDrawElements() const;
 	GLsizei GetNormalCount(bool average) const;

@@ -23,6 +23,10 @@ The functions included are:
 - void Model::CreateCube();
 - void Model::CreatePlane();
 - void Model::BindBuffers();
+- void Model::BindModelBuffer();
+- void Model::BindNormalBuffer();
+- void Model::BindAverageBuffer();
+- void Model::GenBuffers();
 - void Model::FreeBuffers();
 - GLsizei Model::GetDrawElements() const;
 - GLsizei Model::GetNormalCount() const;
@@ -788,58 +792,100 @@ Binds the VBO and VAO buffers of the model
 **************************************************************************/
 void Model::BindBuffers()
 {
-	//generating the VAO and VBO buffers
-	glGenVertexArrays(3, mVAO);
-	glGenBuffers(5, mVBO);
+	GenBuffers();
 
-	for (int i = 0; i < 3; i++)
+	BindModelBuffer();
+
+	BindNormalBuffer();
+
+	BindAverageBuffer();
+
+}
+
+/**************************************************************************
+*!
+\fn     Model::BindNormalBuffer
+
+\brief
+Binds the VBO and VAO buffers of the normals
+
+*
+**************************************************************************/
+void Model::BindNormalBuffer()
+{
+	glBindVertexArray(mVAO[1]);
+
+	//addign normals
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[3]);
+	glBufferData(GL_ARRAY_BUFFER, mNormals.size() * sizeof(glm::vec3), &mNormals[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	// Unbind the VAO
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(mVAO[1]);
+}
+
+/**************************************************************************
+*!
+\fn     Model::BindAverageBuffer
+
+\brief
+Binds the VBO and VAO buffers of the averaged normals
+
+*
+**************************************************************************/
+void Model::BindAverageBuffer()
+{
+	glBindVertexArray(mVAO[2]);
+
+	//addign average normals
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[4]);
+	glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	// Unbind the VAO
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(mVAO[2]);
+}
+
+/**************************************************************************
+*!
+\fn     Model::BindModelBuffer
+
+\brief
+Binds the VBO and VAO buffers of the model
+
+*
+**************************************************************************/
+void Model::BindModelBuffer()
+{
+	//binding the VAo
+	glBindVertexArray(mVAO[0]);
+
+	//addign pos
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3), &mVertices[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	//adding textureCoords
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, mTextureCoords.size() * sizeof(glm::vec2), &mTextureCoords[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+
+	if (mIndexed)
 	{
-		//binding the VAo
-		glBindVertexArray(mVAO[i]);
-
-		if (i == 0)
-		{
-			//addign pos
-			glBindBuffer(GL_ARRAY_BUFFER, mVBO[0]);
-			glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3), &mVertices[0].x, GL_STATIC_DRAW);
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-			//adding textureCoords
-			glBindBuffer(GL_ARRAY_BUFFER, mVBO[1]);
-			glBufferData(GL_ARRAY_BUFFER, mTextureCoords.size() * sizeof(glm::vec2), &mTextureCoords[0].x, GL_STATIC_DRAW);
-			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
-
-			if (mIndexed)
-			{
-				//adding triangle indexes
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[2]);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
-			}
-		}
-		else if(i == 1)
-		{
-			//addign pos
-			glBindBuffer(GL_ARRAY_BUFFER, mVBO[3]);
-			glBufferData(GL_ARRAY_BUFFER, mNormals.size() * sizeof(glm::vec3), &mNormals[0].x, GL_STATIC_DRAW);
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-		}
-		else
-		{
-			//addign pos
-			glBindBuffer(GL_ARRAY_BUFFER, mVBO[4]);
-			glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-		}
-
-		// Unbind the VAO
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(mVAO[i]);
+		//adding triangle indexes
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[2]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
 	}
 
+	// Unbind the VAO
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(mVAO[0]);
 }
 
 /**************************************************************************
@@ -864,6 +910,13 @@ void Model::FreeBuffers()
 	mTextureCoords.clear();
 	mIndexes.clear();
 	mNormalsPerFace.clear();
+}
+
+void Model::GenBuffers()
+{
+	//generating the VAO and VBO buffers
+	glGenVertexArrays(3, mVAO);
+	glGenBuffers(5, mVBO);
 }
 
 /**************************************************************************
