@@ -21,6 +21,7 @@ The functions included are:
 
 
 #include "Color.h"
+#include <IMGUI/imgui.h>
 
 //setting the static variables
 Color Color::White  = Color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -99,4 +100,19 @@ Color::Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 	mB = b;
 	mA = a;
 }
+
+void Color::SetColor(glm::vec4& color)
+{
+	mR = static_cast<unsigned char>(color.r);
+	mG = static_cast<unsigned char>(color.g);
+	mB = static_cast<unsigned char>(color.b);
+	mA = static_cast<unsigned char>(color.a);
+}
+
+glm::ivec4 Color::GetColor()
+{
+	return glm::ivec4(mR, mG, mB, mA);
+}
+
+
 

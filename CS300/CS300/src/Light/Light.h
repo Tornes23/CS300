@@ -22,7 +22,9 @@ public:
 	const Color GetDiffuse() const;
 	const Color GetSpecular() const;
 
-	const LightType GetType() const;
+LightType GetType() const;
+
+	void Edit();
 
 private:
 	LightType mType;

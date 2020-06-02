@@ -38,7 +38,11 @@ const Color Light::GetSpecular() const
 	return mSpecularColor;
 }
 
-const Light::LightType Light::GetType() const
+Light::LightType Light::GetType() const
 {
 	return mType;
+}
+
+void Light::Edit()
+{
 }

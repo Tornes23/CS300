@@ -41,6 +41,7 @@ class GameObjectManager
 		GameObject* CreateObject(glm::vec3 position, glm::vec3 scale, const char* name = "Box", Model::Shape shape = Model::Shape::Cube,
 							     bool active = false, glm::vec3 up = glm::vec3(0,1,0), glm::vec3 forward = glm::vec3(0, 0, 1), std::string textureName = "./src/Texture/resources/default.png");
 		void Update();
+		void EditObj(GameObject* obj);
 		GameObject* FindObject(const char* name = "Box");
 		GameObject* FindActiveObject();
 		~GameObjectManager();

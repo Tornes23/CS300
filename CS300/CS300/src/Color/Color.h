@@ -19,6 +19,7 @@ The functions included are:
 
 ***************************************************************************/
 #pragma once
+#include <GLM/vec4.hpp>
 
 class Color
 {
@@ -37,6 +38,9 @@ public:
 	static Color Cyan;
 	static Color Pink;
 	static Color Yellow;
+
+	void SetColor(glm::vec4& color);
+	glm::ivec4 GetColor();
 
 private:
 

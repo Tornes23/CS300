@@ -36,12 +36,12 @@ const Color Material::GetSpecular() const
 	return mSpecularColor;
 }
 
-const float Material::GetShininess() const
+float Material::GetShininess() const
 {
 	return mShininess;
 }
 
-const float Material::GetAmbient() const
+float Material::GetAmbient() const
 {
 	return mAmbientCof;
 }

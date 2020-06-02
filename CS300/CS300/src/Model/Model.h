@@ -50,11 +50,11 @@ class Model
 public:
 
 	enum Shape {
+		Plane,
 		Cube,
-		Cylinder,
 		Cone,
-		Sphere,
-		Plane
+		Cylinder,
+		Sphere
 	};
 
 	Model(Shape form = Cube, int precision = 9);
@@ -81,6 +81,8 @@ public:
 
 	const GLuint GetVAO() const;
 	const GLuint GetNormalVAO(bool average) const;
+	Shape GetShape() const;
+	void SetShape(Shape shape);
 
 private:
 

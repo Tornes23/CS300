@@ -13,10 +13,8 @@ public:
 	const Color GetDiffuse() const;
 	const Color GetSpecular() const;
 
-	const float GetShininess() const;
-	const float GetAmbient() const;
-
-private:
+	float GetShininess() const;
+	float GetAmbient() const;
 
 	Texture mTexture;
 

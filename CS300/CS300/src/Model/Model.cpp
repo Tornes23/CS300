@@ -991,5 +991,43 @@ const GLuint Model::GetNormalVAO(bool average) const
 	return mVAO[1];
 }
 
+Model::Shape Model::GetShape() const
+{
+	return mShape;
+}
+
+void Model::SetShape(Shape shape)
+{
+	mShape = shape;
+
+	FreeBuffers();
+
+	switch (mShape)
+	{
+	case Model::Cube:
+		mIndexed = false;
+		CreateCube();
+		break;
+	case Model::Cylinder:
+		mIndexed = false;
+		CreateCylinder(mPrecision);
+		break;
+	case Model::Cone:
+		mIndexed = false;
+		CreateCone(mPrecision);
+		break;
+	case Model::Sphere:
+		mIndexed = true;
+		CreateSphere(mPrecision);
+		break;
+	case Model::Plane:
+		mIndexed = true;
+		CreatePlane();
+		break;
+	default:
+		break;
+	}
+}
+
 
 

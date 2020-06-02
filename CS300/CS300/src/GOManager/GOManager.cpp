@@ -27,6 +27,8 @@ The functions included are:
 
 #include "GOManager.h"
 #include "../Input/Input.h"
+#include <GLM/gtc/type_ptr.hpp>
+#include <IMGUI/imgui.h>
 
 /**************************************************************************
 *!
@@ -217,11 +219,84 @@ void GameObjectManager::Update()
 
 #pragma endregion
 
+	EditObj(obj);
+
 	//calling update for each object
 	for (unsigned i = 0; i < mObjects.size(); i++)
 	{
 		mObjects[i]->Update();
 	}
+}
+
+void GameObjectManager::EditObj(GameObject* obj)
+{
+	if (!ImGui::Begin("Game Object"))
+	{
+		// Early out if the window is collapsed, as an optimization.
+		ImGui::End();
+		return;
+	}
+
+	char* tempName = (char*)obj->mName.c_str();
+
+	ImGui::InputText("Name", tempName, IM_ARRAYSIZE(tempName));
+
+	if (ImGui::TreeNode("Transform"))
+	{
+		ImGui::DragFloat3("Position", glm::value_ptr(obj->mPosition));
+		ImGui::DragFloat3("Scale", glm::value_ptr(obj->mScale));
+
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Model"))
+	{
+		int shape = obj->mModel.GetShape();
+
+		const char* model[5] = { "Plane","Cube", "Cone", "Cylinder", "Sphere" };
+
+		if (ImGui::Combo("Shape", &shape, model, 5, 6)) {
+			switch (shape)
+			{
+			case 0:
+				obj->mModel.SetShape(Model::Shape::Plane);
+				break;
+			case 1:
+				obj->mModel.SetShape(Model::Shape::Cube);
+				break;
+			case 2:
+				obj->mModel.SetShape(Model::Shape::Cone);
+				break;
+			case 3:
+				obj->mModel.SetShape(Model::Shape::Cylinder);
+				break;
+			case 4:
+				obj->mModel.SetShape(Model::Shape::Sphere);
+				break;
+			}
+		}
+
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Material"))
+	{
+		ImGui::DragFloat("Shininess", &obj->mMaterial.mShininess);
+		ImGui::DragFloat("Ambient Coeficient", &obj->mMaterial.mAmbientCof);
+
+		glm::vec4 diffuse = obj->mMaterial.mDiffuseColor.GetColor();
+		glm::vec4 specular = obj->mMaterial.mSpecularColor.GetColor();
+
+		ImGui::ColorEdit4("Diffuse Color", glm::value_ptr(diffuse));
+		ImGui::ColorEdit4("Specular Color", glm::value_ptr(specular));
+
+		obj->mMaterial.mDiffuseColor.SetColor(diffuse);
+		obj->mMaterial.mSpecularColor.SetColor(specular);
+
+		ImGui::TreePop();
+	}
+	
+	ImGui::End();
 }
 
 /**************************************************************************

@@ -49,8 +49,6 @@ int main()
 	myCamera.AddShader("./src/Shader/programs/Normals.vs"       , "./src/Shader/programs/Normals.fs"       );
 	myCamera.AddShader("./src/Shader/programs/NormalsAverage.vs", "./src/Shader/programs/NormalsAverage.fs");
 
-	bool demo = true;
-
 	while (!myWindow.IsClosed())
 	{
 		myEditor.StartFrame();
@@ -73,8 +71,6 @@ int main()
 				InputManager.HandleKeyEvent(event);
 			}
 		}
-
-		ImGui::ShowDemoWindow(&demo);
 
 		myWindow.Update();
 		myManager.Update();
