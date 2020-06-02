@@ -48,8 +48,11 @@ public:
 
 	const GLuint GetUniformLoc(const std::string& name) const;
 
-	void SetUniform(const std::string& name, int value);
-	void SetUniform(const std::string& name, float* values);
+	void SetIntUniform(const std::string& name, int value);
+	void SetFloatUniform(const std::string& name, float value);
+	void SetMatUniform(const std::string& name, float* values);
+	void SetVec3Uniform(const std::string& name, float* values);
+	void SetVec4Uniform(const std::string& name, float* values);
 
 	void Use();
 

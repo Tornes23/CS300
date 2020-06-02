@@ -143,7 +143,7 @@ the value to be set to the uniform
 
 *
 **************************************************************************/
-void ShaderProgram::SetUniform(const std::string & name, int value)
+void ShaderProgram::SetIntUniform(const std::string & name, int value)
 {
 	//getting the location of the uniform
 	GLuint location = GetUniformLoc(name);
@@ -164,6 +164,37 @@ void ShaderProgram::SetUniform(const std::string & name, int value)
 \fn     ShaderProgram::SetUniform
 
 \brief
+Sets a uniform variable
+
+\param  const std::string & name
+the name of the uniform
+
+\param  int value
+the value to be set to the uniform
+
+*
+**************************************************************************/
+void ShaderProgram::SetFloatUniform(const std::string & name, float value)
+{
+	//getting the location of the uniform
+	GLuint location = GetUniformLoc(name);
+
+	//if it was found
+	if (location < 0)
+	{
+		std::cout << "Uniform: " << name << " not found" << std::endl;
+		return;
+	}
+
+	//setting the value
+	glUniform1f(location, value);
+}
+
+/**************************************************************************
+*!
+\fn     ShaderProgram::SetUniform
+
+\brief
 Sets a uniform matrtix variable
 
 \param  const std::string & name
@@ -174,7 +205,7 @@ the name of the uniform
 
 *
 **************************************************************************/
-void ShaderProgram::SetUniform(const std::string & name, float * values)
+void ShaderProgram::SetMatUniform(const std::string & name, float * values)
 {
 	//getting the location of the uniform
 	GLuint location = GetUniformLoc(name);
@@ -189,6 +220,70 @@ void ShaderProgram::SetUniform(const std::string & name, float * values)
 	//setting the value
 	glUniformMatrix4fv(location, 1, GL_FALSE, values);
 	
+}
+
+/**************************************************************************
+*!
+\fn     ShaderProgram::SetUniform
+
+\brief
+Sets a uniform matrtix variable
+
+\param  const std::string & name
+the name of the uniform
+
+\param  float * values
+ array of floats to set to the uniform matrix
+
+*
+**************************************************************************/
+void ShaderProgram::SetVec3Uniform(const std::string & name, float * values)
+{
+	//getting the location of the uniform
+	GLuint location = GetUniformLoc(name);
+
+	//if it was found
+	if (location < 0)
+	{
+		std::cout << "Uniform: " << name << " not found" << std::endl;
+		return;
+	}
+
+	//setting the value
+	glUniform3fv(location, 1, values);
+
+}
+
+/**************************************************************************
+*!
+\fn     ShaderProgram::SetUniform
+
+\brief
+Sets a uniform matrtix variable
+
+\param  const std::string & name
+the name of the uniform
+
+\param  float * values
+ array of floats to set to the uniform matrix
+
+*
+**************************************************************************/
+void ShaderProgram::SetVec4Uniform(const std::string & name, float * values)
+{
+	//getting the location of the uniform
+	GLuint location = GetUniformLoc(name);
+
+	//if it was found
+	if (location < 0)
+	{
+		std::cout << "Uniform: " << name << " not found" << std::endl;
+		return;
+	}
+
+	//setting the value
+	glUniform4fv(location, 1, values);
+
 }
 
 void ShaderProgram::Use()

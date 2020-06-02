@@ -64,6 +64,8 @@ Camera::Camera(glm::vec3 direction)
 	mTextureMapping = false;
 	mLighting = false;
 
+	AddAllShaders();
+	AddAllLights();
 }
 
 /**************************************************************************
@@ -95,21 +97,25 @@ void Camera::Render(std::vector<GameObject*>& objects)
 			continue;
 
 		ShaderProgram currentShader = GetShader();
+		//Light lightSource;
 
 		currentShader.Use();
 
+		//if (mLighting)
+		//	lightSource = GetLight();
+
 		//Setting the matrix uniforms
-		currentShader.SetUniform("view", glm::value_ptr(mCameraMatrix));
-		currentShader.SetUniform("projection", glm::value_ptr(mPerspective));
+		currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
+		currentShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
 
 		//generate the model to world of the object
 		glm::mat4x4 m2w_object = objects[i]->GenerateM2W();
 
 		//setting the uniform matrix
-		currentShader.SetUniform("m2w", glm::value_ptr(m2w_object));
+		currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
 
 		//setting the texture of the object as active
-		objects[i]->mMaterial.GetTexture().SetActiveTexture();
+		objects[i]->mMaterial.SetUniforms(&currentShader);
 
 		//if wireframe is on change the render mode
 		if (!mWireframe)//if wireframe is not togled on
@@ -129,9 +135,9 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 			glm::mat4x4 m2w_normal = objects[i]->GenerateNormalTransform();
 
-			currentShader.SetUniform("m2w", glm::value_ptr(m2w_normal));
-			currentShader.SetUniform("view", glm::value_ptr(mCameraMatrix));
-			currentShader.SetUniform("projection", glm::value_ptr(mPerspective));
+			currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_normal));
+			currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
+			currentShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
 
 			DrawNormals(objects[i]);
 		}
@@ -274,6 +280,24 @@ void Camera::ComputeVectors()
 	mPosition = glm::vec3(posX, posY, posZ);
 }
 
+void Camera::AddAllShaders()
+{
+	AddShader("./src/Shader/programs/Texture.vs"          , "./src/Shader/programs/Texture.fs"        );
+	AddShader("./src/Shader/programs/Mapping.vs"          , "./src/Shader/programs/Mapping.fs"        );
+	AddShader("./src/Shader/programs/LightingTexture.vs"  , "./src/Shader/programs/LightingTexture.fs");
+	AddShader("./src/Shader/programs/LightingColor.vs"    , "./src/Shader/programs/LightingColor.fs"  );
+	AddShader("./src/Shader/programs/Mapping.vs"          , "./src/Shader/programs/Mapping.fs"        );
+	AddShader("./src/Shader/programs/Normals.vs"          , "./src/Shader/programs/Normals.fs"        );
+	AddShader("./src/Shader/programs/NormalsAverage.vs"   , "./src/Shader/programs/NormalsAverage.fs" );
+}
+
+void Camera::AddAllLights()
+{
+	mLights.push_back(Light::LightType::Point);
+	mLights.push_back(Light::LightType::Directional);
+	mLights.push_back(Light::LightType::Spotlight);
+}
+
 /**************************************************************************
 *!
 \fn     Camera::CreatePerspective
@@ -355,11 +379,17 @@ ShaderProgram Camera::GetShader()
 	//if texture mapping is on
 	if (mTextureMapping)
 	{
+		if (mLighting)
+			return mShaders[5];
+
 		//return the shader that renders colors based on UV coords
 		return mShaders[1];
 	}
 	else
 	{
+		if (mLighting)
+			return mShaders[4];
+
 		//return the shader that renders the texture
 		return mShaders[0];
 	}
@@ -390,5 +420,25 @@ ShaderProgram Camera::GetNormalShader()
 	}
 
 	return mShaders[2];//normals shader
+}
+
+const Light Camera::GetLight(Light::LightType mode) const
+{
+	switch (mode)
+	{
+	case Light::Point:
+		return mLights[0];
+		break;
+	case Light::Directional:
+		return mLights[1];
+		break;
+	case Light::Spotlight:
+		return mLights[2];
+		break;
+	default:
+		break;
+	}
+
+	return mLights[0];
 }
 

@@ -2,6 +2,8 @@
 #include <GLM/vec3.hpp>
 #include "../Color/Color.h"
 
+class ShaderProgram;
+
 class Light
 {
 public:
@@ -13,10 +15,12 @@ public:
 		Spotlight
 	};
 
-	Light(glm::vec3 position = glm::vec3(0,0,0), glm::vec3 direction = glm::vec3(0, 0, 1), Color ambient = Color::White, Color diffuse = Color::White, Color specular = Color::White, LightType type = LightType::Point);
+	Light(LightType type = LightType::Point, glm::vec3 position = glm::vec3(10,0,12.5), glm::vec3 direction = glm::vec3(0, 0, 0), Color ambient = Color::White, Color diffuse = Color::White, Color specular = Color::White);
 
 	const glm::vec3 GetPosition() const;
 	const glm::vec3 GetDirection() const;
+
+	void Setuniforms(ShaderProgram* shader);
 
 	const Color GetAmbient() const;
 	const Color GetDiffuse() const;

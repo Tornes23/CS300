@@ -58,6 +58,30 @@
     <Filter Include="Source Files\Editor\ImGUI">
       <UniqueIdentifier>{4bf83fba-6e70-4978-8603-7c215aaea102}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shader\Programs">
+      <UniqueIdentifier>{65f1a47f-6b48-4fbb-b27e-935ab95eeeac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shader\Programs\Texture Rending">
+      <UniqueIdentifier>{87d23878-cad8-4d39-b065-34dcca3a53bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shader\Programs\Texture Rending\Color Mapping">
+      <UniqueIdentifier>{ced66369-c0d1-43b2-b679-385a0f5166c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shader\Programs\Texture Rending\Light">
+      <UniqueIdentifier>{b131e20e-b1ac-4f3b-9728-497096238670}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shader\Programs\Texture Rending\Light\Light&amp;Texture">
+      <UniqueIdentifier>{0e24a323-9122-40d2-a33c-577abf0cce37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shader\Programs\Texture Rending\Light\Light&amp;Color">
+      <UniqueIdentifier>{e881e100-e21b-4012-a15d-1c9a125dd3e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shader\Programs\Normals">
+      <UniqueIdentifier>{aadd3463-5f70-4af7-aba6-07a334c87214}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shader\Programs\Normals\Average">
+      <UniqueIdentifier>{a8f9d983-af4d-416e-bf5f-d8a6e690897c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -170,5 +194,49 @@
     <ClInclude Include="src\Editor\Editor.h">
       <Filter>Source Files\Editor</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Shader\programs\defaultFrag.fs">
+      <Filter>Source Files\Shader\Programs</Filter>
+    </None>
+    <None Include="src\Shader\programs\defaultVert.vs">
+      <Filter>Source Files\Shader\Programs</Filter>
+    </None>
+    <None Include="src\Shader\programs\Texture.fs">
+      <Filter>Source Files\Shader\Programs\Texture Rending</Filter>
+    </None>
+    <None Include="src\Shader\programs\Texture.vs">
+      <Filter>Source Files\Shader\Programs\Texture Rending</Filter>
+    </None>
+    <None Include="src\Shader\programs\Mapping.fs">
+      <Filter>Source Files\Shader\Programs\Texture Rending\Color Mapping</Filter>
+    </None>
+    <None Include="src\Shader\programs\Mapping.vs">
+      <Filter>Source Files\Shader\Programs\Texture Rending\Color Mapping</Filter>
+    </None>
+    <None Include="src\Shader\programs\LightingTexture.vs">
+      <Filter>Source Files\Shader\Programs\Texture Rending\Light\Light&amp;Texture</Filter>
+    </None>
+    <None Include="src\Shader\programs\LightingTexture.fs">
+      <Filter>Source Files\Shader\Programs\Texture Rending\Light\Light&amp;Texture</Filter>
+    </None>
+    <None Include="src\Shader\programs\NormalsAverage.vs">
+      <Filter>Source Files\Shader\Programs\Normals\Average</Filter>
+    </None>
+    <None Include="src\Shader\programs\NormalsAverage.fs">
+      <Filter>Source Files\Shader\Programs\Normals\Average</Filter>
+    </None>
+    <None Include="src\Shader\programs\Normals.vs">
+      <Filter>Source Files\Shader\Programs\Normals</Filter>
+    </None>
+    <None Include="src\Shader\programs\Normals.fs">
+      <Filter>Source Files\Shader\Programs\Normals</Filter>
+    </None>
+    <None Include="src\Shader\programs\LightingColor.fs">
+      <Filter>Source Files\Shader\Programs\Texture Rending\Light\Light&amp;Color</Filter>
+    </None>
+    <None Include="src\Shader\programs\LightingColor.vs">
+      <Filter>Source Files\Shader\Programs\Texture Rending\Light\Light&amp;Color</Filter>
+    </None>
   </ItemGroup>
 </Project>

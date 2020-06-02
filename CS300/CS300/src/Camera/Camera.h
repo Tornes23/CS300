@@ -50,6 +50,8 @@ public:
 	void DrawNormals(GameObject* target);
 	void ApplyLight(GameObject* target);
 	void ComputeVectors();
+	void AddAllShaders();
+	void AddAllLights();
 
 	glm::mat4x4 CreatePerspective();
 	glm::mat4x4 CreateCameraMat();
@@ -57,6 +59,8 @@ public:
 	void AddShader(const std::string& vertex, const std::string& fragment);
 	ShaderProgram GetShader();
 	ShaderProgram GetNormalShader();
+
+	const Light GetLight(Light::LightType mode) const;
 
 private:
 
@@ -82,6 +86,8 @@ private:
 	float mRadius;
 
 	glm::vec3 mRotations;
+
+	Light::LightType mLightMode;
 
 	std::vector<ShaderProgram> mShaders;
 	std::vector<Light> mLights;

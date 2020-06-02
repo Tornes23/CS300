@@ -113,6 +113,22 @@
     <ClInclude Include="src\Utilities\Utilities.h" />
     <ClInclude Include="src\Window\Window.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Shader\programs\defaultFrag.fs" />
+    <None Include="src\Shader\programs\defaultVert.vs" />
+    <None Include="src\Shader\programs\LightingColor.fs" />
+    <None Include="src\Shader\programs\LightingColor.vs" />
+    <None Include="src\Shader\programs\LightingTexture.fs" />
+    <None Include="src\Shader\programs\LightingTexture.vs" />
+    <None Include="src\Shader\programs\Mapping.fs" />
+    <None Include="src\Shader\programs\Mapping.vs" />
+    <None Include="src\Shader\programs\Normals.fs" />
+    <None Include="src\Shader\programs\Normals.vs" />
+    <None Include="src\Shader\programs\NormalsAverage.fs" />
+    <None Include="src\Shader\programs\NormalsAverage.vs" />
+    <None Include="src\Shader\programs\Texture.fs" />
+    <None Include="src\Shader\programs\Texture.vs" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -1,6 +1,8 @@
 #pragma once
 #include "../Texture/Texture.h"
 
+class ShaderProgram;
+
 class Material
 {
 public:
@@ -15,6 +17,8 @@ public:
 
 	float GetShininess() const;
 	float GetAmbient() const;
+
+	void SetUniforms(ShaderProgram* shader);
 
 	Texture mTexture;
 

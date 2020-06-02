@@ -1,4 +1,6 @@
 #include "Material.h"
+#include "../Shader/Shader.h"
+#include <GLM/gtc/type_ptr.hpp>
 
 Material::Material(Color diffuse, Color specular, float shininess, std::string texture, float ambient) : mTexture(texture)
 {
@@ -44,4 +46,15 @@ float Material::GetShininess() const
 float Material::GetAmbient() const
 {
 	return mAmbientCof;
+}
+
+void Material::SetUniforms(ShaderProgram * shader)
+{
+	mTexture.SetActiveTexture();
+
+	shader->SetVec4Uniform("material.DiffuseColor",  (float*)glm::value_ptr(mDiffuseColor.GetColor()));
+	shader->SetVec4Uniform("material.SpecularColor", (float*)glm::value_ptr(mSpecularColor.GetColor()));
+
+	shader->SetFloatUniform("material.Shininess", mShininess);
+	shader->SetFloatUniform("material.AmbientCefficient", mAmbientCof);
 }

@@ -40,9 +40,7 @@ public:
 	static Color Yellow;
 
 	void SetColor(glm::vec4& color);
-	glm::ivec4 GetColor();
-
-private:
+	glm::vec4 GetColor();
 
 	unsigned char mR;
 	unsigned char mG;

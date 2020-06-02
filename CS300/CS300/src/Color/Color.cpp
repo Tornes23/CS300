@@ -109,9 +109,9 @@ void Color::SetColor(glm::vec4& color)
 	mA = static_cast<unsigned char>(color.a);
 }
 
-glm::ivec4 Color::GetColor()
+glm::vec4 Color::GetColor()
 {
-	return glm::ivec4(mR, mG, mB, mA);
+	return glm::vec4(mR, mG, mB, mA);
 }
 
 

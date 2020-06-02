@@ -32,9 +32,9 @@ int main()
 	Editor myEditor(myWindow.GetSDLWindow(), myWindow.GetContext());
 
 	GameObjectManager myManager;
-	Camera myCamera(glm::vec3(0, 0, 10));
 
 	Utils::InitGL(&myWindow);
+	Camera myCamera(glm::vec3(0, 0, 10));
 
 	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(50, 50, 1), "Floor", Model::Shape::Plane, true, glm::vec3(0, 0, 1), glm::vec3(0, 1, 0)));
 
@@ -44,10 +44,6 @@ int main()
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(5,  10,  5),  "Cylinder", Model::Shape::Cylinder));
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Sphere",   Model::Shape::Sphere));
 
-	myCamera.AddShader("./src/Shader/programs/Texture.vs"       , "./src/Shader/programs/Texture.fs"       );
-	myCamera.AddShader("./src/Shader/programs/Mapping.vs"       , "./src/Shader/programs/Mapping.fs"       );
-	myCamera.AddShader("./src/Shader/programs/Normals.vs"       , "./src/Shader/programs/Normals.fs"       );
-	myCamera.AddShader("./src/Shader/programs/NormalsAverage.vs", "./src/Shader/programs/NormalsAverage.fs");
 
 	while (!myWindow.IsClosed())
 	{
