@@ -3,7 +3,7 @@
 #include <GLM/gtc/type_ptr.hpp>
 
 
-Light::Light(LightType type, glm::vec3 position, glm::vec3 direction, Color ambient, Color diffuse, Color specular)
+Light::Light(LightType type, glm::vec3 position, glm::vec3 direction, Color ambient, Color diffuse, Color specular, float constant, float linear, float quadratic)
 {
 	mPosition = position;
 	mDirection = direction;
@@ -13,6 +13,10 @@ Light::Light(LightType type, glm::vec3 position, glm::vec3 direction, Color ambi
 	mSpecularColor = specular;
 
 	mType = type;
+
+	mConstant = constant;
+	mLinear = linear;
+	mQuadratic = quadratic;
 
 }
 
@@ -34,6 +38,10 @@ void Light::Setuniforms(ShaderProgram * shader)
 	shader->SetVec4Uniform("light.Ambient",  (float*)glm::value_ptr(mAmbientColor.GetColor()));
 	shader->SetVec4Uniform("light.Diffuse",  (float*)glm::value_ptr(mDiffuseColor.GetColor()));
 	shader->SetVec4Uniform("light.Specular", (float*)glm::value_ptr(mSpecularColor.GetColor()));
+
+	shader->SetFloatUniform("light.Constant",  mConstant);
+	shader->SetFloatUniform("light.Linear",    mLinear);
+	shader->SetFloatUniform("light.Quadratic", mQuadratic);
 
 }
 

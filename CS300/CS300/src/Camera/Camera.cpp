@@ -97,12 +97,15 @@ void Camera::Render(std::vector<GameObject*>& objects)
 			continue;
 
 		ShaderProgram currentShader = GetShader();
-		//Light lightSource;
+		Light lightSource;
 
 		currentShader.Use();
 
-		//if (mLighting)
-		//	lightSource = GetLight();
+		if (mLighting)
+		{
+			currentShader.SetVec3Uniform("Pos", glm::value_ptr(mPosition));
+			lightSource = GetLight(mLightMode);
+		}
 
 		//Setting the matrix uniforms
 		currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
@@ -286,7 +289,6 @@ void Camera::AddAllShaders()
 	AddShader("./src/Shader/programs/Mapping.vs"          , "./src/Shader/programs/Mapping.fs"        );
 	AddShader("./src/Shader/programs/LightingTexture.vs"  , "./src/Shader/programs/LightingTexture.fs");
 	AddShader("./src/Shader/programs/LightingColor.vs"    , "./src/Shader/programs/LightingColor.fs"  );
-	AddShader("./src/Shader/programs/Mapping.vs"          , "./src/Shader/programs/Mapping.fs"        );
 	AddShader("./src/Shader/programs/Normals.vs"          , "./src/Shader/programs/Normals.fs"        );
 	AddShader("./src/Shader/programs/NormalsAverage.vs"   , "./src/Shader/programs/NormalsAverage.fs" );
 }
@@ -380,7 +382,7 @@ ShaderProgram Camera::GetShader()
 	if (mTextureMapping)
 	{
 		if (mLighting)
-			return mShaders[5];
+			return mShaders[3];
 
 		//return the shader that renders colors based on UV coords
 		return mShaders[1];
@@ -388,7 +390,7 @@ ShaderProgram Camera::GetShader()
 	else
 	{
 		if (mLighting)
-			return mShaders[4];
+			return mShaders[2];
 
 		//return the shader that renders the texture
 		return mShaders[0];
@@ -416,10 +418,10 @@ ShaderProgram Camera::GetNormalShader()
 {
 	if (mAveragedNormals)
 	{
-		return mShaders[3];//return normals & averaged
+		return mShaders[5];//return normals & averaged
 	}
 
-	return mShaders[2];//normals shader
+	return mShaders[4];//normals shader
 }
 
 const Light Camera::GetLight(Light::LightType mode) const
