@@ -198,17 +198,32 @@ void Model::CreateSphere(int slices, float radius)
 			//adding the indexes for the 2 triangles that will form each piece of the sphere
 			if (i != 0)
 			{
+				glm::vec3 v0 = mVertices[index1];
+				glm::vec3 v1 = mVertices[index2];
+				glm::vec3 v2 = mVertices[index1 + 1];
+				glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
+
 				mIndexes.push_back(index1);
 				mIndexes.push_back(index2);
 				mIndexes.push_back(index1 + 1);
+				
+				mNormalVecs.push_back(normal);
+
 			}
 
 			
 			if (i != (ringCount - 1))
 			{
+				glm::vec3 v0 = mVertices[index1 + 1];
+				glm::vec3 v1 = mVertices[index2];
+				glm::vec3 v2 = mVertices[index2 + 1];
+				glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
+
 				mIndexes.push_back(index1 + 1);
 				mIndexes.push_back(index2);
 				mIndexes.push_back(index2 + 1);
+
+				mNormalVecs.push_back(normal);
 			}
 		}
 	}
@@ -286,68 +301,109 @@ void Model::CreateCylinder(int slices, float radius, float height)
 			yCoord2 = circleCoords[1];
 			zCoord2 = circleCoords[2];
 		}
+
 #pragma region MIDDLE TRIANGLES
+
+		glm::vec3 v0 = glm::vec3(xCoord2 * radius, botY, zCoord2 * radius);
+		glm::vec3 v1 = glm::vec3(xCoord * radius, botY, zCoord * radius);
+		glm::vec3 v2 = glm::vec3(xCoord * radius, topY, zCoord * radius);
+		glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
 
 #pragma region TRIANGLE 1
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord2 * radius, botY, zCoord2 * radius));
+		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord * radius, botY, zCoord * radius));
+		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord * radius, topY, zCoord * radius));
+		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 1));
+
+		//once per vertex
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
+
 #pragma endregion
 
 #pragma region TRIANGLE 2
+
+		v0 = glm::vec3(xCoord * radius, topY, zCoord * radius);
+		v1 = glm::vec3(xCoord2 * radius, topY, zCoord2 * radius);
+		v2 = glm::vec3(xCoord2 * radius, botY, zCoord2 * radius);
+		normal = glm::triangleNormal(v0, v1, v2);
+
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord * radius, topY, zCoord * radius));
+		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 1));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord2 * radius, topY, zCoord2 * radius));
+		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 1));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord2 * radius, botY, zCoord2 * radius));
+		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
+
+		//once per vertex
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
 #pragma endregion
 
 #pragma endregion TOP AND BOT TRIANGLES
 
 #pragma region TOP TRIANGLE
 
+		v0 = glm::vec3(xCoord * radius, topY, zCoord * radius);
+		v1 = glm::vec3(0, topY, 0);
+		v2 = glm::vec3(xCoord2 * radius, topY, zCoord2 * radius);
+		normal = glm::triangleNormal(v0, v1, v2);
+
 		float uMid = (static_cast<float>(i) / slices + static_cast<float>(i + 1) / slices) / 2.0F;
 
-		mVertices.push_back(glm::vec3(xCoord * radius, topY, zCoord * radius));
+		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 1));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(0, topY, 0));
+		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(uMid, 1));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord2 * radius, topY, zCoord2 * radius));
+		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 1));
 
+		//once per vertex
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
 #pragma endregion
 
 #pragma region BOT TRIANGLE
 
-		mVertices.push_back(glm::vec3(xCoord2 * radius, botY, zCoord2 * radius));
+		v0 = glm::vec3(xCoord2 * radius, botY, zCoord2 * radius);
+		v1 = glm::vec3(0, botY, 0);
+		v2 = glm::vec3(xCoord * radius, botY, zCoord * radius);
+		normal = glm::triangleNormal(v0, v1, v2);
+
+		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(0, botY, 0));
+		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(uMid, 0));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord * radius, botY, zCoord * radius));
+		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0));
 
+		//once per vertex
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
 #pragma endregion
 
 #pragma endregion
@@ -432,32 +488,53 @@ void Model::CreateCone(int slices, float radius, float height)
 			zCoord2 = circleCoords[2];
 		}
 
+		glm::vec3 v0 = glm::vec3(xCoord * radius, botY, zCoord * radius);
+		glm::vec3 v1 = glm::vec3(xCoord2 * radius, botY, zCoord2 * radius);
+		glm::vec3 v2 = glm::vec3(0, topY, 0);
+		glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
+
 #pragma region MIDDLE TRIANGLE
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord2 * radius, botY, zCoord2 * radius));
+		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord * radius, botY, zCoord * radius));
+		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(0, topY, 0));
+		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(uMid, 1));
+
+		//once per vertex
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
 #pragma endregion
 
 #pragma region BOTTOM TRIANGLE
+
+		v0 = glm::vec3(0, botY, 0);
+		v1 = glm::vec3(xCoord * radius, botY, zCoord * radius);
+		v2 = glm::vec3(xCoord2 * radius, botY, zCoord2 * radius);
+		normal = glm::triangleNormal(v0, v1, v2);
+
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(0, botY, 0));
+		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(uMid, 0));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord * radius, botY, zCoord * radius));
+		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(glm::vec3(xCoord2 * radius, botY, zCoord2 * radius));
+		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
+
+		//once per vertex
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
 #pragma endregion
 
 		k += 3;
@@ -483,13 +560,25 @@ void Model::CreateCube()
 
 	//front
 	//adding the position texture coordinates and normal values for the four vertices
-	mVertices.push_back(glm::vec3(-0.5, -0.5, 0.5));
-	mVertices.push_back(glm::vec3(0.5, -0.5, 0.5));
-	mVertices.push_back(glm::vec3(0.5, 0.5, 0.5));
+	glm::vec3 v0 = glm::vec3(-0.5, -0.5, 0.5);
+	glm::vec3 v1 = glm::vec3(0.5, -0.5, 0.5);
+	glm::vec3 v2 = glm::vec3(0.5, 0.5, 0.5);
+	glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
 
-	mVertices.push_back(glm::vec3(0.5, 0.5, 0.5));
-	mVertices.push_back(glm::vec3(-0.5, 0.5, 0.5));
-	mVertices.push_back(glm::vec3(-0.5, -0.5, 0.5));
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
+
+	v0 = glm::vec3(0.5, 0.5, 0.5);
+	v1 = glm::vec3(-0.5, 0.5, 0.5);
+	v2 = glm::vec3(-0.5, -0.5, 0.5);
+	normal = glm::triangleNormal(v0, v1, v2);
+
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -501,13 +590,26 @@ void Model::CreateCube()
 
 	//right
 	//adding the position texture coordinates and normal values for the four vertices
-	mVertices.push_back(glm::vec3(0.5, -0.5, 0.5));
-	mVertices.push_back(glm::vec3(0.5, -0.5, -0.5));
-	mVertices.push_back(glm::vec3(0.5, 0.5, -0.5));
 
-	mVertices.push_back(glm::vec3(0.5, 0.5, -0.5));
-	mVertices.push_back(glm::vec3(0.5, 0.5, 0.5));
-	mVertices.push_back(glm::vec3(0.5, -0.5, 0.5));
+	v0 = glm::vec3(0.5, -0.5, 0.5);
+	v1 = glm::vec3(0.5, -0.5, -0.5);
+	v2 = glm::vec3(0.5, 0.5, -0.5);
+	normal = glm::triangleNormal(v0, v1, v2);
+
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
+
+	v0 = glm::vec3(0.5, 0.5, -0.5);
+	v1 = glm::vec3(0.5, 0.5, 0.5);
+	v2 = glm::vec3(0.5, -0.5, 0.5);
+	normal = glm::triangleNormal(v0, v1, v2);
+
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -519,13 +621,25 @@ void Model::CreateCube()
 
 	//Left
 	//adding the position texture coordinates and normal values for the four vertices
-	mVertices.push_back(glm::vec3(-0.5, -0.5, -0.5));
-	mVertices.push_back(glm::vec3(-0.5, -0.5, 0.5));
-	mVertices.push_back(glm::vec3(-0.5, 0.5, 0.5));
+	v0 = glm::vec3(-0.5, -0.5, -0.5);
+	v1 = glm::vec3(-0.5, -0.5,  0.5);
+	v2 = glm::vec3(-0.5,  0.5,  0.5);
+	normal = glm::triangleNormal(v0, v1, v2);
 
-	mVertices.push_back(glm::vec3(-0.5, 0.5, 0.5));
-	mVertices.push_back(glm::vec3(-0.5, 0.5, -0.5));
-	mVertices.push_back(glm::vec3(-0.5, -0.5, -0.5));
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
+
+	v0 = glm::vec3(-0.5,  0.5,  0.5);
+	v1 = glm::vec3(-0.5,  0.5, -0.5);
+	v2 = glm::vec3(-0.5, -0.5, -0.5);
+	normal = glm::triangleNormal(v0, v1, v2);
+
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -538,13 +652,25 @@ void Model::CreateCube()
 
 	//back
 	//adding the position texture coordinates and normal values for the four vertices
-	mVertices.push_back(glm::vec3(-0.5, 0.5, -0.5));
-	mVertices.push_back(glm::vec3(0.5, 0.5, -0.5));
-	mVertices.push_back(glm::vec3(0.5, -0.5, -0.5));
+	v0 = glm::vec3(-0.5, 0.5, -0.5);
+	v1 = glm::vec3(0.5, 0.5, -0.5);
+	v2 = glm::vec3(0.5, -0.5, -0.5);
+	normal = glm::triangleNormal(v0, v1, v2);
 
-	mVertices.push_back(glm::vec3(0.5, -0.5, -0.5));
-	mVertices.push_back(glm::vec3(-0.5, -0.5, -0.5));
-	mVertices.push_back(glm::vec3(-0.5, 0.5, -0.5));
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
+
+	v0 = glm::vec3(0.5, -0.5, -0.5);
+	v1 = glm::vec3(-0.5, -0.5, -0.5);
+	v2 = glm::vec3(-0.5, 0.5, -0.5);
+	normal = glm::triangleNormal(v0, v1, v2);
+
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -556,13 +682,25 @@ void Model::CreateCube()
 
 	//bot
 	//adding the position texture coordinates and normal values for the four vertices
-	mVertices.push_back(glm::vec3(0.5, -0.5, -0.5));
-	mVertices.push_back(glm::vec3(0.5, -0.5, 0.5));
-	mVertices.push_back(glm::vec3(-0.5, -0.5, 0.5));
+	v0 = glm::vec3(0.5, -0.5, -0.5);
+	v1 = glm::vec3(0.5, -0.5, 0.5);
+	v2 = glm::vec3(-0.5, -0.5, 0.5);
+	normal = glm::triangleNormal(v0, v1, v2);
 
-	mVertices.push_back(glm::vec3(-0.5, -0.5, 0.5));
-	mVertices.push_back(glm::vec3(-0.5, -0.5, -0.5));
-	mVertices.push_back(glm::vec3(0.5, -0.5, -0.5));
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
+
+	v0 = glm::vec3(-0.5, -0.5, 0.5);
+	v1 = glm::vec3(-0.5, -0.5, -0.5);
+	v2 = glm::vec3(0.5, -0.5, -0.5);
+	normal = glm::triangleNormal(v0, v1, v2);
+
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(0, 1));
@@ -574,13 +712,25 @@ void Model::CreateCube()
 
 	//top
 	//adding the position texture coordinates and normal values for the four vertices
-	mVertices.push_back(glm::vec3(0.5, 0.5, 0.5));
-	mVertices.push_back(glm::vec3(0.5, 0.5, -0.5));
-	mVertices.push_back(glm::vec3(-0.5, 0.5, -0.5));
+	v0 = glm::vec3(0.5, 0.5, 0.5);
+	v1 = glm::vec3(0.5, 0.5, -0.5);
+	v2 = glm::vec3(-0.5, 0.5, -0.5);
+	normal = glm::triangleNormal(v0, v1, v2);
 
-	mVertices.push_back(glm::vec3(-0.5, 0.5, -0.5));
-	mVertices.push_back(glm::vec3(-0.5, 0.5, 0.5));
-	mVertices.push_back(glm::vec3(0.5, 0.5, 0.5));
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
+
+	v0 = glm::vec3(-0.5, 0.5, -0.5);
+	v1 = glm::vec3(-0.5, 0.5, 0.5);
+	v2 = glm::vec3(0.5, 0.5, 0.5);
+	normal = glm::triangleNormal(v0, v1, v2);
+
+	mVertices.push_back(v0);
+	mVertices.push_back(v1);
+	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -606,27 +756,37 @@ Generates a plane model
 **************************************************************************/
 void Model::CreatePlane()
 {
+	mIndexed = false;
+	glm::vec3 v0 = glm::vec3(-0.5, -0.5, 0.0);
+	glm::vec3 v1 = glm::vec3(0.5, -0.5, 0.0);
+	glm::vec3 v2 = glm::vec3(0.5, 0.5, 0.0);
+
 	//adding the position texture coordinates and normal values for the four vertices
-	mVertices.push_back(glm::vec3(-0.5, -0.5, 0.0));
+	mVertices.push_back(v0);
 	mTextureCoords.push_back(glm::vec2(0, 0));
+	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
 
-	mVertices.push_back(glm::vec3(0.5, -0.5, 0.0));
+	mVertices.push_back(v1);
 	mTextureCoords.push_back(glm::vec2(1, 0));
+	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
 
-	mVertices.push_back(glm::vec3(0.5, 0.5, 0.0));
+	mVertices.push_back(v2);
 	mTextureCoords.push_back(glm::vec2(1, 1));
+	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
 
-	mVertices.push_back(glm::vec3(-0.5, 0.5, 0.0));
+	v1 = glm::vec3(-0.5, 0.5, 0.0);
+
+	mVertices.push_back(v2);
+	mTextureCoords.push_back(glm::vec2(1, 1));
+	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
+
+	mVertices.push_back(v1);
 	mTextureCoords.push_back(glm::vec2(0, 1));
+	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
 
-	//adding the indexes to create 2 triangles
-	mIndexes.push_back(0);
-	mIndexes.push_back(1);
-	mIndexes.push_back(2);
-
-	mIndexes.push_back(2);
-	mIndexes.push_back(3);
-	mIndexes.push_back(0);
+	mVertices.push_back(v0);
+	mTextureCoords.push_back(glm::vec2(0, 0));
+	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
 
 	ComputeNormals();
 
@@ -673,14 +833,14 @@ void Model::ComputeNormals()
 			mNormalsPerFace[mIndexes[k + 2]].push_back(normal);
 
 			//pushing the normals
-			mNormals.push_back(mVertices[mIndexes[k]]);
-			mNormals.push_back(mVertices[mIndexes[k]] + normal);
+			mNormalPoints.push_back(mVertices[mIndexes[k]]);
+			mNormalPoints.push_back(mVertices[mIndexes[k]] + normal);
 
-			mNormals.push_back(mVertices[mIndexes[k + 1]]);
-			mNormals.push_back(mVertices[mIndexes[k + 1]] + normal);
+			mNormalPoints.push_back(mVertices[mIndexes[k + 1]]);
+			mNormalPoints.push_back(mVertices[mIndexes[k + 1]] + normal);
 
-			mNormals.push_back(mVertices[mIndexes[k + 2]]);
-			mNormals.push_back(mVertices[mIndexes[k + 2]] + normal);
+			mNormalPoints.push_back(mVertices[mIndexes[k + 2]]);
+			mNormalPoints.push_back(mVertices[mIndexes[k + 2]] + normal);
 		}
 		else
 		{
@@ -693,14 +853,14 @@ void Model::ComputeNormals()
 			mNormalsPerFace[k + 2].push_back(normal);
 
 			//pushing the normals
-			mNormals.push_back(mVertices[k]);
-			mNormals.push_back(mVertices[k] + normal);
+			mNormalPoints.push_back(mVertices[k]);
+			mNormalPoints.push_back(mVertices[k] + normal);
 
-			mNormals.push_back(mVertices[k + 1]);
-			mNormals.push_back(mVertices[k + 1] + normal);
+			mNormalPoints.push_back(mVertices[k + 1]);
+			mNormalPoints.push_back(mVertices[k + 1] + normal);
 
-			mNormals.push_back(mVertices[k + 2]);
-			mNormals.push_back(mVertices[k + 2] + normal);
+			mNormalPoints.push_back(mVertices[k + 2]);
+			mNormalPoints.push_back(mVertices[k + 2] + normal);
 		}
 
 		k += 3;
@@ -816,8 +976,8 @@ void Model::BindNormalBuffer()
 	glBindVertexArray(mVAO[1]);
 
 	//addign normals
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[3]);
-	glBufferData(GL_ARRAY_BUFFER, mNormals.size() * sizeof(glm::vec3), &mNormals[0].x, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[4]);
+	glBufferData(GL_ARRAY_BUFFER, mNormalPoints.size() * sizeof(glm::vec3), &mNormalPoints[0].x, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
@@ -840,7 +1000,7 @@ void Model::BindAverageBuffer()
 	glBindVertexArray(mVAO[2]);
 
 	//addign average normals
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[4]);
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[5]);
 	glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
@@ -876,10 +1036,16 @@ void Model::BindModelBuffer()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 
+	//addign normals
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[2]);
+	glBufferData(GL_ARRAY_BUFFER, mNormalVecs.size() * sizeof(glm::vec3), &mNormalVecs[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
 	if (mIndexed)
 	{
 		//adding triangle indexes
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[2]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[3]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
 	}
 
@@ -900,12 +1066,13 @@ Deallocates the VBOs and VAOs
 void Model::FreeBuffers()
 {
 	//deallocating the 2 VAOs and the 4 VBOs
-	glDeleteBuffers(5, mVBO);
+	glDeleteBuffers(6, mVBO);
 	glDeleteVertexArrays(3, mVAO);
 
 	//clearing the vectors
 	mVertices.clear();
-	mNormals.clear();
+	mNormalPoints.clear();
+	mNormalVecs.clear();
 	mAveraged.clear();
 	mTextureCoords.clear();
 	mIndexes.clear();
@@ -916,7 +1083,7 @@ void Model::GenBuffers()
 {
 	//generating the VAO and VBO buffers
 	glGenVertexArrays(3, mVAO);
-	glGenBuffers(5, mVBO);
+	glGenBuffers(6, mVBO);
 }
 
 /**************************************************************************
@@ -957,7 +1124,7 @@ GLsizei Model::GetNormalCount(bool average) const
 	if(average)
 		return static_cast<GLsizei>(mAveraged.size());
 
-	return static_cast<GLsizei>(mNormals.size());
+	return static_cast<GLsizei>(mNormalPoints.size());
 }
 
 bool Model::GetIndexed()

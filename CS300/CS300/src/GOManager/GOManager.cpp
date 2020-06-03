@@ -155,30 +155,30 @@ void GameObjectManager::Update()
 	{
 		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::X, 1.0F);
 
+		temp = glm::vec4(obj->mForward, 1.0F);
+
+		obj->mForward = axis_angle * temp;
+		obj->mForward = glm::normalize(obj->mForward);
+
 		temp = glm::vec4(obj->mUp, 1.0F);
 
 		obj->mUp = axis_angle * temp;
 		obj->mUp = glm::normalize(obj->mUp);
-
-		temp = glm::vec4(obj->mRight, 1.0F);
-
-		obj->mRight = axis_angle * temp;
-		obj->mRight = glm::normalize(obj->mRight);
 	}
 
 	if (KeyDown(Down))
 	{
 		axis_angle = obj->GenerateAxisAngleMetod(GameObject::Axis::X, -1.0F);
 
+		temp = glm::vec4(obj->mForward, 1.0F);
+
+		obj->mForward = axis_angle * temp;
+		obj->mForward = glm::normalize(obj->mForward);
+
 		temp = glm::vec4(obj->mUp, 1.0F);
 
 		obj->mUp = axis_angle * temp;
 		obj->mUp = glm::normalize(obj->mUp);
-
-		temp = glm::vec4(obj->mRight, 1.0F);
-
-		obj->mRight = axis_angle * temp;
-		obj->mRight = glm::normalize(obj->mRight);
 	}
 
 #pragma endregion
