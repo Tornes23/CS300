@@ -47,6 +47,7 @@ public:
 	void Render(std::vector<GameObject*>& objects);
 	void Update();
 	void DrawTriangle(GameObject* target);
+	void DrawNormals(GameObject* target);
 	void ApplyLight(GameObject* target);
 	void ComputeVectors();
 	void AddAllShaders();

@@ -68,7 +68,6 @@ public:
 
 	void BindBuffers();
 	void BindNormalBuffer();
-	void BindAverageBuffer();
 	void BindModelBuffer();
 	void FreeBuffers();
 	void GenBuffers();
@@ -77,6 +76,7 @@ public:
 	bool GetIndexed();
 
 	const GLuint GetVAO() const;
+	const GLuint GetNormalVAO() const;
 	Shape GetShape() const;
 	void SetShape(Shape shape);
 
@@ -92,6 +92,6 @@ private:
 	bool mIndexed;
 	int mPrecision;
 	Shape mShape;
-	GLuint mVAO;
+	GLuint mVAO[3];
 	GLuint mVBO[5];
 };

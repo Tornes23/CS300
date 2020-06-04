@@ -88,7 +88,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	GLenum error = glGetError();
 	//getting the shader which will be used
 	
-
 	//for each object
 	for (unsigned i = 0; i < objects.size(); i++)
 	{
@@ -138,16 +137,12 @@ void Camera::Render(std::vector<GameObject*>& objects)
 			currentShader.Use();
 
 			glm::mat4x4 m2w_normal = glm::transpose(glm::inverse(mCameraMatrix * m2w_object));
-
-			int check = mAveragedNormals ? 1 : 0;
-
-			currentShader.SetIntUniform("Averaged", check);
 			currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
 			currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 			currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
 			currentShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
 
-			DrawTriangle(objects[i]);
+			DrawNormals(objects[i]);
 		}
 
 		if (mLighting)
@@ -249,6 +244,23 @@ void Camera::DrawTriangle(GameObject* target)
 	error = glGetError();
 }
 
+void Camera::DrawNormals(GameObject * target)
+{
+	GLenum error = glGetError();
+
+	//binding the objects VAO
+	glBindVertexArray(target->mModel.GetNormalVAO());
+	error = glGetError();
+
+	// Drawing
+	if (target->mModel.GetIndexed())
+		glDrawElements(GL_TRIANGLES, target->mModel.GetDrawElements(), GL_UNSIGNED_SHORT, 0);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, target->mModel.GetDrawElements());
+
+	error = glGetError();
+}
+
 void Camera::ApplyLight(GameObject * target)
 {
 }
@@ -269,7 +281,7 @@ void Camera::AddAllShaders()
 	AddShader("./src/Shader/programs/LightingTexture.vs"  , "./src/Shader/programs/LightingTexture.fs");
 	AddShader("./src/Shader/programs/LightingColor.vs"    , "./src/Shader/programs/LightingColor.fs"  );
 	AddShader("./src/Shader/programs/Normals.vs"          , "./src/Shader/programs/Normals.fs"        , "./src/Shader/programs/Normals.gs");
-	AddShader("./src/Shader/programs/NormalsAverage.vs"   , "./src/Shader/programs/NormalsAverage.fs" );
+	AddShader("./src/Shader/programs/NormalsAverage.vs"   , "./src/Shader/programs/NormalsAverage.fs" , "./src/Shader/programs/Normals.gs");
 }
 
 void Camera::AddAllLights()
@@ -395,6 +407,9 @@ returns the shader program
 **************************************************************************/
 ShaderProgram Camera::GetNormalShader()
 {
+	if (mAveragedNormals)
+		return mShaders[5];
+
 	return mShaders[4];//normals shader
 }
 

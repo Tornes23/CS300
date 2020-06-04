@@ -593,9 +593,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	v0 = glm::vec3(0.5, 0.5, 0.5);
 	v1 = glm::vec3(-0.5, 0.5, 0.5);
@@ -610,9 +615,9 @@ void Model::CreateCube()
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
-	mAveraged.push_back(-v0);
-	mAveraged.push_back(-v1);
-	mAveraged.push_back(-v2);
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -638,9 +643,9 @@ void Model::CreateCube()
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
-	mAveraged.push_back(-v0);
-	mAveraged.push_back(-v1);
-	mAveraged.push_back(-v2);
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	v0 = glm::vec3(0.5, 0.5, -0.5);
 	v1 = glm::vec3(0.5, 0.5, 0.5);
@@ -655,9 +660,9 @@ void Model::CreateCube()
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
-	mAveraged.push_back(-v0);
-	mAveraged.push_back(-v1);
-	mAveraged.push_back(-v2);
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -682,9 +687,9 @@ void Model::CreateCube()
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
-	mAveraged.push_back(-v0);
-	mAveraged.push_back(-v1);
-	mAveraged.push_back(-v2);
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	v0 = glm::vec3(-0.5,  0.5,  0.5);
 	v1 = glm::vec3(-0.5,  0.5, -0.5);
@@ -699,9 +704,9 @@ void Model::CreateCube()
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
-	mAveraged.push_back(-v0);
-	mAveraged.push_back(-v1);
-	mAveraged.push_back(-v2);
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -727,9 +732,9 @@ void Model::CreateCube()
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
-	mAveraged.push_back(-v0);
-	mAveraged.push_back(-v1);
-	mAveraged.push_back(-v2);
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	v0 = glm::vec3(0.5, -0.5, -0.5);
 	v1 = glm::vec3(-0.5, -0.5, -0.5);
@@ -744,9 +749,9 @@ void Model::CreateCube()
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
-	mAveraged.push_back(-v0);
-	mAveraged.push_back(-v1);
-	mAveraged.push_back(-v2);
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -771,9 +776,9 @@ void Model::CreateCube()
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
-	mAveraged.push_back(-v0);
-	mAveraged.push_back(-v1);
-	mAveraged.push_back(-v2);
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	v0 = glm::vec3(-0.5, -0.5, 0.5);
 	v1 = glm::vec3(-0.5, -0.5, -0.5);
@@ -788,9 +793,9 @@ void Model::CreateCube()
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
-	mAveraged.push_back(-v0);
-	mAveraged.push_back(-v1);
-	mAveraged.push_back(-v2);
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(0, 1));
@@ -815,9 +820,9 @@ void Model::CreateCube()
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
-	mAveraged.push_back(-v0);
-	mAveraged.push_back(-v1);
-	mAveraged.push_back(-v2);
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	v0 = glm::vec3(-0.5, 0.5, -0.5);
 	v1 = glm::vec3(-0.5, 0.5, 0.5);
@@ -832,9 +837,9 @@ void Model::CreateCube()
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
-	mAveraged.push_back(-v0);
-	mAveraged.push_back(-v1);
-	mAveraged.push_back(-v2);
+	mAveraged.push_back(v0);
+	mAveraged.push_back(v1);
+	mAveraged.push_back(v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -913,26 +918,9 @@ void Model::BindBuffers()
 {
 	GenBuffers();
 
-	//binding the VAo
-	glBindVertexArray(mVAO);
-
 	BindModelBuffer();
 
 	BindNormalBuffer();
-
-	BindAverageBuffer();
-
-	if (mIndexed)
-	{
-		//adding triangle indexes
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[4]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
-	}
-
-	// Unbind the VAO
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(mVAO);
-
 }
 
 /**************************************************************************
@@ -946,29 +934,30 @@ Binds the VBO and VAO buffers of the normals
 **************************************************************************/
 void Model::BindNormalBuffer()
 {
+	//binding the VAO
+	glBindVertexArray(mVAO[1]);
+
+	//addign pos
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3), &mVertices[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
 	//addign normals
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[2]);
 	glBufferData(GL_ARRAY_BUFFER, mNormalVecs.size() * sizeof(glm::vec3), &mNormalVecs[0].x, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-}
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
-/**************************************************************************
-*!
-\fn     Model::BindAverageBuffer
-
-\brief
-Binds the VBO and VAO buffers of the averaged normals
-
-*
-**************************************************************************/
-void Model::BindAverageBuffer()
-{
-	//addign normals
+	//addign average normals
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[3]);
 	glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	// Unbind the VAO
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(mVAO[1]);
 }
 
 /**************************************************************************
@@ -982,6 +971,9 @@ Binds the VBO and VAO buffers of the model
 **************************************************************************/
 void Model::BindModelBuffer()
 {
+	//binding the VAO
+	glBindVertexArray(mVAO[0]);
+
 	//addign pos
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[0]);
 	glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3), &mVertices[0].x, GL_STATIC_DRAW);
@@ -994,6 +986,28 @@ void Model::BindModelBuffer()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 
+	//addign normals
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[2]);
+	glBufferData(GL_ARRAY_BUFFER, mNormalVecs.size() * sizeof(glm::vec3), &mNormalVecs[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	//addign average normals
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[3]);
+	glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	if (mIndexed)
+	{
+		//adding triangle indexes
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[4]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
+	}
+
+	// Unbind the VAO
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(mVAO[0]);
 }
 
 /**************************************************************************
@@ -1009,7 +1023,7 @@ void Model::FreeBuffers()
 {
 	//deallocating the 2 VAOs and the 4 VBOs
 	glDeleteBuffers(5, mVBO);
-	glDeleteVertexArrays(1, &mVAO);
+	glDeleteVertexArrays(3, mVAO);
 
 	//clearing the vectors
 	mVertices.clear();
@@ -1022,7 +1036,7 @@ void Model::FreeBuffers()
 void Model::GenBuffers()
 {
 	//generating the VAO and VBO buffers
-	glGenVertexArrays(1, &mVAO);
+	glGenVertexArrays(3, mVAO);
 	glGenBuffers(5, mVBO);
 }
 
@@ -1067,9 +1081,26 @@ Returns the handle for the VAO
 const GLuint Model::GetVAO() const
 {
 	//returing the VAO of the model
-	return mVAO;
+	return mVAO[0];
 }
 
+/**************************************************************************
+*!
+\fn     Model::GetNormalVAO
+
+\brief
+Gets the VAO to render
+
+\return const GLuint
+Returns the handle for the VAO
+
+*
+**************************************************************************/
+const GLuint Model::GetNormalVAO() const
+{
+	//returing the VAO of the normal
+	return mVAO[1];
+}
 
 Model::Shape Model::GetShape() const
 {
