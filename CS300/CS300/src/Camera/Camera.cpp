@@ -196,13 +196,23 @@ void Camera::Update()
 		mWireframe = !mWireframe;
 
 	if (KeyTriggered(N))
+	{
+		if (mAveragedNormals)
+			mAveragedNormals = !mAveragedNormals;
+
 		mRenderNormals = !mRenderNormals;
+	}
 
 	if (KeyTriggered(T))
 		mTextureMapping = !mTextureMapping;
 
 	if (KeyTriggered(F))
+	{
+		if (mRenderNormals)
+			mRenderNormals = !mRenderNormals;
+
 		mAveragedNormals = !mAveragedNormals;
+	}
 
 	if (KeyTriggered(P))
 		mLighting = !mLighting;

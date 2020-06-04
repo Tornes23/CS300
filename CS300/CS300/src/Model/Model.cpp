@@ -176,9 +176,6 @@ void Model::CreateSphere(int slices, float radius)
 			float yCoord = (radius * sinf(ringAngle));
 			float zCoord = (radius * cosf(ringAngle)) * cosf(sliceAngle);
 
-			//average normal
-			mAveraged.push_back(glm::normalize(glm::vec3(xCoord, yCoord, zCoord)));
-
 			//computing the u v coordinates
 			float u = static_cast<float>(j) / slices;
 			float v = static_cast<float>(i) / ringCount;
@@ -212,6 +209,13 @@ void Model::CreateSphere(int slices, float radius)
 				mIndexes.push_back(index1 + 1);
 				
 				mNormalVecs.push_back(normal);
+				mNormalVecs.push_back(normal);
+				mNormalVecs.push_back(normal);
+
+				mAveraged.push_back(v0);
+				mAveraged.push_back(v1);
+				mAveraged.push_back(v2);
+
 			}
 
 			if (i != (ringCount - 1))
@@ -226,6 +230,12 @@ void Model::CreateSphere(int slices, float radius)
 				mIndexes.push_back(index2 + 1);
 
 				mNormalVecs.push_back(normal);
+				mNormalVecs.push_back(normal);
+				mNormalVecs.push_back(normal);
+				
+				mAveraged.push_back(v0);
+				mAveraged.push_back(v1);
+				mAveraged.push_back(v2);
 			}
 		}
 	}
