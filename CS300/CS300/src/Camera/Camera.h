@@ -56,7 +56,7 @@ public:
 	glm::mat4x4 CreatePerspective();
 	glm::mat4x4 CreateCameraMat();
 
-	void AddShader(const std::string& vertex, const std::string& fragment);
+	void AddShader(const std::string& vertex, const std::string& fragment, const std::string& geometry = "");
 	ShaderProgram GetShader();
 	ShaderProgram GetNormalShader();
 

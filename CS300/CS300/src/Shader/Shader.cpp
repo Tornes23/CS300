@@ -46,8 +46,16 @@ a string containing the address of the fragment shader
 
 *
 **************************************************************************/
-ShaderProgram::ShaderProgram(std::string vertex, std::string fragment) : mVertex(GL_VERTEX_SHADER, vertex.data()), mFragment(GL_FRAGMENT_SHADER, fragment.data())
+ShaderProgram::ShaderProgram(std::string vertex, std::string fragment, std::string geometry) : mVertex(GL_VERTEX_SHADER, vertex.data()), 
+																							   mFragment(GL_FRAGMENT_SHADER, fragment.data()),
+																							   mGeometry(GL_GEOMETRY_SHADER, geometry.data())
 {
+	
+	mbGeometry = false;
+
+	if(geometry != "")
+		mbGeometry = true;
+
 	GLenum error = glGetError();
 	//creating a shader program
 	mHandle = glCreateProgram();
@@ -60,6 +68,13 @@ ShaderProgram::ShaderProgram(std::string vertex, std::string fragment) : mVertex
 	//attaching the vertex shader
 	glAttachShader(mHandle, mVertex.GetHandle());
 	error = glGetError();
+
+	if (mbGeometry)
+	{
+		//attaching the vertex shader
+		glAttachShader(mHandle, mGeometry.GetHandle());
+		error = glGetError();
+	}
 
 	//linking both shaders
 	glLinkProgram(mHandle);
@@ -174,6 +189,37 @@ the value to be set to the uniform
 
 *
 **************************************************************************/
+void ShaderProgram::SetBoolUniform(const std::string & name, bool value)
+{
+	//getting the location of the uniform
+	GLuint location = GetUniformLoc(name);
+
+	//if it was found
+	if (location < 0)
+	{
+		std::cout << "Uniform: " << name << " not found" << std::endl;
+		return;
+	}
+
+	//setting the value
+	glUniform1i(location, value);
+}
+
+/**************************************************************************
+*!
+\fn     ShaderProgram::SetUniform
+
+\brief
+Sets a uniform variable
+
+\param  const std::string & name
+the name of the uniform
+
+\param  int value
+the value to be set to the uniform
+
+*
+**************************************************************************/
 void ShaderProgram::SetFloatUniform(const std::string & name, float value)
 {
 	//getting the location of the uniform
@@ -237,7 +283,7 @@ the name of the uniform
 
 *
 **************************************************************************/
-void ShaderProgram::SetVec3Uniform(const std::string & name, float * values)
+void ShaderProgram::SetVec3Uniform(const std::string & name, glm::vec3  values)
 {
 	//getting the location of the uniform
 	GLuint location = GetUniformLoc(name);
@@ -250,7 +296,7 @@ void ShaderProgram::SetVec3Uniform(const std::string & name, float * values)
 	}
 
 	//setting the value
-	glUniform3fv(location, 1, values);
+	glUniform3f(location, values.x, values.y, values.z);
 
 }
 
@@ -269,7 +315,7 @@ the name of the uniform
 
 *
 **************************************************************************/
-void ShaderProgram::SetVec4Uniform(const std::string & name, float * values)
+void ShaderProgram::SetVec4Uniform(const std::string & name, glm::vec4 values)
 {
 	//getting the location of the uniform
 	GLuint location = GetUniformLoc(name);
@@ -282,7 +328,7 @@ void ShaderProgram::SetVec4Uniform(const std::string & name, float * values)
 	}
 
 	//setting the value
-	glUniform4fv(location, 1, values);
+	glUniform4f(location, values.x, values.y, values.z, values.w);
 
 }
 

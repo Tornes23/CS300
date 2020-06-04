@@ -2,8 +2,12 @@
 
 out vec4 FragColor;  
 
+in vec2 UV;
+
 void main()
 {
-    //vec3 ambient = lightColor * material.
-    FragColor = vec4(1,1,1,1);
+    //if(Averaged)
+    //    FragColor = vec4(1,0,0,1);
+    //else
+        FragColor = vec4(1,1,1,1);
 }

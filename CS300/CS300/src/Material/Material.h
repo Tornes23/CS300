@@ -7,7 +7,7 @@ class Material
 {
 public:
 
-	Material(Color diffuse, Color specular, float shininess, std::string texture, float ambient = 1.0F);
+	Material(Color diffuse, Color specular, float shininess, std::string texture, float ambient = 0.5F);
 	Material(std::string texture);
 
 	Texture& GetTexture();

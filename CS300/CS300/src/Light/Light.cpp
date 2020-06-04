@@ -32,16 +32,16 @@ const glm::vec3 Light::GetDirection() const
 
 void Light::Setuniforms(ShaderProgram * shader)
 {
-	shader->SetVec3Uniform("light.Position",  glm::value_ptr(mPosition));
-	shader->SetVec3Uniform("light.Direction", glm::value_ptr(mDirection));
+	shader->SetVec3Uniform("lightSource.Position",  mPosition);
+	shader->SetVec3Uniform("lightSource.Direction", mDirection);
 
-	shader->SetVec4Uniform("light.Ambient",  (float*)glm::value_ptr(mAmbientColor.GetColor()));
-	shader->SetVec4Uniform("light.Diffuse",  (float*)glm::value_ptr(mDiffuseColor.GetColor()));
-	shader->SetVec4Uniform("light.Specular", (float*)glm::value_ptr(mSpecularColor.GetColor()));
+	shader->SetVec4Uniform("lightSource.Ambient",  mAmbientColor.GetColor());
+	shader->SetVec4Uniform("lightSource.Diffuse",  mDiffuseColor.GetColor());
+	shader->SetVec4Uniform("lightSource.Specular", mSpecularColor.GetColor());
 
-	shader->SetFloatUniform("light.Constant",  mConstant);
-	shader->SetFloatUniform("light.Linear",    mLinear);
-	shader->SetFloatUniform("light.Quadratic", mQuadratic);
+	shader->SetFloatUniform("lightSource.Constant",  mConstant);
+	shader->SetFloatUniform("lightSource.Linear",    mLinear);
+	shader->SetFloatUniform("lightSource.Quadratic", mQuadratic);
 
 }
 

@@ -103,8 +103,9 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 		if (mLighting)
 		{
-			currentShader.SetVec3Uniform("Pos", glm::value_ptr(mPosition));
+			//currentShader.SetVec3Uniform("Pos", glm::value_ptr(mPosition));
 			lightSource = GetLight(mLightMode);
+			lightSource.Setuniforms(&currentShader);
 		}
 
 		//Setting the matrix uniforms
@@ -138,11 +139,13 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 			glm::mat4x4 m2w_normal = objects[i]->GenerateNormalTransform();
 
-			currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_normal));
+			currentShader.SetIntUniform("Averaged", mAveragedNormals ? 1 : 0);
+			currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
+			currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 			currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
 			currentShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
 
-			DrawNormals(objects[i]);
+			DrawTriangle(objects[i]);
 		}
 
 		if (mLighting)
@@ -289,7 +292,7 @@ void Camera::AddAllShaders()
 	AddShader("./src/Shader/programs/Mapping.vs"          , "./src/Shader/programs/Mapping.fs"        );
 	AddShader("./src/Shader/programs/LightingTexture.vs"  , "./src/Shader/programs/LightingTexture.fs");
 	AddShader("./src/Shader/programs/LightingColor.vs"    , "./src/Shader/programs/LightingColor.fs"  );
-	AddShader("./src/Shader/programs/Normals.vs"          , "./src/Shader/programs/Normals.fs"        );
+	AddShader("./src/Shader/programs/Normals.vs"          , "./src/Shader/programs/Normals.fs"        , "./src/Shader/programs/Normals.gs");
 	AddShader("./src/Shader/programs/NormalsAverage.vs"   , "./src/Shader/programs/NormalsAverage.fs" );
 }
 
@@ -358,10 +361,10 @@ a string containing the address of the fragment shader
 
 *
 **************************************************************************/
-void Camera::AddShader(const std::string & vertex, const std::string & fragment)
+void Camera::AddShader(const std::string & vertex, const std::string & fragment, const std::string& geometry)
 {
 	//adding the shader to the vector
-	mShaders.push_back(ShaderProgram(vertex, fragment));
+	mShaders.push_back(ShaderProgram(vertex, fragment, geometry));
 }
 
 /**************************************************************************

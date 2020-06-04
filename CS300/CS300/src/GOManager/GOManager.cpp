@@ -230,6 +230,9 @@ void GameObjectManager::Update()
 
 void GameObjectManager::EditObj(GameObject* obj)
 {
+	if (obj == nullptr)
+		return;
+
 	if (!ImGui::Begin("Game Object"))
 	{
 		// Early out if the window is collapsed, as an optimization.

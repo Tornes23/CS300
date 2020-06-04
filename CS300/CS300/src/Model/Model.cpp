@@ -175,6 +175,9 @@ void Model::CreateSphere(int slices, float radius)
 			float yCoord = (radius * sinf(ringAngle));
 			float zCoord = (radius * cosf(ringAngle)) * cosf(sliceAngle);
 
+			//average normal
+			mAveraged.push_back(glm::normalize(glm::vec3(xCoord, yCoord, zCoord)));
+
 			//computing the u v coordinates
 			float u = static_cast<float>(j) / slices;
 			float v = static_cast<float>(i) / ringCount;
@@ -228,8 +231,6 @@ void Model::CreateSphere(int slices, float radius)
 		}
 	}
 
-	//computing the normals
-	ComputeNormals();
 	//calling to bind the buffers
 	BindBuffers();
 }
@@ -411,7 +412,8 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		k += 3;
 	}
 
-	ComputeNormals();
+	ComputeAverage();
+
 	//binding the buffers
 	BindBuffers();
 }
@@ -540,7 +542,8 @@ void Model::CreateCone(int slices, float radius, float height)
 		k += 3;
 	}
 
-	ComputeNormals();
+	ComputeAverage();
+
 	//calling to bind the buffers
 	BindBuffers();
 }
@@ -569,6 +572,8 @@ void Model::CreateCube()
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
 	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 
 	v0 = glm::vec3(0.5, 0.5, 0.5);
 	v1 = glm::vec3(-0.5, 0.5, 0.5);
@@ -578,6 +583,8 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
@@ -600,6 +607,8 @@ void Model::CreateCube()
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
 	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 
 	v0 = glm::vec3(0.5, 0.5, -0.5);
 	v1 = glm::vec3(0.5, 0.5, 0.5);
@@ -609,6 +618,8 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
@@ -630,6 +641,8 @@ void Model::CreateCube()
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
 	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 
 	v0 = glm::vec3(-0.5,  0.5,  0.5);
 	v1 = glm::vec3(-0.5,  0.5, -0.5);
@@ -639,6 +652,8 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
@@ -661,6 +676,8 @@ void Model::CreateCube()
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
 	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 
 	v0 = glm::vec3(0.5, -0.5, -0.5);
 	v1 = glm::vec3(-0.5, -0.5, -0.5);
@@ -670,6 +687,8 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
@@ -691,6 +710,8 @@ void Model::CreateCube()
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
 	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 
 	v0 = glm::vec3(-0.5, -0.5, 0.5);
 	v1 = glm::vec3(-0.5, -0.5, -0.5);
@@ -700,6 +721,8 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
@@ -721,6 +744,8 @@ void Model::CreateCube()
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
 	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 
 	v0 = glm::vec3(-0.5, 0.5, -0.5);
 	v1 = glm::vec3(-0.5, 0.5, 0.5);
@@ -731,6 +756,8 @@ void Model::CreateCube()
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
 	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
+	mNormalVecs.push_back(normal);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -740,7 +767,8 @@ void Model::CreateCube()
 	mTextureCoords.push_back(glm::vec2(0, 1));
 	mTextureCoords.push_back(glm::vec2(0, 0));
 
-	ComputeNormals();
+	ComputeAverage();
+
 	//binding buffers
 	BindBuffers();
 }
@@ -765,30 +793,34 @@ void Model::CreatePlane()
 	mVertices.push_back(v0);
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
+	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
 
 	mVertices.push_back(v1);
 	mTextureCoords.push_back(glm::vec2(1, 0));
 	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
+	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
 
 	mVertices.push_back(v2);
 	mTextureCoords.push_back(glm::vec2(1, 1));
 	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
+	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
 
 	v1 = glm::vec3(-0.5, 0.5, 0.0);
 
 	mVertices.push_back(v2);
 	mTextureCoords.push_back(glm::vec2(1, 1));
 	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
+	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
 
 	mVertices.push_back(v1);
 	mTextureCoords.push_back(glm::vec2(0, 1));
 	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
+	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
 
 	mVertices.push_back(v0);
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
-
-	ComputeNormals();
+	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
 
 	BindBuffers();
 }
@@ -888,11 +920,20 @@ void Model::ComputeAverage()
 	//epsilon value to check the position
 	float errorVal = 0.1F;
 
+	size_t size = mIndexed ? mIndexes.size() : mVertices.size();
+
 	//looping throught the vertices
-	for (unsigned i = 0; i < mNormalsPerFace.size(); i++)
+	for (size_t i = 0; i < size; i++)
 	{
+		if (mIndexed)
+			average = mNormalVecs[mIndexes[i]];
+		else
+			average = mNormalVecs[i];
+
+		int count = 1;
+
 		//another loop to compare the vertices
-		for (unsigned j = i + 1; j < mNormalsPerFace.size(); j++)
+		for (size_t j = i + 1; j < size; j++)
 		{
 			//computing the difference between the two vertex
 			float differenceX = glm::abs(mVertices[i].x - mVertices[j].x);
@@ -902,43 +943,54 @@ void Model::ComputeAverage()
 			//if the difference is lower than the error value
 			if (differenceX < errorVal && differenceY < errorVal && differenceZ < errorVal)
 			{
-				//copy the normals to the original vertex
-				for (unsigned k = 0; k < mNormalsPerFace[j].size(); k++)
-				{
-					mNormalsPerFace[i].push_back(mNormalsPerFace[j][k]);
-				}
-				//clearing the normals of te duplicated vertex
-				mNormalsPerFace[j].clear();
+				if (mIndexed)
+					average += mNormalVecs[mIndexes[j]];
+				else
+					average += mNormalVecs[j];
+
+				count++;
+
+				////copy the normals to the original vertex
+				//for (unsigned k = 0; k < mNormalsPerFace[j].size(); k++)
+				//{
+				//	mNormalsPerFace[i].push_back(mNormalsPerFace[j][k]);
+				//}
+				////clearing the normals of te duplicated vertex
+				//mNormalsPerFace[j].clear();
 			}
 		}
+
+		average /= count;
+
+		mAveraged.push_back(average);
 	}
 
-	//for each vertex
-	for (unsigned i = 0; i < mVertices.size(); i++)
-	{
-		//set the average to 0
-		average = glm::vec3(0, 0, 0);
-
-		//if is empty skip it
-		if (mNormalsPerFace[i].empty())
-			continue;
-
-		//adding all the normals
-		for (unsigned j = 0; j < mNormalsPerFace[i].size(); j++)
-		{
-			average += mNormalsPerFace[i][j];
-		}
-
-		//dividing it over the added amount
-		average /= mNormalsPerFace[i].size();
-
-		//normalizing it
-		average = glm::normalize(average);
-
-		//adding the normal to the  container
-		mAveraged.push_back(mVertices[i]);
-		mAveraged.push_back(mVertices[i] + average);
-	}
+	////for each vertex
+	//for (unsigned i = 0; i < mVertices.size(); i++)
+	//{
+	//	//set the average to 0
+	//	average = glm::vec3(0, 0, 0);
+	//
+	//	//if is empty skip it
+	//	if (mNormalsPerFace[i].empty())
+	//		continue;
+	//
+	//	//adding all the normals
+	//	for (unsigned j = 0; j < mNormalsPerFace[i].size(); j++)
+	//	{
+	//		average += mNormalsPerFace[i][j];
+	//	}
+	//
+	//	//dividing it over the added amount
+	//	average /= mNormalsPerFace[i].size();
+	//
+	//	//normalizing it
+	//	average = glm::normalize(average);
+	//
+	//	//adding the normal to the  container
+	//	mAveraged.push_back(mVertices[i]);
+	//	mAveraged.push_back(mVertices[i] + average);
+	//}
 }
 
 /**************************************************************************
@@ -973,17 +1025,17 @@ Binds the VBO and VAO buffers of the normals
 **************************************************************************/
 void Model::BindNormalBuffer()
 {
-	glBindVertexArray(mVAO[1]);
-
-	//addign normals
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[4]);
-	glBufferData(GL_ARRAY_BUFFER, mNormalPoints.size() * sizeof(glm::vec3), &mNormalPoints[0].x, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-	// Unbind the VAO
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(mVAO[1]);
+	//glBindVertexArray(mVAO[1]);
+	//
+	////addign normals
+	//glBindBuffer(GL_ARRAY_BUFFER, mVBO[4]);
+	//glBufferData(GL_ARRAY_BUFFER, mNormalPoints.size() * sizeof(glm::vec3), &mNormalPoints[0].x, GL_STATIC_DRAW);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	//
+	//// Unbind the VAO
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindVertexArray(mVAO[1]);
 }
 
 /**************************************************************************
@@ -997,17 +1049,17 @@ Binds the VBO and VAO buffers of the averaged normals
 **************************************************************************/
 void Model::BindAverageBuffer()
 {
-	glBindVertexArray(mVAO[2]);
-
-	//addign average normals
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[5]);
-	glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-	// Unbind the VAO
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(mVAO[2]);
+	//glBindVertexArray(mVAO[2]);
+	//
+	////addign average normals
+	//glBindBuffer(GL_ARRAY_BUFFER, mVBO[5]);
+	//glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	//
+	//// Unbind the VAO
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindVertexArray(mVAO[2]);
 }
 
 /**************************************************************************
@@ -1039,13 +1091,19 @@ void Model::BindModelBuffer()
 	//addign normals
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[2]);
 	glBufferData(GL_ARRAY_BUFFER, mNormalVecs.size() * sizeof(glm::vec3), &mNormalVecs[0].x, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	//addign normals
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[3]);
+	glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
 	if (mIndexed)
 	{
 		//adding triangle indexes
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[3]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[4]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
 	}
 
