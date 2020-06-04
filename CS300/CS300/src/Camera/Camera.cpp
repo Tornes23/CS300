@@ -130,7 +130,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		DrawTriangle(objects[i]);
 
 		//if the normals have to be rendered
-		if (mRenderNormals)
+		if (mRenderNormals || mAveragedNormals)
 		{
 			currentShader = GetNormalShader();
 

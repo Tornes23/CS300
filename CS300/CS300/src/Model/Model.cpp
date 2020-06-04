@@ -477,7 +477,14 @@ void Model::CreateCone(int slices, float radius, float height)
 	{
 		float angle = i * angleStep;
 		float angle2 = (i + 1) * angleStep;
-		glm::mat4x4 rotationMat(1.0F);
+		glm::mat4x4 rotationMat(1.0F); 
+
+		rotationMat = glm::rotate(rotationMat, -angle, glm::vec3(0, 1, 0));
+
+		glm::mat4x4 rotationMat2(1.0F);
+
+		rotationMat2 = glm::rotate(rotationMat2, -angle2, glm::vec3(0, 1, 0));;
+
 		//getting the x y z coordinates of the circle
 		float xCoord = circleCoords[k];
 		float yCoord = circleCoords[k + 1];
@@ -509,24 +516,33 @@ void Model::CreateCone(int slices, float radius, float height)
 		glm::vec3 v2 = glm::vec3(0, topY, 0);
 		glm::vec3 normal = glm::triangleNormal(v1, v0, v2);
 
-		glm::vec3 average = normalize((glm::vec3(0,0,-1) + glm::vec3(1, 0, 0) + glm::vec3(0, 0.5, 0)));
+		glm::vec3 xVec = glm::vec3(1, 0, 0);
+		glm::vec3 yVec = glm::vec3(0, -1, 0);
+		glm::vec3 zVec = glm::vec3(0, 0.5, 0);
+
+		glm::vec3 result = xVec + zVec;
+
+		result = yVec + normalize(result);
+
+		result /= 2;
+
+		glm::vec3 average = normalize(result);
 
 #pragma region MIDDLE TRIANGLE
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
-		mAveraged.push_back(glm::vec3(glm::rotate(rotationMat, angle2, glm::vec3(0,1,0)) * glm::vec4(average, 1.0)));
+		mAveraged.push_back(glm::vec3(rotationMat2 * glm::vec4(average, 1.0)));
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0)); 
-		mAveraged.push_back(glm::vec3(glm::rotate(rotationMat, angle, glm::vec3(0, 1, 0)) * glm::vec4(average, 1.0)));
+		mAveraged.push_back(glm::vec3(rotationMat * glm::vec4(average, 1.0)));
 
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(uMid, 1));
-		mAveraged.push_back(v2);
 		mAveraged.push_back(glm::vec3(0, 1, 0));
 
 		//once per vertex
@@ -537,25 +553,23 @@ void Model::CreateCone(int slices, float radius, float height)
 
 #pragma region BOTTOM TRIANGLE
 
-		v0 = glm::vec3(0, botY, 0);
-		v1 = glm::vec3(xCoord * radius, botY, zCoord * radius);
-		v2 = glm::vec3(xCoord2 * radius, botY, zCoord2 * radius);
+		v2 = glm::vec3(0, botY, 0);
 		normal = glm::triangleNormal(v0, v1, v2);
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(v0);
+		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(uMid, 0));
 		mAveraged.push_back(glm::vec3(0, -1, 0));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(v1);
+		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0));
-		mAveraged.push_back(glm::vec3(glm::rotate(rotationMat, angle2, glm::vec3(0, 1, 0)) * glm::vec4(average, 1.0)));
+		mAveraged.push_back(rotationMat * glm::vec4(average, 1.0));
 
 		//adding the position texture coordinates and normal values for the four vertices
-		mVertices.push_back(v2);
+		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
-		mAveraged.push_back(glm::vec3(glm::rotate(rotationMat, angle2, glm::vec3(0, 1, 0)) * glm::vec4(average, 1.0)));
+		mAveraged.push_back(rotationMat2 * glm::vec4(average, 1.0));
 
 		//once per vertex
 		mNormalVecs.push_back(normal);
