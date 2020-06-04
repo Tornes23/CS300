@@ -40,6 +40,7 @@ The functions included are:
 
 #include "Model.h"
 #include <GLM/gtc/constants.hpp>
+#include <GLM/gtc/matrix_transform.hpp>
 #include <GLM/gtx/normal.hpp>
 #include <iostream>
 
@@ -72,13 +73,13 @@ Model::Model(Shape form, int precision)
 		CreateCube();
 		break;
 	case Model::Cylinder:
-		CreateCylinder(mPrecision);
+		CreateCylinder(mPrecision, 0.5F);
 		break;
 	case Model::Cone:
-		CreateCone(mPrecision);
+		CreateCone(mPrecision, 0.5F);
 		break;
 	case Model::Sphere:
-		CreateSphere(mPrecision);
+		CreateSphere(mPrecision, 0.5F);
 		break;
 	case Model::Plane:
 		CreatePlane();
@@ -113,17 +114,17 @@ void Model::UpdateModel(int modification)
 	case Model::Cylinder:
 		FreeBuffers();
 
-		CreateCylinder(mPrecision);
+		CreateCylinder(mPrecision, 0.5);
 		break;
 	case Model::Cone:
 		FreeBuffers();
 
-		CreateCone(mPrecision);
+		CreateCone(mPrecision, 0.5);
 		break;
 	case Model::Sphere:
 		FreeBuffers();
 
-		CreateSphere(mPrecision);
+		CreateSphere(mPrecision, 0.5);
 		break;
 	default:
 		break;
@@ -211,16 +212,14 @@ void Model::CreateSphere(int slices, float radius)
 				mIndexes.push_back(index1 + 1);
 				
 				mNormalVecs.push_back(normal);
-
 			}
 
-			
 			if (i != (ringCount - 1))
 			{
 				glm::vec3 v0 = mVertices[index1 + 1];
 				glm::vec3 v1 = mVertices[index2];
 				glm::vec3 v2 = mVertices[index2 + 1];
-				glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
+				glm::vec3 normal = glm::triangleNormal(v0, v2, v0);
 
 				mIndexes.push_back(index1 + 1);
 				mIndexes.push_back(index2);
@@ -314,14 +313,17 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
+		mAveraged.push_back(v0);
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0));
+		mAveraged.push_back(v1);
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 1));
+		mAveraged.push_back(v2);
 
 		//once per vertex
 		mNormalVecs.push_back(normal);
@@ -340,14 +342,17 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 1));
+		mAveraged.push_back(v0);
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 1));
+		mAveraged.push_back(v1);
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
+		mAveraged.push_back(v2);
 
 		//once per vertex
 		mNormalVecs.push_back(normal);
@@ -355,7 +360,9 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		mNormalVecs.push_back(normal);
 #pragma endregion
 
-#pragma endregion TOP AND BOT TRIANGLES
+#pragma endregion 
+
+#pragma region TOP AND BOT TRIANGLES
 
 #pragma region TOP TRIANGLE
 
@@ -368,14 +375,17 @@ void Model::CreateCylinder(int slices, float radius, float height)
 
 		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 1));
+		mAveraged.push_back(v0);
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(uMid, 1));
+		mAveraged.push_back(v1);
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 1));
+		mAveraged.push_back(v2);
 
 		//once per vertex
 		mNormalVecs.push_back(normal);
@@ -392,14 +402,17 @@ void Model::CreateCylinder(int slices, float radius, float height)
 
 		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
+		mAveraged.push_back(v0);
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(uMid, 0));
+		mAveraged.push_back(v1);
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0));
+		mAveraged.push_back(v2);
 
 		//once per vertex
 		mNormalVecs.push_back(normal);
@@ -411,8 +424,6 @@ void Model::CreateCylinder(int slices, float radius, float height)
 
 		k += 3;
 	}
-
-	ComputeAverage();
 
 	//binding the buffers
 	BindBuffers();
@@ -464,6 +475,9 @@ void Model::CreateCone(int slices, float radius, float height)
 	//computing triangles
 	for (int i = 0; i < slices; i++)
 	{
+		float angle = i * angleStep;
+		float angle2 = (i + 1) * angleStep;
+		glm::mat4x4 rotationMat(1.0F);
 		//getting the x y z coordinates of the circle
 		float xCoord = circleCoords[k];
 		float yCoord = circleCoords[k + 1];
@@ -493,20 +507,27 @@ void Model::CreateCone(int slices, float radius, float height)
 		glm::vec3 v0 = glm::vec3(xCoord * radius, botY, zCoord * radius);
 		glm::vec3 v1 = glm::vec3(xCoord2 * radius, botY, zCoord2 * radius);
 		glm::vec3 v2 = glm::vec3(0, topY, 0);
-		glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
+		glm::vec3 normal = glm::triangleNormal(v1, v0, v2);
+
+		glm::vec3 average = normalize((glm::vec3(0,0,-1) + glm::vec3(1, 0, 0) + glm::vec3(0, 0.5, 0)));
 
 #pragma region MIDDLE TRIANGLE
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
+		mAveraged.push_back(glm::vec3(glm::rotate(rotationMat, angle2, glm::vec3(0,1,0)) * glm::vec4(average, 1.0)));
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v0);
-		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0));
+		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0)); 
+		mAveraged.push_back(glm::vec3(glm::rotate(rotationMat, angle, glm::vec3(0, 1, 0)) * glm::vec4(average, 1.0)));
+
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(uMid, 1));
+		mAveraged.push_back(v2);
+		mAveraged.push_back(glm::vec3(0, 1, 0));
 
 		//once per vertex
 		mNormalVecs.push_back(normal);
@@ -524,14 +545,17 @@ void Model::CreateCone(int slices, float radius, float height)
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(uMid, 0));
+		mAveraged.push_back(glm::vec3(0, -1, 0));
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v1);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0));
+		mAveraged.push_back(glm::vec3(glm::rotate(rotationMat, angle2, glm::vec3(0, 1, 0)) * glm::vec4(average, 1.0)));
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
+		mAveraged.push_back(glm::vec3(glm::rotate(rotationMat, angle2, glm::vec3(0, 1, 0)) * glm::vec4(average, 1.0)));
 
 		//once per vertex
 		mNormalVecs.push_back(normal);
@@ -541,8 +565,6 @@ void Model::CreateCone(int slices, float radius, float height)
 
 		k += 3;
 	}
-
-	ComputeAverage();
 
 	//calling to bind the buffers
 	BindBuffers();
@@ -583,9 +605,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(-v0);
+	mAveraged.push_back(-v1);
+	mAveraged.push_back(-v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -606,9 +633,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(-v0);
+	mAveraged.push_back(-v1);
+	mAveraged.push_back(-v2);
 
 	v0 = glm::vec3(0.5, 0.5, -0.5);
 	v1 = glm::vec3(0.5, 0.5, 0.5);
@@ -618,9 +650,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(-v0);
+	mAveraged.push_back(-v1);
+	mAveraged.push_back(-v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -640,9 +677,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(-v0);
+	mAveraged.push_back(-v1);
+	mAveraged.push_back(-v2);
 
 	v0 = glm::vec3(-0.5,  0.5,  0.5);
 	v1 = glm::vec3(-0.5,  0.5, -0.5);
@@ -652,9 +694,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(-v0);
+	mAveraged.push_back(-v1);
+	mAveraged.push_back(-v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -675,9 +722,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(-v0);
+	mAveraged.push_back(-v1);
+	mAveraged.push_back(-v2);
 
 	v0 = glm::vec3(0.5, -0.5, -0.5);
 	v1 = glm::vec3(-0.5, -0.5, -0.5);
@@ -687,9 +739,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(-v0);
+	mAveraged.push_back(-v1);
+	mAveraged.push_back(-v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -709,9 +766,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+	
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(-v0);
+	mAveraged.push_back(-v1);
+	mAveraged.push_back(-v2);
 
 	v0 = glm::vec3(-0.5, -0.5, 0.5);
 	v1 = glm::vec3(-0.5, -0.5, -0.5);
@@ -721,9 +783,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(-v0);
+	mAveraged.push_back(-v1);
+	mAveraged.push_back(-v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(0, 1));
@@ -743,9 +810,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(-v0);
+	mAveraged.push_back(-v1);
+	mAveraged.push_back(-v2);
 
 	v0 = glm::vec3(-0.5, 0.5, -0.5);
 	v1 = glm::vec3(-0.5, 0.5, 0.5);
@@ -755,9 +827,14 @@ void Model::CreateCube()
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
+
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
 	mNormalVecs.push_back(normal);
+
+	mAveraged.push_back(-v0);
+	mAveraged.push_back(-v1);
+	mAveraged.push_back(-v2);
 
 	mTextureCoords.push_back(glm::vec2(0, 0));
 	mTextureCoords.push_back(glm::vec2(1, 0));
@@ -766,8 +843,6 @@ void Model::CreateCube()
 	mTextureCoords.push_back(glm::vec2(1, 1));
 	mTextureCoords.push_back(glm::vec2(0, 1));
 	mTextureCoords.push_back(glm::vec2(0, 0));
-
-	ComputeAverage();
 
 	//binding buffers
 	BindBuffers();
@@ -809,110 +884,20 @@ void Model::CreatePlane()
 
 	mVertices.push_back(v2);
 	mTextureCoords.push_back(glm::vec2(1, 1));
-	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
-	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
+	mNormalVecs.push_back(glm::triangleNormal(v1, v0, v2));
+	mAveraged.push_back(glm::triangleNormal(v1, v0, v2));
 
 	mVertices.push_back(v1);
 	mTextureCoords.push_back(glm::vec2(0, 1));
-	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
-	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
+	mNormalVecs.push_back(glm::triangleNormal(v1, v0, v2));
+	mAveraged.push_back(glm::triangleNormal(v1, v0, v2));
 
 	mVertices.push_back(v0);
 	mTextureCoords.push_back(glm::vec2(0, 0));
-	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
-	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
+	mNormalVecs.push_back(glm::triangleNormal(v1, v0, v2));
+	mAveraged.push_back(glm::triangleNormal(v1, v0, v2));
 
 	BindBuffers();
-}
-
-/**************************************************************************
-*!
-\fn     Model::ComputeAverage
-
-\brief
-Generates the averaged normals
-
-*
-**************************************************************************/
-void Model::ComputeAverage()
-{
-	//vector to contain the averaged normal
-	glm::vec3 average;
-
-	//epsilon value to check the position
-	float errorVal = 0.1F;
-
-	size_t size = mIndexed ? mIndexes.size() : mVertices.size();
-
-	//looping throught the vertices
-	for (size_t i = 0; i < size; i++)
-	{
-		if (mIndexed)
-			average = mNormalVecs[mIndexes[i]];
-		else
-			average = mNormalVecs[i];
-
-		int count = 1;
-
-		//another loop to compare the vertices
-		for (size_t j = i + 1; j < size; j++)
-		{
-			//computing the difference between the two vertex
-			float differenceX = glm::abs(mVertices[i].x - mVertices[j].x);
-			float differenceY = glm::abs(mVertices[i].y - mVertices[j].y);
-			float differenceZ = glm::abs(mVertices[i].z - mVertices[j].z);
-
-			//if the difference is lower than the error value
-			if (differenceX < errorVal && differenceY < errorVal && differenceZ < errorVal)
-			{
-				if (mIndexed)
-					average += mNormalVecs[mIndexes[j]];
-				else
-					average += mNormalVecs[j];
-
-				count++;
-
-				////copy the normals to the original vertex
-				//for (unsigned k = 0; k < mNormalsPerFace[j].size(); k++)
-				//{
-				//	mNormalsPerFace[i].push_back(mNormalsPerFace[j][k]);
-				//}
-				////clearing the normals of te duplicated vertex
-				//mNormalsPerFace[j].clear();
-			}
-		}
-
-		average /= count;
-
-		mAveraged.push_back(average);
-	}
-
-	////for each vertex
-	//for (unsigned i = 0; i < mVertices.size(); i++)
-	//{
-	//	//set the average to 0
-	//	average = glm::vec3(0, 0, 0);
-	//
-	//	//if is empty skip it
-	//	if (mNormalsPerFace[i].empty())
-	//		continue;
-	//
-	//	//adding all the normals
-	//	for (unsigned j = 0; j < mNormalsPerFace[i].size(); j++)
-	//	{
-	//		average += mNormalsPerFace[i][j];
-	//	}
-	//
-	//	//dividing it over the added amount
-	//	average /= mNormalsPerFace[i].size();
-	//
-	//	//normalizing it
-	//	average = glm::normalize(average);
-	//
-	//	//adding the normal to the  container
-	//	mAveraged.push_back(mVertices[i]);
-	//	mAveraged.push_back(mVertices[i] + average);
-	//}
 }
 
 /**************************************************************************

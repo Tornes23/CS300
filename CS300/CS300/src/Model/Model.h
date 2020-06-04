@@ -65,8 +65,6 @@ public:
 	void CreateCone(int slices = 9, float radius = 1.0F, float height = 1.0F);
 	void CreateCube();
 	void CreatePlane();
-	void ComputeNormals();
-	void ComputeAverage();
 
 	void BindBuffers();
 	void BindNormalBuffer();
@@ -76,11 +74,9 @@ public:
 	void GenBuffers();
 
 	GLsizei GetDrawElements() const;
-	GLsizei GetNormalCount(bool average) const;
 	bool GetIndexed();
 
 	const GLuint GetVAO() const;
-	const GLuint GetNormalVAO(bool average) const;
 	Shape GetShape() const;
 	void SetShape(Shape shape);
 

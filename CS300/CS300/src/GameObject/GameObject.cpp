@@ -135,33 +135,6 @@ glm::mat4x4 GameObject::GenerateOrthogonal()
 
 /**************************************************************************
 *!
-\fn     GameObject::GenerateInverseM2W
-
-\brief 
-Creates the inverse model to world matrix
-
-\return glm::mat4x4
-returns the matrix
-
-*
-**************************************************************************/
-glm::mat4x4 GameObject::GenerateInverseM2W()
-{
-#pragma region CREATING THE NECESSARY MATRICES
-	//GenerateInverseScale();
-	////INVERSE ROTATIONS
-	//GenerateInverseTranslation();
-#pragma endregion
-
-	//multiplying the Transform Rotations and Scaling
-	//mInverseModel2World = mInverseScaling * /*PENDING ROTATION MULTIPLICATIONS * */ mInverseTranslation);
-
-	//returning the matrix
-	return mInverseModel2World;
-}
-
-/**************************************************************************
-*!
 \fn     GameObject::GenerateAxisAngleMetod
 
 \brief 
@@ -306,34 +279,6 @@ glm::mat4x4 GameObject::GenerateAxisAngleMetod(Axis rotationAxis, float amount)
 
 /**************************************************************************
 *!
-\fn     GameObject::GenerateNormalTransform
-
-\brief 
-Creates the transformation matrix for thew normals
-
-\return glm::mat4x4
-returns the matrix
-
-*
-**************************************************************************/
-glm::mat4x4 GameObject::GenerateNormalTransform()
-{
-	mNormalTransform = glm::transpose(glm::inverse(mModel2World));
-
-	//glm::mat4x4 inverse_m2w = GenerateInverseM2W();
-	//
-	//mNormalTransform = glm::mat4x4(
-	//					inverse_m2w[0][0], inverse_m2w[1][0], inverse_m2w[2][0], inverse_m2w[3][0],
-	//					inverse_m2w[0][1], inverse_m2w[1][1], inverse_m2w[2][1], inverse_m2w[3][1],
-	//					inverse_m2w[0][2], inverse_m2w[1][2], inverse_m2w[2][2], inverse_m2w[3][2],
-	//					inverse_m2w[0][3], inverse_m2w[1][3], inverse_m2w[2][3], inverse_m2w[3][3]
-	//					);
-
-	return mNormalTransform;
-}
-
-/**************************************************************************
-*!
 \fn     GameObject::UpdateModel
 
 \brief 
@@ -363,8 +308,6 @@ void GameObject::Update()
 {
 	//creating a new model to world matrix
 	GenerateM2W();
-	GenerateInverseM2W();
-	GenerateNormalTransform();
 }
 
 

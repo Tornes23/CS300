@@ -137,9 +137,11 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 			currentShader.Use();
 
-			glm::mat4x4 m2w_normal = objects[i]->GenerateNormalTransform();
+			glm::mat4x4 m2w_normal = glm::transpose(glm::inverse(mCameraMatrix * m2w_object));
 
-			currentShader.SetIntUniform("Averaged", mAveragedNormals ? 1 : 0);
+			int check = mAveragedNormals ? 1 : 0;
+
+			currentShader.SetIntUniform("Averaged", check);
 			currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
 			currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 			currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));

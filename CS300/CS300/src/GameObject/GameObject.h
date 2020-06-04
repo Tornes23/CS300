@@ -49,19 +49,14 @@ struct GameObject
 	//member functions
 	glm::mat4x4 GenerateM2W();
 	glm::mat4x4 GenerateOrthogonal();
-	glm::mat4x4 GenerateInverseM2W();
 	glm::mat4x4 GenerateAxisAngleMetod(Axis rotationAxis, float amount);
-	glm::mat4x4 GenerateNormalTransform();
 	void UpdateModel(int modify);
 	void Update();
 
 	//member variables
 	glm::mat4x4 mModel2World;
-	glm::mat4x4 mInverseModel2World;
 	glm::mat4x4 mOrthogonal;
 	glm::mat4x4 mAxisAngleMethod;
-	glm::mat4x4 mInverseOrthogonal;
-	glm::mat4x4 mNormalTransform;
 
 	glm::vec3 mPosition;
 	glm::vec3 mScale;
