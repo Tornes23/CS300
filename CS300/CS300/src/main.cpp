@@ -39,10 +39,10 @@ int main()
 	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(50, 50, 1), "Floor", Model::Shape::Plane, true, glm::vec3(0, 0, 1), glm::vec3(0, 1, 0)));
 
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Plane",    Model::Shape::Plane, true));
-	//myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cube",     Model::Shape::Cube));
-	//myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(5,  10,  5),  "Cone",     Model::Shape::Cone));
-	//myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(5,  10,  5),  "Cylinder", Model::Shape::Cylinder));
-	//myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Sphere",   Model::Shape::Sphere));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cube",     Model::Shape::Cube));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(5,  10,  5),  "Cone",     Model::Shape::Cone));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(5,  10,  5),  "Cylinder", Model::Shape::Cylinder));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Sphere",   Model::Shape::Sphere));
 
 
 	while (!myWindow.IsClosed())

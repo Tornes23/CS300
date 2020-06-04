@@ -247,32 +247,6 @@ void Camera::DrawTriangle(GameObject* target)
 	error = glGetError();
 }
 
-/**************************************************************************
-*!
-\fn     Camera::DrawNormals
-
-\brief
-Renders a triangle or the outline based on the setted flags
-
-\param  GameObject* target
-the object to be rendered
-
-*
-**************************************************************************/
-void Camera::DrawNormals(GameObject* target)
-{
-	GLenum error = glGetError();
-
-	//binding the objects VAO
-	glBindVertexArray(target->mModel.GetNormalVAO(mAveragedNormals));
-	error = glGetError();
-
-	// Drawing
-	glDrawArrays(GL_LINES, 0, target->mModel.GetNormalCount(mAveragedNormals));
-
-	error = glGetError();
-}
-
 void Camera::ApplyLight(GameObject * target)
 {
 }
@@ -419,11 +393,6 @@ returns the shader program
 **************************************************************************/
 ShaderProgram Camera::GetNormalShader()
 {
-	if (mAveragedNormals)
-	{
-		return mShaders[5];//return normals & averaged
-	}
-
 	return mShaders[4];//normals shader
 }
 

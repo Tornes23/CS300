@@ -10,6 +10,7 @@ out VS_OUT {
 } vs_out;
 
 out vec2 UV;
+flat out int AvNormal;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -33,5 +34,7 @@ void main()
         vs_out.normal = normalize(vec3(m2w_normal * vec4(vAveraged, 0.0)));
     else
         vs_out.normal = normalize(vec3(m2w_normal * vec4(vNormal, 1.0)));
+        
+    AvNormal = Averaged;
         
 }

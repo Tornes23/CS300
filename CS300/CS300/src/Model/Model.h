@@ -88,16 +88,14 @@ private:
 
 	std::vector<glm::vec3> mVertices;
 	std::vector<glm::vec2> mTextureCoords;
-	std::vector<glm::vec3> mNormalPoints;
 	std::vector<glm::vec3> mNormalVecs;
 	std::vector<glm::vec3> mAveraged;
 	std::vector<unsigned short> mIndexes;
-	std::vector<std::vector<glm::vec3>> mNormalsPerFace;
 	
 
 	bool mIndexed;
 	int mPrecision;
 	Shape mShape;
-	GLuint mVAO[3];
+	GLuint mVAO;
 	GLuint mVBO[5];
 };

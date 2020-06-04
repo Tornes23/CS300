@@ -204,7 +204,7 @@ void Model::CreateSphere(int slices, float radius)
 				glm::vec3 v0 = mVertices[index1];
 				glm::vec3 v1 = mVertices[index2];
 				glm::vec3 v2 = mVertices[index1 + 1];
-				glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
+				glm::vec3 normal = glm::triangleNormal(v1, v2, v0);
 
 				mIndexes.push_back(index1);
 				mIndexes.push_back(index2);
@@ -792,7 +792,7 @@ void Model::CreatePlane()
 	//adding the position texture coordinates and normal values for the four vertices
 	mVertices.push_back(v0);
 	mTextureCoords.push_back(glm::vec2(0, 0));
-	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
+	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
 	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
 
 	mVertices.push_back(v1);
@@ -802,105 +802,27 @@ void Model::CreatePlane()
 
 	mVertices.push_back(v2);
 	mTextureCoords.push_back(glm::vec2(1, 1));
-	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
+	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
 	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
 
 	v1 = glm::vec3(-0.5, 0.5, 0.0);
 
 	mVertices.push_back(v2);
 	mTextureCoords.push_back(glm::vec2(1, 1));
-	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
+	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
 	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
 
 	mVertices.push_back(v1);
 	mTextureCoords.push_back(glm::vec2(0, 1));
-	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
+	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
 	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
 
 	mVertices.push_back(v0);
 	mTextureCoords.push_back(glm::vec2(0, 0));
-	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
+	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
 	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
 
 	BindBuffers();
-}
-
-/**************************************************************************
-*!
-\fn     Model::ComputeNormals
-
-\brief
-Generates the normals
-
-*
-**************************************************************************/
-void Model::ComputeNormals()
-{
-	size_t size;
-
-	//resizing the vector vector to match the vertex size
-	mNormalsPerFace.resize(mVertices.size());
-
-	//if is not using indexes the size is one third of the vertices (3 vertices make a face)
-	if (!mIndexed)
-		size = mVertices.size() / 3;
-	else
-		size = mIndexes.size() / 3;
-
-	//variable to access the container
-	int k = 0;
-
-	//looping through the faces
-	for (size_t i = 0; i < size; i++)
-	{
-		//if is indexed
-		if (mIndexed)
-		{
-			//computing the normal
-			glm::vec3 normal = glm::triangleNormal(mVertices[mIndexes[k]], mVertices[mIndexes[k + 1]], mVertices[mIndexes[k + 2]]);
-
-			//adding it to the corresponding vertices
-			mNormalsPerFace[mIndexes[k]].push_back(normal);
-			mNormalsPerFace[mIndexes[k + 1]].push_back(normal);
-			mNormalsPerFace[mIndexes[k + 2]].push_back(normal);
-
-			//pushing the normals
-			mNormalPoints.push_back(mVertices[mIndexes[k]]);
-			mNormalPoints.push_back(mVertices[mIndexes[k]] + normal);
-
-			mNormalPoints.push_back(mVertices[mIndexes[k + 1]]);
-			mNormalPoints.push_back(mVertices[mIndexes[k + 1]] + normal);
-
-			mNormalPoints.push_back(mVertices[mIndexes[k + 2]]);
-			mNormalPoints.push_back(mVertices[mIndexes[k + 2]] + normal);
-		}
-		else
-		{
-			//computing the normal
-			glm::vec3 normal = glm::triangleNormal(mVertices[k], mVertices[k + 1], mVertices[k + 2]);
-
-			//adding it to the corresponding vertices
-			mNormalsPerFace[k].push_back(normal);
-			mNormalsPerFace[k + 1].push_back(normal);
-			mNormalsPerFace[k + 2].push_back(normal);
-
-			//pushing the normals
-			mNormalPoints.push_back(mVertices[k]);
-			mNormalPoints.push_back(mVertices[k] + normal);
-
-			mNormalPoints.push_back(mVertices[k + 1]);
-			mNormalPoints.push_back(mVertices[k + 1] + normal);
-
-			mNormalPoints.push_back(mVertices[k + 2]);
-			mNormalPoints.push_back(mVertices[k + 2] + normal);
-		}
-
-		k += 3;
-	}
-
-	//computing the average normals 
-	ComputeAverage();
-
 }
 
 /**************************************************************************
@@ -1006,11 +928,25 @@ void Model::BindBuffers()
 {
 	GenBuffers();
 
+	//binding the VAo
+	glBindVertexArray(mVAO);
+
 	BindModelBuffer();
 
 	BindNormalBuffer();
 
 	BindAverageBuffer();
+
+	if (mIndexed)
+	{
+		//adding triangle indexes
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[4]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
+	}
+
+	// Unbind the VAO
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(mVAO);
 
 }
 
@@ -1025,17 +961,11 @@ Binds the VBO and VAO buffers of the normals
 **************************************************************************/
 void Model::BindNormalBuffer()
 {
-	//glBindVertexArray(mVAO[1]);
-	//
-	////addign normals
-	//glBindBuffer(GL_ARRAY_BUFFER, mVBO[4]);
-	//glBufferData(GL_ARRAY_BUFFER, mNormalPoints.size() * sizeof(glm::vec3), &mNormalPoints[0].x, GL_STATIC_DRAW);
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	//
-	//// Unbind the VAO
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindVertexArray(mVAO[1]);
+	//addign normals
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[2]);
+	glBufferData(GL_ARRAY_BUFFER, mNormalVecs.size() * sizeof(glm::vec3), &mNormalVecs[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 }
 
 /**************************************************************************
@@ -1049,17 +979,11 @@ Binds the VBO and VAO buffers of the averaged normals
 **************************************************************************/
 void Model::BindAverageBuffer()
 {
-	//glBindVertexArray(mVAO[2]);
-	//
-	////addign average normals
-	//glBindBuffer(GL_ARRAY_BUFFER, mVBO[5]);
-	//glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	//
-	//// Unbind the VAO
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindVertexArray(mVAO[2]);
+	//addign normals
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[3]);
+	glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 }
 
 /**************************************************************************
@@ -1073,9 +997,6 @@ Binds the VBO and VAO buffers of the model
 **************************************************************************/
 void Model::BindModelBuffer()
 {
-	//binding the VAo
-	glBindVertexArray(mVAO[0]);
-
 	//addign pos
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[0]);
 	glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3), &mVertices[0].x, GL_STATIC_DRAW);
@@ -1088,28 +1009,6 @@ void Model::BindModelBuffer()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 
-	//addign normals
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[2]);
-	glBufferData(GL_ARRAY_BUFFER, mNormalVecs.size() * sizeof(glm::vec3), &mNormalVecs[0].x, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-	//addign normals
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[3]);
-	glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-	if (mIndexed)
-	{
-		//adding triangle indexes
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[4]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
-	}
-
-	// Unbind the VAO
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(mVAO[0]);
 }
 
 /**************************************************************************
@@ -1124,24 +1023,22 @@ Deallocates the VBOs and VAOs
 void Model::FreeBuffers()
 {
 	//deallocating the 2 VAOs and the 4 VBOs
-	glDeleteBuffers(6, mVBO);
-	glDeleteVertexArrays(3, mVAO);
+	glDeleteBuffers(5, mVBO);
+	glDeleteVertexArrays(1, &mVAO);
 
 	//clearing the vectors
 	mVertices.clear();
-	mNormalPoints.clear();
 	mNormalVecs.clear();
 	mAveraged.clear();
 	mTextureCoords.clear();
 	mIndexes.clear();
-	mNormalsPerFace.clear();
 }
 
 void Model::GenBuffers()
 {
 	//generating the VAO and VBO buffers
-	glGenVertexArrays(3, mVAO);
-	glGenBuffers(6, mVBO);
+	glGenVertexArrays(1, &mVAO);
+	glGenBuffers(5, mVBO);
 }
 
 /**************************************************************************
@@ -1165,26 +1062,6 @@ GLsizei Model::GetDrawElements() const
 		return static_cast<GLsizei>(mVertices.size());
 }
 
-/**************************************************************************
-*!
-\fn     Model::GetNormalCount
-
-\brief 
-
-
-\return GLsizei
-
-
-*
-**************************************************************************/
-GLsizei Model::GetNormalCount(bool average) const
-{
-	if(average)
-		return static_cast<GLsizei>(mAveraged.size());
-
-	return static_cast<GLsizei>(mNormalPoints.size());
-}
-
 bool Model::GetIndexed()
 {
 	return mIndexed;
@@ -1205,16 +1082,9 @@ Returns the handle for the VAO
 const GLuint Model::GetVAO() const
 {
 	//returing the VAO of the model
-	return mVAO[0];
+	return mVAO;
 }
 
-const GLuint Model::GetNormalVAO(bool average) const
-{
-	if (average)
-		return mVAO[2];
-
-	return mVAO[1];
-}
 
 Model::Shape Model::GetShape() const
 {
