@@ -176,6 +176,8 @@ void Model::CreateSphere(int slices, float radius)
 			float yCoord = (radius * sinf(ringAngle));
 			float zCoord = (radius * cosf(ringAngle)) * cosf(sliceAngle);
 
+			mAveraged.push_back(glm::vec3(xCoord, yCoord, zCoord));
+
 			//computing the u v coordinates
 			float u = static_cast<float>(j) / slices;
 			float v = static_cast<float>(i) / ringCount;
@@ -209,12 +211,6 @@ void Model::CreateSphere(int slices, float radius)
 				mIndexes.push_back(index1 + 1);
 				
 				mNormalVecs.push_back(normal);
-				mNormalVecs.push_back(normal);
-				mNormalVecs.push_back(normal);
-
-				mAveraged.push_back(v0);
-				mAveraged.push_back(v1);
-				mAveraged.push_back(v2);
 
 			}
 
@@ -230,12 +226,6 @@ void Model::CreateSphere(int slices, float radius)
 				mIndexes.push_back(index2 + 1);
 
 				mNormalVecs.push_back(normal);
-				mNormalVecs.push_back(normal);
-				mNormalVecs.push_back(normal);
-				
-				mAveraged.push_back(v0);
-				mAveraged.push_back(v1);
-				mAveraged.push_back(v2);
 			}
 		}
 	}
@@ -978,6 +968,13 @@ void Model::BindNormalBuffer()
 	glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	if (mIndexed)
+	{
+		//adding triangle indexes
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[4]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
+	}
 
 	// Unbind the VAO
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
