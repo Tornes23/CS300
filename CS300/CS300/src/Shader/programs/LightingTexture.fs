@@ -97,10 +97,10 @@ vec3 DirectionalLight(vec3 initialCol)
     return initialCol; 
 }
 
-vec3 SpotLight(vec3 initialCol)
-{
-    
-}
+//vec3 SpotLight(vec3 initialCol)
+//{
+//    
+//}
 
 vec3 ApplyPhongLight()
 {
