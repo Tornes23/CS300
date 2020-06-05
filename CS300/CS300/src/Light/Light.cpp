@@ -158,38 +158,29 @@ void Light::Edit()
 		ImGui::TreePop();
 	}
 
-	if (ImGui::TreeNode("Model"))
+	if (ImGui::TreeNode("Light Properties"))
 	{
-		int shape = mModel.GetShape();
 
-		const char* model[5] = { "Plane","Cube", "Cone", "Cylinder", "Sphere" };
+		int shape = mType;
 
-		if (ImGui::Combo("Shape", &shape, model, 5, 6)) {
+		const char* model[3] = { "Point", "Directional", "Spotlight" };
+
+		if (ImGui::Combo("Light Mode", &shape, model, 3, 4)) 
+		{
 			switch (shape)
 			{
 			case 0:
-				mModel.SetShape(Model::Shape::Plane);
+				mType = Point;
 				break;
 			case 1:
-				mModel.SetShape(Model::Shape::Cube);
+				mType = Directional;
+
 				break;
 			case 2:
-				mModel.SetShape(Model::Shape::Cone);
-				break;
-			case 3:
-				mModel.SetShape(Model::Shape::Cylinder);
-				break;
-			case 4:
-				mModel.SetShape(Model::Shape::Sphere);
+				mType = Spotlight;
 				break;
 			}
 		}
-
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("Light Properties"))
-	{
 
 		glm::vec4 diffuse = glm::vec4(mDiffuseColor.GetColor(), 1.0F);
 		glm::vec4 specular = glm::vec4(mSpecularColor.GetColor(), 1.0F);
@@ -198,6 +189,13 @@ void Light::Edit()
 		ImGui::ColorEdit4("Ambient Color", glm::value_ptr(specular));
 		ImGui::ColorEdit4("Diffuse Color", glm::value_ptr(diffuse));
 		ImGui::ColorEdit4("Specular Color", glm::value_ptr(ambient));
+
+		ImGui::DragFloat3("Attenuation", glm::value_ptr(mAttenuation));
+
+		ImGui::DragFloat("Inner Cosine", &mCosInner);
+		ImGui::DragFloat("Outer Cosine", &mCosOuter);
+		ImGui::DragFloat("Fall Off", &mFallOff);
+		ImGui::DragFloat("Radius", &mRadius);
 
 		mDiffuseColor.SetColor(diffuse);
 		mSpecularColor.SetColor(specular);
