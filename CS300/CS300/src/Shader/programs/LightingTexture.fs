@@ -36,15 +36,27 @@ in vec3 Normal;
 
 uniform sampler2D textureData;
 
-vec3 PointLight()
+vec3 PointLight(vec3 initialCol)
 {
     vec3 lightDir = normalize(lightSource.PosInCamSpc - PosInCamSpc);
     
     float diffuseVal = max(dot(Normal, lightDir), 0.0);
     
-    vec3 result = diffuseVal * lightSource.DiffuseColor;
-                
-    return result;
+    vec3 diffuseCol = diffuseVal * lightSource.DiffuseColor;
+    
+    initialCol += diffuseCol;
+    
+    float specularStrength = 0.5;
+    
+    vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
+    vec3 reflectDir = reflect(-lightDir, Normal);  
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    
+    vec3 specular = specularStrength * spec * lightSource.SpecularColor;  
+    
+    initialCol += specular;
+    
+    return initialCol;
 }
 
 //vec3 DirectionalLight(vec3 diffuseCol)
@@ -70,9 +82,9 @@ vec3 ApplyPhongLight()
     
     if(lightSource.Type == 0)
     {
-        vec3 color = PointLight();
+        vec3 color = PointLight(ambientCol);
         
-        finalCol = (ambientCol + color) * textureCol;
+        finalCol = color * textureCol;
         
         return finalCol;
     }
