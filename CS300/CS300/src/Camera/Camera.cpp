@@ -62,7 +62,7 @@ Camera::Camera(glm::vec3 direction)
 	mRenderNormals = false;
 	mAveragedNormals = false;
 	mTextureMapping = false;
-	mLighting = false;
+	mLighting = true;
 
 	AddAllShaders();
 	AddAllLights();
@@ -414,7 +414,7 @@ ShaderProgram Camera::GetShader()
 	}
 
 	//by default return the texture shader
-	return mShaders[0];
+	return mShaders[2];
 }
 
 /**************************************************************************

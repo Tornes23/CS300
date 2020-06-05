@@ -50,9 +50,14 @@ void Light::Setuniforms(ShaderProgram * shader, glm::mat4x4& w2Cam)
 	shader->SetVec3Uniform("lightSource.Direction", mDirection);
 	shader->SetVec3Uniform("lightSource.PosInCamSpc", w2Cam * glm::vec4(mPosition, 1.0));
 
-	shader->SetVec3Uniform("lightSource.Ambient",  mAmbientColor.GetColor());
-	shader->SetVec3Uniform("lightSource.Diffuse",  mDiffuseColor.GetColor());
-	shader->SetVec3Uniform("lightSource.Specular", mSpecularColor.GetColor());
+	//CHECK THIS SHI
+	//shader->SetVec3Uniform("lightSource.Ambient",  mAmbientColor.GetColor());
+	//shader->SetVec3Uniform("lightSource.Diffuse",  mDiffuseColor.GetColor());
+	//shader->SetVec3Uniform("lightSource.Specular", mSpecularColor.GetColor());
+
+	shader->SetVec3Uniform("lightSource.AmbientColor", glm::vec3(0, 0, 0));
+	shader->SetVec3Uniform("lightSource.DiffuseColor", glm::vec3(1, 1, 1));
+	shader->SetVec3Uniform("lightSource.SpecularColor", glm::vec3(1, 1, 1));
 
 	shader->SetVec3Uniform("lightSource.Attenuation", mAttenuation);
 
@@ -75,10 +80,10 @@ void Light::Update()
 		mRotations.x += 1.0F;
 
 	if (KeyDown(U))
-		mRadius -= 1.0F;
+		mRadius -= 0.5F;
 
 	if (KeyDown(O))
-		mRadius += 1.0F;
+		mRadius += 0.5F;
 
 	GetM2W();
 }
