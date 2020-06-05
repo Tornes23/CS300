@@ -1,6 +1,7 @@
+#include <GLM/gtc/type_ptr.hpp>
+#include <IMGUI/imgui.h>
 #include "Light.h"
 #include "../Shader/Shader.h"
-#include <GLM/gtc/type_ptr.hpp>
 #include "../Input/Input.h"
 
 
@@ -59,6 +60,7 @@ void Light::Setuniforms(ShaderProgram * shader, glm::mat4x4& w2Cam)
 
 void Light::Update()
 {
+	Edit();
 
 	if (KeyDown(I))
 		mRotations.y += 1.0F;
@@ -141,4 +143,68 @@ ShaderProgram Light::GetShader() const
 
 void Light::Edit()
 {
+	if (!ImGui::Begin("Light"))
+	{
+		// Early out if the window is collapsed, as an optimization.
+		ImGui::End();
+		return;
+	}
+
+	if (ImGui::TreeNode("Transform"))
+	{
+		ImGui::DragFloat3("Position", glm::value_ptr(mRotations));
+		ImGui::DragFloat3("Scale", glm::value_ptr(mScale));
+
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Model"))
+	{
+		int shape = mModel.GetShape();
+
+		const char* model[5] = { "Plane","Cube", "Cone", "Cylinder", "Sphere" };
+
+		if (ImGui::Combo("Shape", &shape, model, 5, 6)) {
+			switch (shape)
+			{
+			case 0:
+				mModel.SetShape(Model::Shape::Plane);
+				break;
+			case 1:
+				mModel.SetShape(Model::Shape::Cube);
+				break;
+			case 2:
+				mModel.SetShape(Model::Shape::Cone);
+				break;
+			case 3:
+				mModel.SetShape(Model::Shape::Cylinder);
+				break;
+			case 4:
+				mModel.SetShape(Model::Shape::Sphere);
+				break;
+			}
+		}
+
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Light Properties"))
+	{
+
+		glm::vec4 diffuse = glm::vec4(mDiffuseColor.GetColor(), 1.0F);
+		glm::vec4 specular = glm::vec4(mSpecularColor.GetColor(), 1.0F);
+		glm::vec4 ambient = glm::vec4(mAmbientColor.GetColor(), 1.0F);
+
+		ImGui::ColorEdit4("Ambient Color", glm::value_ptr(specular));
+		ImGui::ColorEdit4("Diffuse Color", glm::value_ptr(diffuse));
+		ImGui::ColorEdit4("Specular Color", glm::value_ptr(ambient));
+
+		mDiffuseColor.SetColor(diffuse);
+		mSpecularColor.SetColor(specular);
+		mAmbientColor.SetColor(specular);
+
+		ImGui::TreePop();
+	}
+
+	ImGui::End();
 }
