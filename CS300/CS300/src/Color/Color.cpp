@@ -60,10 +60,10 @@ the value for the alpha color
 Color::Color(float r, float g, float b, float a)
 {
 	//setting the values
-	mR = static_cast<unsigned char>(r) * 255;
-	mG = static_cast<unsigned char>(g) * 255;
-	mB = static_cast<unsigned char>(b) * 255;
-	mA = static_cast<unsigned char>(a) * 255;
+	mR = static_cast<unsigned char>(r * 255.99F);
+	mG = static_cast<unsigned char>(g * 255.99F);
+	mB = static_cast<unsigned char>(b * 255.99F);
+	mA = static_cast<unsigned char>(a * 255.99F);
 }
 
 /**************************************************************************
@@ -109,9 +109,9 @@ void Color::SetColor(glm::vec4& color)
 	mA = static_cast<unsigned char>(color.a);
 }
 
-glm::vec4 Color::GetColor()
+glm::vec3 Color::GetColor()
 {
-	return glm::vec4(mR, mG, mB, mA);
+	return glm::vec3(mR, mG, mB);
 }
 
 

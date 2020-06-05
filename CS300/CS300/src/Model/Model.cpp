@@ -176,7 +176,7 @@ void Model::CreateSphere(int slices, float radius)
 			float yCoord = (radius * sinf(ringAngle));
 			float zCoord = (radius * cosf(ringAngle)) * cosf(sliceAngle);
 
-			mAveraged.push_back(glm::vec3(xCoord, yCoord, zCoord));
+			mAveraged.push_back(glm::normalize(glm::vec3(xCoord, yCoord, zCoord)));
 
 			//computing the u v coordinates
 			float u = static_cast<float>(j) / slices;
@@ -188,6 +188,8 @@ void Model::CreateSphere(int slices, float radius)
 
 		}
 	}
+
+	mNormalVecs.resize(mVertices.size());
 
 	//adding indexes
 	for (int i = 0; i < ringCount; ++i)
@@ -205,13 +207,15 @@ void Model::CreateSphere(int slices, float radius)
 				glm::vec3 v1 = mVertices[index2];
 				glm::vec3 v2 = mVertices[index1 + 1];
 				glm::vec3 normal = glm::triangleNormal(v1, v2, v0);
-
+			
 				mIndexes.push_back(index1);
 				mIndexes.push_back(index2);
 				mIndexes.push_back(index1 + 1);
 				
-				mNormalVecs.push_back(normal);
-
+				mNormalVecs[index1] = (normal);
+				mNormalVecs[index2] = (normal);
+				mNormalVecs[index1 + 1] = (normal);
+			
 			}
 
 			if (i != (ringCount - 1))
@@ -219,13 +223,19 @@ void Model::CreateSphere(int slices, float radius)
 				glm::vec3 v0 = mVertices[index1 + 1];
 				glm::vec3 v1 = mVertices[index2];
 				glm::vec3 v2 = mVertices[index2 + 1];
-				glm::vec3 normal = glm::triangleNormal(v0, v2, v0);
+				glm::vec3 normal = glm::triangleNormal(v1, v2, v0);
 
 				mIndexes.push_back(index1 + 1);
 				mIndexes.push_back(index2);
 				mIndexes.push_back(index2 + 1);
 
-				mNormalVecs.push_back(normal);
+				mNormalVecs[index1 + 1] = normal;
+				mNormalVecs[index2] = normal;
+				mNormalVecs[index2 + 1] = normal;
+
+				//mNormalVecs.push_back(normal);
+				//mNormalVecs.push_back(normal);
+				//mNormalVecs.push_back(normal);
 			}
 		}
 	}

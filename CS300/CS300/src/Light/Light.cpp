@@ -14,9 +14,9 @@ Light::Light(LightType type, glm::vec3 position, glm::vec3 direction, Color ambi
 
 	mType = type;
 
-	mConstant = constant;
-	mLinear = linear;
-	mQuadratic = quadratic;
+	mAttenuation.x = constant;
+	mAttenuation.y = linear;
+	mAttenuation.z = quadratic;
 
 }
 
@@ -30,34 +30,35 @@ const glm::vec3 Light::GetDirection() const
 	return mDirection;
 }
 
-void Light::Setuniforms(ShaderProgram * shader)
+void Light::Setuniforms(ShaderProgram * shader, glm::mat4x4& w2Cam)
 {
+	shader->SetIntUniform("lightSource.Type", mType);
+
 	shader->SetVec3Uniform("lightSource.Position",  mPosition);
 	shader->SetVec3Uniform("lightSource.Direction", mDirection);
+	shader->SetVec3Uniform("lightSource.PosInCamSpc", w2Cam * glm::vec4(mPosition, 1.0));
 
-	shader->SetVec4Uniform("lightSource.Ambient",  mAmbientColor.GetColor());
-	shader->SetVec4Uniform("lightSource.Diffuse",  mDiffuseColor.GetColor());
-	shader->SetVec4Uniform("lightSource.Specular", mSpecularColor.GetColor());
+	shader->SetVec3Uniform("lightSource.Ambient",  mAmbientColor.GetColor());
+	shader->SetVec3Uniform("lightSource.Diffuse",  mDiffuseColor.GetColor());
+	shader->SetVec3Uniform("lightSource.Specular", mSpecularColor.GetColor());
 
-	shader->SetFloatUniform("lightSource.Constant",  mConstant);
-	shader->SetFloatUniform("lightSource.Linear",    mLinear);
-	shader->SetFloatUniform("lightSource.Quadratic", mQuadratic);
+	shader->SetVec3Uniform("lightSource.Attenuation", mAttenuation);
 
 }
 
-const Color Light::GetAmbient() const
+const glm::vec3 Light::GetAmbient()
 {
-	return mAmbientColor;
+	return mAmbientColor.GetColor();
 }
 
-const Color Light::GetDiffuse() const
+const glm::vec3 Light::GetDiffuse()
 {
-	return mDiffuseColor;
+	return mDiffuseColor.GetColor();
 }
 
-const Color Light::GetSpecular() const
+const glm::vec3 Light::GetSpecular()
 {
-	return mSpecularColor;
+	return mSpecularColor.GetColor();
 }
 
 Light::LightType Light::GetType() const

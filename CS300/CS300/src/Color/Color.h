@@ -19,13 +19,14 @@ The functions included are:
 
 ***************************************************************************/
 #pragma once
+#include <GLM/vec3.hpp>
 #include <GLM/vec4.hpp>
 
 class Color
 {
 public:
 
-	Color(float r = 0.0F, float g = 0.0F, float b = 0.0F, float a = 0.0F);
+	Color(float r = 1.0F, float g = 1.0F, float b = 1.0F, float a = 1.0F);
 	Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
 	static Color White;
@@ -40,7 +41,7 @@ public:
 	static Color Yellow;
 
 	void SetColor(glm::vec4& color);
-	glm::vec4 GetColor();
+	glm::vec3 GetColor();
 
 	unsigned char mR;
 	unsigned char mG;

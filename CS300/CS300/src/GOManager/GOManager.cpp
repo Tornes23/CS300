@@ -285,16 +285,18 @@ void GameObjectManager::EditObj(GameObject* obj)
 	if (ImGui::TreeNode("Material"))
 	{
 		ImGui::DragFloat("Shininess", &obj->mMaterial.mShininess);
-		ImGui::DragFloat("Ambient Coeficient", &obj->mMaterial.mAmbientCof);
 
-		glm::vec4 diffuse = obj->mMaterial.mDiffuseColor.GetColor();
-		glm::vec4 specular = obj->mMaterial.mSpecularColor.GetColor();
+		glm::vec4 diffuse = glm::vec4(obj->mMaterial.mDiffuseColor.GetColor(), 1.0F);
+		glm::vec4 specular = glm::vec4(obj->mMaterial.mSpecularColor.GetColor(), 1.0F);
+		glm::vec4 ambient = glm::vec4(obj->mMaterial.mAmbientColor.GetColor(), 1.0F);
 
+		ImGui::ColorEdit4("Ambient Color", glm::value_ptr(specular));
 		ImGui::ColorEdit4("Diffuse Color", glm::value_ptr(diffuse));
-		ImGui::ColorEdit4("Specular Color", glm::value_ptr(specular));
+		ImGui::ColorEdit4("Specular Color", glm::value_ptr(ambient));
 
 		obj->mMaterial.mDiffuseColor.SetColor(diffuse);
 		obj->mMaterial.mSpecularColor.SetColor(specular);
+		obj->mMaterial.mAmbientColor.SetColor(specular);
 
 		ImGui::TreePop();
 	}

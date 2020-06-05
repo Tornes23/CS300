@@ -100,25 +100,26 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 		currentShader.Use();
 
-		if (mLighting)
-		{
-			//currentShader.SetVec3Uniform("Pos", glm::value_ptr(mPosition));
-			lightSource = GetLight(mLightMode);
-			lightSource.Setuniforms(&currentShader);
-		}
-
 		//Setting the matrix uniforms
 		currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
 		currentShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
 
 		//generate the model to world of the object
 		glm::mat4x4 m2w_object = objects[i]->GenerateM2W();
+		glm::mat4x4 m2w_normal = glm::transpose(glm::inverse(mCameraMatrix * m2w_object));
 
 		//setting the uniform matrix
 		currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
+		currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 
 		//setting the texture of the object as active
 		objects[i]->mMaterial.SetUniforms(&currentShader);
+
+		if (mLighting)
+		{
+			ApplyLight(currentShader, mCameraMatrix);
+		}
+
 
 		//if wireframe is on change the render mode
 		if (!mWireframe)//if wireframe is not togled on
@@ -130,13 +131,13 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		DrawTriangle(objects[i]);
 
 		//if the normals have to be rendered
-		if (mRenderNormals || mAveragedNormals)
+		if (mRenderNormals)
 		{
 			currentShader = GetNormalShader();
 
 			currentShader.Use();
 
-			glm::mat4x4 m2w_normal = glm::transpose(glm::inverse(mCameraMatrix * m2w_object));
+			
 			currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
 			currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 			currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
@@ -145,10 +146,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 			DrawNormals(objects[i]);
 		}
 
-		if (mLighting)
-		{
-			ApplyLight(objects[i]);
-		}
 	}
 
 	//unbinding the VAOs
@@ -196,23 +193,13 @@ void Camera::Update()
 		mWireframe = !mWireframe;
 
 	if (KeyTriggered(N))
-	{
-		if (mAveragedNormals)
-			mAveragedNormals = !mAveragedNormals;
-
 		mRenderNormals = !mRenderNormals;
-	}
 
 	if (KeyTriggered(T))
 		mTextureMapping = !mTextureMapping;
 
 	if (KeyTriggered(F))
-	{
-		if (mRenderNormals)
-			mRenderNormals = !mRenderNormals;
-
 		mAveragedNormals = !mAveragedNormals;
-	}
 
 	if (KeyTriggered(P))
 		mLighting = !mLighting;
@@ -271,8 +258,15 @@ void Camera::DrawNormals(GameObject * target)
 	error = glGetError();
 }
 
-void Camera::ApplyLight(GameObject * target)
+void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam)
 {
+	shader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
+	shader.SetVec3Uniform("Pos", mPosition);
+
+	Light light = GetLight(mLightMode);
+
+	light.Setuniforms(&shader, w2Cam);
+
 }
 
 void Camera::ComputeVectors()

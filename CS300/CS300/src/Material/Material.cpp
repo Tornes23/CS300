@@ -2,23 +2,23 @@
 #include "../Shader/Shader.h"
 #include <GLM/gtc/type_ptr.hpp>
 
-Material::Material(Color diffuse, Color specular, float shininess, std::string texture, float ambient) : mTexture(texture)
+Material::Material(Color diffuse, Color specular, Color ambient, float shininess, std::string texture) : mTexture(texture)
 {
 
 	mDiffuseColor = diffuse;
 	mSpecularColor = specular;
+	mAmbientColor = ambient;
 
 	mShininess = shininess;
-	mAmbientCof = ambient;
 }
 
 Material::Material(std::string texture) : mTexture(texture)
 {
 	mDiffuseColor = Color::White;
 	mSpecularColor = Color::White;
+	mAmbientColor = Color::Black;
 
 	mShininess = 0.0F;
-	mAmbientCof = 0.5F;
 }
 
 Texture& Material::GetTexture()
@@ -41,18 +41,18 @@ float Material::GetShininess() const
 	return mShininess;
 }
 
-float Material::GetAmbient() const
+const Color Material::GetAmbient() const
 {
-	return mAmbientCof;
+	return mAmbientColor;
 }
 
 void Material::SetUniforms(ShaderProgram * shader)
 {
 	mTexture.SetActiveTexture();
 
-	shader->SetVec4Uniform("material.DiffuseColor",  mDiffuseColor.GetColor());
-	shader->SetVec4Uniform("material.SpecularColor", mSpecularColor.GetColor());
+	shader->SetVec3Uniform("material.AmbientColor",  mAmbientColor.GetColor());
+	shader->SetVec3Uniform("material.DiffuseColor",  mDiffuseColor.GetColor());
+	shader->SetVec3Uniform("material.SpecularColor", mSpecularColor.GetColor());
 
 	shader->SetFloatUniform("material.Shininess", mShininess);
-	shader->SetFloatUniform("material.AmbientCoefficient", mAmbientCof);
 }

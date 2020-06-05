@@ -48,7 +48,7 @@ public:
 	void Update();
 	void DrawTriangle(GameObject* target);
 	void DrawNormals(GameObject* target);
-	void ApplyLight(GameObject* target);
+	void ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam);
 	void ComputeVectors();
 	void AddAllShaders();
 	void AddAllLights();
