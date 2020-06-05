@@ -21,7 +21,7 @@ struct Material{
     vec3 DiffuseColor;
     vec3 SpecularColor;
     
-    float Sininess;
+    float Shininess;
     
 };
 
@@ -40,19 +40,22 @@ vec3 PointLight(vec3 initialCol)
 {
     vec3 lightDir = normalize(lightSource.PosInCamSpc - PosInCamSpc);
     
+    //computing diffuse color
     float diffuseVal = max(dot(Normal, lightDir), 0.0);
     
-    vec3 diffuseCol = diffuseVal * lightSource.DiffuseColor;
+    vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSource.DiffuseColor;
     
     initialCol += diffuseCol;
     
-    float specularStrength = 0.5;
+    //computing specular color
     
     vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
+
     vec3 reflectDir = reflect(-lightDir, Normal);  
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
     
-    vec3 specular = specularStrength * spec * lightSource.SpecularColor;  
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+    
+    vec3 specular = (material.SpecularColor * spec) * lightSource.SpecularColor;  
     
     initialCol += specular;
     

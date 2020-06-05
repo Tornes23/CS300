@@ -18,7 +18,7 @@ Material::Material(std::string texture) : mTexture(texture)
 	mSpecularColor = Color::White;
 	mAmbientColor = Color::Black;
 
-	mShininess = 0.0F;
+	mShininess = 50;
 }
 
 Texture& Material::GetTexture()
@@ -50,9 +50,14 @@ void Material::SetUniforms(ShaderProgram * shader)
 {
 	mTexture.SetActiveTexture();
 
-	shader->SetVec3Uniform("material.AmbientColor",  mAmbientColor.GetColor());
-	shader->SetVec3Uniform("material.DiffuseColor",  mDiffuseColor.GetColor());
-	shader->SetVec3Uniform("material.SpecularColor", mSpecularColor.GetColor());
+	//CKECK THIS
+	//shader->SetVec3Uniform("material.AmbientColor",  mAmbientColor.GetColor());
+	//shader->SetVec3Uniform("material.DiffuseColor",  mDiffuseColor.GetColor());
+	//shader->SetVec3Uniform("material.SpecularColor", mSpecularColor.GetColor());
+
+	shader->SetVec3Uniform("material.AmbientColor",  glm::vec3(0, 0, 0));
+	shader->SetVec3Uniform("material.DiffuseColor",  glm::vec3(1, 1, 1));
+	shader->SetVec3Uniform("material.SpecularColor", glm::vec3(1, 1, 1));
 
 	shader->SetFloatUniform("material.Shininess", mShininess);
 }
