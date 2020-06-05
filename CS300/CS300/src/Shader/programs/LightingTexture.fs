@@ -59,18 +59,48 @@ vec3 PointLight(vec3 initialCol)
     
     initialCol += specular;
     
+    float distance = length(lightSource.PosInCamSpc - PosInCamSpc);
+    
+    float attenuation = min((1.0 / 
+                        (lightSource.Attenuation.x + (lightSource.Attenuation.y * distance) 
+                        + lightSource.Attenuation.z * (distance * distance))), 1.0);
+    
+    initialCol *= attenuation;
+    
     return initialCol;
 }
 
-//vec3 DirectionalLight(vec3 diffuseCol)
-//{
-//    
-//}
-//
-//vec3 SpotLight(vec3 diffuseCol)
-//{
-//    
-//}
+vec3 DirectionalLight(vec3 initialCol)
+{
+   vec3 lightDir = normalize(lightSource.Direction);
+    
+    //computing diffuse color
+    float diffuseVal = max(dot(Normal, lightDir), 0.0);
+    
+    vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSource.DiffuseColor;
+    
+    initialCol += diffuseCol;
+    
+    //computing specular color
+    vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
+
+    vec3 reflectDir = reflect(-lightDir, Normal);  
+    
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+    
+    vec3 specular = (material.SpecularColor * spec) * lightSource.SpecularColor;  
+    
+    initialCol += specular;
+    
+    float distance = length(lightSource.PosInCamSpc - PosInCamSpc);
+    
+    return initialCol; 
+}
+
+vec3 SpotLight(vec3 initialCol)
+{
+    
+}
 
 vec3 ApplyPhongLight()
 {
@@ -94,12 +124,20 @@ vec3 ApplyPhongLight()
     
     if(lightSource.Type == 1)
     {
-        //DirectionalLight();
+        vec3 color = DirectionalLight(ambientCol);
+        
+        finalCol = color * textureCol;
+        
+        return finalCol;
     }
     
     if(lightSource.Type == 2)
     {
-        //SpotLight();
+        //vec3 color = SpotLight(ambientCol);
+        
+        //finalCol = color * textureCol;
+        //
+        //return finalCol;
     }
 }
 
