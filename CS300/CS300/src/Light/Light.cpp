@@ -18,7 +18,7 @@ Light::Light(LightType type, glm::vec3 position, glm::vec3 direction, Color ambi
 
 	mPosition = glm::vec3(posX, posY, posZ);
 
-	mDirection = direction;
+	mDirection = mPosition;
 
 	mAmbientColor = ambient;
 	mDiffuseColor = diffuse;
@@ -42,12 +42,12 @@ const glm::vec3 Light::GetDirection() const
 	return mDirection;
 }
 
-void Light::Setuniforms(ShaderProgram * shader, glm::mat4x4& w2Cam)
+void Light::Setuniforms(ShaderProgram * shader, glm::mat4x4& w2Cam, glm::vec3& camPos)
 {
 	shader->SetIntUniform("lightSource.Type", mType);
 
 	shader->SetVec3Uniform("lightSource.Position",  mPosition);
-	shader->SetVec3Uniform("lightSource.Direction", w2Cam * glm::vec4(mDirection, 0.0));
+	shader->SetVec3Uniform("lightSource.Direction", w2Cam * glm::vec4(camPos - mPosition, 1.0));
 	shader->SetVec3Uniform("lightSource.PosInCamSpc", w2Cam * glm::vec4(mPosition, 1.0));
 
 	//CHECK THIS SHI

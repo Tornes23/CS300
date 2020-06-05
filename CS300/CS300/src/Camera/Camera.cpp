@@ -285,11 +285,10 @@ void Camera::DrawLights()
 void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam)
 {
 	shader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
-	shader.SetVec3Uniform("Pos", mPosition);
 
 	Light light = GetLight(mLightMode);
 
-	light.Setuniforms(&shader, w2Cam);
+	light.Setuniforms(&shader, w2Cam, mPosition);
 
 }
 

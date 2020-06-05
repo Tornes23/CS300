@@ -72,7 +72,7 @@ vec3 PointLight(vec3 initialCol)
 
 vec3 DirectionalLight(vec3 initialCol)
 {
-   vec3 lightDir = normalize(lightSource.Direction);
+    vec3 lightDir = normalize(-lightSource.Direction);
     
     //computing diffuse color
     float diffuseVal = max(dot(Normal, lightDir), 0.0);
@@ -83,8 +83,8 @@ vec3 DirectionalLight(vec3 initialCol)
     
     //computing specular color
     vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
-
-    vec3 reflectDir = reflect(-lightDir, Normal);  
+    
+    vec3 reflectDir = reflect(lightDir, Normal);  
     
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
     
@@ -97,10 +97,41 @@ vec3 DirectionalLight(vec3 initialCol)
     return initialCol; 
 }
 
-//vec3 SpotLight(vec3 initialCol)
-//{
-//    
-//}
+vec3 SpotLight(vec3 initialCol)
+{
+     vec3 lightDir = normalize(lightSource.PosInCamSpc - PosInCamSpc);
+    
+    //computing diffuse color
+    float diffuseVal = max(dot(Normal, lightDir), 0.0);
+    
+    vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSource.DiffuseColor;
+    
+    initialCol += diffuseCol;
+    
+    //computing specular color
+    
+    vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
+
+    vec3 reflectDir = reflect(-lightDir, Normal);  
+    
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+    
+    vec3 specular = (material.SpecularColor * spec) * lightSource.SpecularColor;  
+    
+    initialCol += specular;
+    
+    //vec3 spotCol = ;
+    
+    float distance = length(lightSource.PosInCamSpc - PosInCamSpc);
+    
+    float attenuation = min((1.0 / 
+                        (lightSource.Attenuation.x + (lightSource.Attenuation.y * distance) 
+                        + lightSource.Attenuation.z * (distance * distance))), 1.0);
+    
+    initialCol *= attenuation;
+    
+    return initialCol;
+}
 
 vec3 ApplyPhongLight()
 {
