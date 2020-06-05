@@ -117,6 +117,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 		if (mLighting)
 		{
+			lightSource = GetLight(mLightMode);
 			ApplyLight(currentShader, mCameraMatrix);
 		}
 
@@ -137,7 +138,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 			currentShader.Use();
 
-			
 			currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
 			currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 			currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
@@ -145,7 +145,21 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 			DrawNormals(objects[i]);
 		}
+	}
 
+	if (mLighting)
+	{
+		ShaderProgram lighShader = mLights[0].GetShader();
+
+		lighShader.Use();
+
+		glm::mat4x4 m2w= mLights[0].GetM2W();
+
+		lighShader.SetMatUniform("m2w", glm::value_ptr(m2w));
+		lighShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
+		lighShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
+
+		DrawLights();
 	}
 
 	//unbinding the VAOs
@@ -206,6 +220,8 @@ void Camera::Update()
 
 #pragma endregion
 
+	mLights[0].Update();
+
 	//updating the matrices and the vectors
 	ComputeVectors();
 	CreatePerspective();
@@ -258,6 +274,14 @@ void Camera::DrawNormals(GameObject * target)
 	error = glGetError();
 }
 
+void Camera::DrawLights()
+{
+	for (unsigned i = 0; i < mLights.size(); i++)
+	{
+		mLights[i].Render();
+	}
+}
+
 void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam)
 {
 	shader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
@@ -291,8 +315,6 @@ void Camera::AddAllShaders()
 void Camera::AddAllLights()
 {
 	mLights.push_back(Light::LightType::Point);
-	mLights.push_back(Light::LightType::Directional);
-	mLights.push_back(Light::LightType::Spotlight);
 }
 
 /**************************************************************************

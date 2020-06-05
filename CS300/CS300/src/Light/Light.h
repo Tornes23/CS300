@@ -2,6 +2,8 @@
 #include <GLM/vec3.hpp>
 #include <GLM/mat4x4.hpp>
 #include "../Color/Color.h"
+#include "../Model/Model.h"
+#include "../Shader/Shader.h"
 
 class ShaderProgram;
 
@@ -23,19 +25,30 @@ public:
 	const glm::vec3 GetDirection() const;
 
 	void Setuniforms(ShaderProgram* shader, glm::mat4x4& w2Cam);
+	void Update();
+	void Render();
+	glm::mat4x4 GetM2W();
 
 	const glm::vec3 GetAmbient();
 	const glm::vec3 GetDiffuse();
 	const glm::vec3 GetSpecular();
 
-LightType GetType() const;
+	LightType GetType() const;
+	ShaderProgram GetShader() const;
 
 	void Edit();
 
 private:
+
+	Model mModel;
+	ShaderProgram mShader;
+	glm::vec3 mScale;
+	glm::mat4x4 mModel2World;
+
 	LightType mType;
 
 	glm::vec3 mPosition;
+	glm::vec3 mRotations;
 	glm::vec3 mDirection;
 
 	Color mAmbientColor;
@@ -47,4 +60,5 @@ private:
 	float mCosInner;
 	float mCosOuter;
 	float mFallOff;
+	float mRadius;
 };
