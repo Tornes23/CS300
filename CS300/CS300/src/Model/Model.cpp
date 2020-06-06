@@ -206,15 +206,15 @@ void Model::CreateSphere(int slices, float radius)
 				glm::vec3 v0 = mVertices[index1];
 				glm::vec3 v1 = mVertices[index2];
 				glm::vec3 v2 = mVertices[index1 + 1];
-				glm::vec3 normal = glm::triangleNormal(v1, v2, v0);
+				glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
 			
 				mIndexes.push_back(index1);
 				mIndexes.push_back(index2);
 				mIndexes.push_back(index1 + 1);
 				
-				mNormalVecs[index1] = (normal);
-				mNormalVecs[index2] = (normal);
-				mNormalVecs[index1 + 1] = (normal);
+				mNormalVecs[index1] = normal;
+				mNormalVecs[index2] = normal;
+				mNormalVecs[index1 + 1] = normal;
 			
 			}
 
@@ -223,7 +223,7 @@ void Model::CreateSphere(int slices, float radius)
 				glm::vec3 v0 = mVertices[index1 + 1];
 				glm::vec3 v1 = mVertices[index2];
 				glm::vec3 v2 = mVertices[index2 + 1];
-				glm::vec3 normal = glm::triangleNormal(v1, v2, v0);
+				glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
 
 				mIndexes.push_back(index1 + 1);
 				mIndexes.push_back(index2);
@@ -232,10 +232,6 @@ void Model::CreateSphere(int slices, float radius)
 				mNormalVecs[index1 + 1] = normal;
 				mNormalVecs[index2] = normal;
 				mNormalVecs[index2 + 1] = normal;
-
-				mNormalVecs.push_back(normal);
-				mNormalVecs.push_back(normal);
-				mNormalVecs.push_back(normal);
 			}
 		}
 	}
