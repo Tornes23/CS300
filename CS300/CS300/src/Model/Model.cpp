@@ -144,8 +144,6 @@ the number of vertical cuts
 \param  float radius
 the radius of the sphere
 
-based on the info provided in the http://www.songho.ca/opengl/gl_sphere.html webpage
-
 *
 **************************************************************************/
 void Model::CreateSphere(int slices, float radius)
@@ -215,7 +213,7 @@ void Model::CreateSphere(int slices, float radius)
 			mAveraged.push_back(v2);
 
 			mTextureCoords.push_back(glm::vec2(u0, t0));
-			mTextureCoords.push_back(glm::vec2(u1, t2));
+			mTextureCoords.push_back(glm::vec2(u0, t2));
 			mTextureCoords.push_back(glm::vec2(u1, t0));
 			
 
@@ -224,23 +222,23 @@ void Model::CreateSphere(int slices, float radius)
 			v0.y = (radius * sinf(ringAngle2));
 			v0.z = (radius * cosf(ringAngle2)) * cosf(sliceAngle1);
 			
+			mVertices.push_back(v0);
 			mVertices.push_back(v2);
 			mVertices.push_back(v1);
-			mVertices.push_back(v0);
 			
-			normal = glm::normalize(glm::triangleNormal(v2, v1, v0));
+			normal = glm::normalize(glm::triangleNormal(v0, v2, v1));
 			
 			mNormalVecs.push_back(normal);
 			mNormalVecs.push_back(normal);
 			mNormalVecs.push_back(normal);
 			
+			mAveraged.push_back(v0);
 			mAveraged.push_back(v2);
 			mAveraged.push_back(v1);
-			mAveraged.push_back(v0);
 			
+			mTextureCoords.push_back(glm::vec2(u1, t2));
 			mTextureCoords.push_back(glm::vec2(u1, t0));
 			mTextureCoords.push_back(glm::vec2(u0, t2));
-			mTextureCoords.push_back(glm::vec2(u1, t2));
 			
 		}
 	}
