@@ -344,6 +344,9 @@ void Camera::AddLight()
 {
 	size_t size = mLights.size();
 
+	if (size == 8)
+		return;
+
 	if (!mLights.empty())
 		mLights.clear();
 
@@ -361,6 +364,9 @@ void Camera::AddLight()
 
 void Camera::RemoveLight()
 {
+	if (mLights.size() == 1)
+		return;
+
 	if (!mLights.empty())
 		mLights.pop_back();
 }
