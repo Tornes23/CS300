@@ -45,14 +45,20 @@ public:
 
 	Camera(glm::vec3 direction = glm::vec3(0,0,-1));
 	void Render(std::vector<GameObject*>& objects);
+	void ComputePos();
 	void Update();
+
 	void DrawTriangle(GameObject* target);
 	void DrawNormals(GameObject* target);
 	void DrawLights();
-	void ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam);
-	void ComputeVectors();
+
 	void AddAllShaders();
-	void AddAllLights();
+
+	void ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam);
+	void AddLight();
+	void RemoveLight();
+	void ChangeLights();
+	void UpdateLights();
 
 	glm::mat4x4 CreatePerspective();
 	glm::mat4x4 CreateCameraMat();

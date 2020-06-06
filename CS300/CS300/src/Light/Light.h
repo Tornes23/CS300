@@ -18,13 +18,13 @@ public:
 		Spotlight
 	};
 
-	Light(LightType type = LightType::Point, glm::vec3 position = glm::vec3(10, 0, 12.5), glm::vec3 direction = glm::vec3(0, 0, 0),
+	Light(LightType type = LightType::Point, glm::vec3 rotations = glm::vec3(0, 0, 0), glm::vec3 direction = glm::vec3(0, 0, 0),
 		 Color ambient = Color::Black, Color diffuse = Color::White, Color specular = Color::White, float constant = 0.0F, float linear = 0.0F, float quadratic = 0.001F);
 
 	const glm::vec3 GetPosition() const;
 	const glm::vec3 GetDirection() const;
 
-	void Setuniforms(ShaderProgram* shader, glm::mat4x4& w2Cam, glm::vec3& objPos);
+	void Setuniforms(std::string shaderString, ShaderProgram* shader, glm::mat4x4& w2Cam, glm::vec3& objPos);
 	void Update();
 	void Render();
 	glm::mat4x4 GetM2W();
@@ -34,6 +34,7 @@ public:
 	const glm::vec3 GetSpecular();
 
 	LightType GetType() const;
+	void  SetType(LightType mode);
 	ShaderProgram GetShader() const;
 
 	void Edit();

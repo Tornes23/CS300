@@ -53,7 +53,7 @@ Camera::Camera(glm::vec3 direction)
 	mUp = glm::vec3(0, 1, 0);
 
 	//initializing all the vues to 0
-	ComputeVectors();
+	ComputePos();
 	mNear = 0.1F;
 	mFar = 100.0F;
 	mRadius = 25.0F;
@@ -64,8 +64,10 @@ Camera::Camera(glm::vec3 direction)
 	mTextureMapping = false;
 	mLighting = true;
 
+	mLightMode = Light::LightType::Point;
+
 	AddAllShaders();
-	AddAllLights();
+	AddLight();
 }
 
 /**************************************************************************
@@ -116,10 +118,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		objects[i]->mMaterial.SetUniforms(&currentShader);
 
 		if (mLighting)
-		{
-			lightSource = GetLight(mLightMode);
 			ApplyLight(currentShader, mCameraMatrix);
-		}
 
 
 		//if wireframe is on change the render mode
@@ -227,14 +226,33 @@ void Camera::Update()
 	if (KeyTriggered(P))
 		mLighting = !mLighting;
 
+	Light::LightType lastMode = mLightMode;
+
+	if (KeyDown(num7))
+		mLightMode = Light::LightType::Point;
+
+	if (KeyDown(num8))
+		mLightMode = Light::LightType::Spotlight;
+
+	if (KeyDown(num9))
+		mLightMode = Light::LightType::Directional;
+
+	if (KeyTriggered(R))
+		AddLight();
+
+	if (KeyTriggered(Y))
+		RemoveLight();
+
 #pragma endregion
 
-	mLights[0].Update();
+	if (lastMode != mLightMode)
+		ChangeLights();
 
 	//updating the matrices and the vectors
-	ComputeVectors();
+	ComputePos();
 	CreatePerspective();
 	CreateCameraMat();
+	UpdateLights();
 }
 
 /**************************************************************************
@@ -294,14 +312,16 @@ void Camera::DrawLights()
 void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam)
 {
 	shader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
+	shader.SetIntUniform("lightCount", mLights.size());
 
-	Light light = GetLight(mLightMode);
-
-	light.Setuniforms(&shader, w2Cam, mPosition);
+	for (int i = 0; i < mLights.size(); i++)
+	{
+		mLights[i].Setuniforms("lightSources[" + std::to_string(i) + "]", &shader, w2Cam, mPosition);
+	}
 
 }
 
-void Camera::ComputeVectors()
+void Camera::ComputePos()
 {
 	float posX = (mRadius * cosf(glm::radians(mRotations.y))) * sinf(glm::radians(mRotations.x));
 	float posY = (mRadius * sinf(glm::radians(mRotations.y)));
@@ -320,9 +340,43 @@ void Camera::AddAllShaders()
 	AddShader("./src/Shader/programs/NormalsAverage.vs"   , "./src/Shader/programs/NormalsAverage.fs" , "./src/Shader/programs/Normals.gs");
 }
 
-void Camera::AddAllLights()
+void Camera::AddLight()
 {
-	mLights.push_back(Light::LightType::Directional);
+	size_t size = mLights.size();
+
+	if (!mLights.empty())
+		mLights.clear();
+
+	float angleStep = glm::two_pi<float>() / (size + 1);
+
+	for (size_t i = 0; i < size + 1; i++)
+	{
+		float angle = i * angleStep;
+
+		glm::vec3 initPos(angle, 0, 0);
+
+		mLights.push_back(Light(mLightMode, initPos));
+	}
+}
+
+void Camera::RemoveLight()
+{
+	if (!mLights.empty())
+		mLights.pop_back();
+}
+
+void Camera::ChangeLights()
+{
+	for (unsigned i = 0; i < mLights.size(); i++)
+	{
+		mLights[i].SetType(mLightMode);
+	}
+}
+
+void Camera::UpdateLights()
+{
+	for (int i = 0; i < mLights.size(); i++)
+		mLights[i].Update();
 }
 
 /**************************************************************************

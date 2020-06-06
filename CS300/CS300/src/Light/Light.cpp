@@ -5,10 +5,10 @@
 #include "../Input/Input.h"
 
 
-Light::Light(LightType type, glm::vec3 position, glm::vec3 direction, Color ambient, Color diffuse, Color specular, float constant, float linear, float quadratic) 
+Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color ambient, Color diffuse, Color specular, float constant, float linear, float quadratic) 
 			: mModel(Model::Shape::Sphere), mShader("./src/Shader/programs/Light.vs", "./src/Shader/programs/Light.fs")
 {
-	mRotations = glm::vec3(0, 0, 0);
+	mRotations = rotations;
 	mScale = glm::vec3(0.5, 0.5, 0.5);
 	mRadius = 15.0F;
 
@@ -42,24 +42,24 @@ const glm::vec3 Light::GetDirection() const
 	return mDirection;
 }
 
-void Light::Setuniforms(ShaderProgram * shader, glm::mat4x4& w2Cam, glm::vec3& camPos)
+void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::mat4x4& w2Cam, glm::vec3& camPos)
 {
-	shader->SetIntUniform("lightSource.Type", mType);
+	shader->SetIntUniform(shaderString + ".Type", mType);
 
-	shader->SetVec3Uniform("lightSource.Position",  mPosition);
-	shader->SetVec3Uniform("lightSource.Direction", w2Cam * glm::vec4(-mPosition, 1.0));
-	shader->SetVec3Uniform("lightSource.PosInCamSpc", glm::vec4(mPosition, 1.0));
+	shader->SetVec3Uniform(shaderString + ".Position",  mPosition);
+	shader->SetVec3Uniform(shaderString + ".Direction", w2Cam * glm::vec4(-camPos, 1.0));
+	shader->SetVec3Uniform(shaderString + ".PosInCamSpc", glm::vec4(mPosition, 1.0));
 
 	//CHECK THIS SHI
 	//shader->SetVec3Uniform("lightSource.Ambient",  mAmbientColor.GetColor());
 	//shader->SetVec3Uniform("lightSource.Diffuse",  mDiffuseColor.GetColor());
 	//shader->SetVec3Uniform("lightSource.Specular", mSpecularColor.GetColor());
 
-	shader->SetVec3Uniform("lightSource.AmbientColor", glm::vec3(0, 0, 0));
-	shader->SetVec3Uniform("lightSource.DiffuseColor", glm::vec3(1, 1, 1));
-	shader->SetVec3Uniform("lightSource.SpecularColor", glm::vec3(1, 1, 1));
+	shader->SetVec3Uniform(shaderString + ".AmbientColor", glm::vec3(0, 0, 0));
+	shader->SetVec3Uniform(shaderString + ".DiffuseColor", glm::vec3(1, 1, 1));
+	shader->SetVec3Uniform(shaderString + ".SpecularColor", glm::vec3(1, 1, 1));
 
-	shader->SetVec3Uniform("lightSource.Attenuation", mAttenuation);
+	shader->SetVec3Uniform(shaderString + ".Attenuation", mAttenuation);
 
 }
 
@@ -139,6 +139,11 @@ const glm::vec3 Light::GetSpecular()
 Light::LightType Light::GetType() const
 {
 	return mType;
+}
+
+void Light::SetType(LightType mode)
+{
+	mType = mode;
 }
 
 ShaderProgram Light::GetShader() const
