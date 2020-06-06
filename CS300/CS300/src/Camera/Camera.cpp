@@ -312,7 +312,7 @@ void Camera::DrawLights()
 void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam)
 {
 	shader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
-	shader.SetIntUniform("lightCount", mLights.size());
+	shader.SetIntUniform("lightCount", (int)mLights.size());
 
 	for (int i = 0; i < mLights.size(); i++)
 	{
@@ -350,7 +350,7 @@ void Camera::AddLight()
 	if (!mLights.empty())
 		mLights.clear();
 
-	float angleStep = 360 / (size + 1);
+	float angleStep = 360.0F / (size + 1);
 
 	for (size_t i = 0; i < size + 1; i++)
 	{
