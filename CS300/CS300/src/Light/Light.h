@@ -24,7 +24,7 @@ public:
 	const glm::vec3 GetPosition() const;
 	const glm::vec3 GetDirection() const;
 
-	void Setuniforms(ShaderProgram* shader, glm::mat4x4& w2Cam, glm::vec3& camPos);
+	void Setuniforms(ShaderProgram* shader, glm::mat4x4& w2Cam, glm::vec3& objPos);
 	void Update();
 	void Render();
 	glm::mat4x4 GetM2W();

@@ -233,9 +233,9 @@ void Model::CreateSphere(int slices, float radius)
 				mNormalVecs[index2] = normal;
 				mNormalVecs[index2 + 1] = normal;
 
-				//mNormalVecs.push_back(normal);
-				//mNormalVecs.push_back(normal);
-				//mNormalVecs.push_back(normal);
+				mNormalVecs.push_back(normal);
+				mNormalVecs.push_back(normal);
+				mNormalVecs.push_back(normal);
 			}
 		}
 	}

@@ -182,19 +182,28 @@ void Camera::Update()
 #pragma region CAMERA MOVEMENT
 
 	if (KeyDown(W))
-		mRotations.y += 1.0F;
+	{
+		if(mRotations.y + 1.0F < 85.0F)
+			mRotations.y += 1.0F;
+	}
 
 	if (KeyDown(A))
 		mRotations.x -= 1.0F;
 
 	if (KeyDown(S))
-		mRotations.y -= 1.0F;
+	{
+		if (mRotations.y - 1.0F > -85.0F)
+			mRotations.y -= 1.0F;
+	}
 
 	if (KeyDown(D))
 		mRotations.x += 1.0F;
 
 	if (KeyDown(Q))
-		mRadius -= 1.0F;
+	{
+		if(mRadius - 1.0F > 5.0F)
+			mRadius -= 1.0F;
+	}
 
 	if (KeyDown(E))
 		mRadius += 1.0F;
@@ -313,7 +322,7 @@ void Camera::AddAllShaders()
 
 void Camera::AddAllLights()
 {
-	mLights.push_back(Light::LightType::Point);
+	mLights.push_back(Light::LightType::Directional);
 }
 
 /**************************************************************************

@@ -47,8 +47,8 @@ void Light::Setuniforms(ShaderProgram * shader, glm::mat4x4& w2Cam, glm::vec3& c
 	shader->SetIntUniform("lightSource.Type", mType);
 
 	shader->SetVec3Uniform("lightSource.Position",  mPosition);
-	shader->SetVec3Uniform("lightSource.Direction", w2Cam * glm::vec4(camPos - mPosition, 1.0));
-	shader->SetVec3Uniform("lightSource.PosInCamSpc", w2Cam * glm::vec4(mPosition, 1.0));
+	shader->SetVec3Uniform("lightSource.Direction", w2Cam * glm::vec4(-mPosition, 1.0));
+	shader->SetVec3Uniform("lightSource.PosInCamSpc", glm::vec4(mPosition, 1.0));
 
 	//CHECK THIS SHI
 	//shader->SetVec3Uniform("lightSource.Ambient",  mAmbientColor.GetColor());
