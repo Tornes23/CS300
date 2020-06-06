@@ -25,7 +25,8 @@ struct Material{
     
 };
 
-uniform Light lightSource; 
+uniform Light lightSources[8];
+uniform int lightCount; 
 uniform Material material;
 
 out vec4 FragColor; 
@@ -34,16 +35,14 @@ in vec3 PosInCamSpc;
 in vec2 UV;
 in vec3 Normal;
 
-uniform sampler2D textureData;
-
-vec3 PointLight(vec3 initialCol)
+vec3 PointLight(vec3 initialCol, int i)
 {
-    vec3 lightDir = normalize(lightSource.PosInCamSpc - PosInCamSpc);
+    vec3 lightDir = normalize(lightSources[i].PosInCamSpc - PosInCamSpc);
     
     //computing diffuse color
     float diffuseVal = max(dot(Normal, lightDir), 0.0);
     
-    vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSource.DiffuseColor;
+    vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSources[i].DiffuseColor;
     
     initialCol += diffuseCol;
     
@@ -55,90 +54,130 @@ vec3 PointLight(vec3 initialCol)
     
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
     
-    vec3 specular = (material.SpecularColor * spec) * lightSource.SpecularColor;  
+    vec3 specular = (material.SpecularColor * spec) * lightSources[i].SpecularColor;  
     
     initialCol += specular;
     
-    float distance = length(lightSource.PosInCamSpc - PosInCamSpc);
+    return initialCol;
+}
+
+vec3 DirectionalLight(vec3 initialCol, int i)
+{
+    vec3 lightDir = normalize(-lightSources[i].Direction);
+    
+    //computing diffuse color
+    float diffuseVal = max(dot(Normal, lightDir), 0.0);
+    
+    vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSources[i].DiffuseColor;
+    
+    initialCol += diffuseCol;
+    
+    //computing specular color
+    vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
+    
+    vec3 reflectDir = reflect(lightDir, Normal);  
+    
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+    
+    vec3 specular = (material.SpecularColor * spec) * lightSources[i].SpecularColor;  
+    
+    initialCol += specular;
+    
+    return initialCol; 
+}
+
+vec3 SpotLight(vec3 initialCol, int i)
+{
+     vec3 lightDir = normalize(lightSources[i].PosInCamSpc - PosInCamSpc);
+    
+    //computing diffuse color
+    float diffuseVal = max(dot(Normal, lightDir), 0.0);
+    
+    vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSources[i].DiffuseColor;
+    
+    initialCol += diffuseCol;
+    
+    //computing specular color
+    
+    vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
+
+    vec3 reflectDir = reflect(-lightDir, Normal);  
+    
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+    
+    vec3 specular = (material.SpecularColor * spec) * lightSources[i].SpecularColor;  
+    
+    initialCol += specular;
+    
+    //vec3 spotCol = ;
+    
+    float distance = length(lightSources[i].PosInCamSpc - PosInCamSpc);
     
     float attenuation = min((1.0 / 
-                        (lightSource.Attenuation.x + (lightSource.Attenuation.y * distance) 
-                        + lightSource.Attenuation.z * (distance * distance))), 1.0);
+                        (lightSources[i].Attenuation.x + (lightSources[i].Attenuation.y * distance) 
+                        + lightSources[i].Attenuation.z * (distance * distance))), 1.0);
     
     initialCol *= attenuation;
     
     return initialCol;
 }
 
-vec3 DirectionalLight(vec3 initialCol)
-{
-   vec3 lightDir = normalize(lightSource.Direction);
-    
-    //computing diffuse color
-    float diffuseVal = max(dot(Normal, lightDir), 0.0);
-    
-    vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSource.DiffuseColor;
-    
-    initialCol += diffuseCol;
-    
-    //computing specular color
-    vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
-
-    vec3 reflectDir = reflect(-lightDir, Normal);  
-    
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
-    
-    vec3 specular = (material.SpecularColor * spec) * lightSource.SpecularColor;  
-    
-    initialCol += specular;
-    
-    float distance = length(lightSource.PosInCamSpc - PosInCamSpc);
-    
-    return initialCol; 
-}
-
-//vec3 SpotLight(vec3 initialCol)
-//{
-//    
-//}
-
 vec3 ApplyPhongLight()
 {
     vec3  finalCol;
     float attenuation;
     float SpotLight = 1.0;
-    float distance = length(lightSource.PosInCamSpc - PosInCamSpc);
     
-    vec3  textureCol = vec3(UV, 0.0);
-    
-    vec3  ambientCol = lightSource.AmbientColor * material.AmbientColor;
-    
-    if(lightSource.Type == 0)
+    for(int i = 0; i < lightCount; i++)
     {
-        vec3 color = PointLight(ambientCol);
+        vec3  textureCol = vec3(UV.x, UV.y, 0.0);
+        vec3  ambientCol = lightSources[i].AmbientColor * material.AmbientColor;
+        vec3 color;
+        float attenuation;
+        float distance = length(lightSources[i].PosInCamSpc - PosInCamSpc);
         
-        finalCol = color * textureCol;
+        if(lightSources[i].Type == 0)
+        {
+            color = PointLight(ambientCol, i);
+            
+            //finalCol = color * textureCol;
+    
+            attenuation = min((1.0 / 
+                        (lightSources[i].Attenuation.x + (lightSources[i].Attenuation.y * distance) 
+                        + lightSources[i].Attenuation.z * (distance * distance))), 1.0);
+    
+            
+            //return finalCol;
+        }
         
-        return finalCol;
+        if(lightSources[i].Type == 1)
+        {
+            color = DirectionalLight(ambientCol, i);
+            
+            //finalCol = color * textureCol;
+            
+            attenuation = min((1.0 / 
+                        (lightSources[i].Attenuation.x + (lightSources[i].Attenuation.y * distance) 
+                        + lightSources[i].Attenuation.z * (distance * distance))), 1.0);
+  
+            
+            //return finalCol;
+            
+        }
+        
+        if(lightSources[i].Type == 2)
+        {
+            //color = SpotLight(ambientCol);
+            
+            //finalCol = color * textureCol;
+            //
+            //return finalCol;
+        }
+        
+        finalCol += color * attenuation * textureCol; //* clamp(SpotLight, 0.0, 1.0);;
     }
     
-    if(lightSource.Type == 1)
-    {
-        vec3 color = DirectionalLight(ambientCol);
-        
-        finalCol = color * textureCol;
-        
-        return finalCol;
-    }
-    
-    if(lightSource.Type == 2)
-    {
-        //vec3 color = SpotLight(ambientCol);
-        
-        //finalCol = color * textureCol;
-        //
-        //return finalCol;
-    }
+    return finalCol;
 }
 
 void main()

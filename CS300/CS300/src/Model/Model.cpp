@@ -219,7 +219,7 @@ void Model::CreateSphere(int slices, float radius)
 			mTextureCoords.push_back(glm::vec2(u1, t0));
 			
 
-			//adding the position texture coordinates and normal values for the first triangle
+			//adding the position texture coordinates and normal values for the second triangle
 			v0.x = (radius * cosf(ringAngle2)) * sinf(sliceAngle1);
 			v0.y = (radius * sinf(ringAngle2));
 			v0.z = (radius * cosf(ringAngle2)) * cosf(sliceAngle1);
