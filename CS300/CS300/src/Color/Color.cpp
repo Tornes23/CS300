@@ -103,15 +103,20 @@ Color::Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 
 void Color::SetColor(glm::vec4& color)
 {
-	mR = static_cast<unsigned char>(color.r);
-	mG = static_cast<unsigned char>(color.g);
-	mB = static_cast<unsigned char>(color.b);
-	mA = static_cast<unsigned char>(color.a);
+	mR = static_cast<unsigned char>(color.r * 255);
+	mG = static_cast<unsigned char>(color.g * 255);
+	mB = static_cast<unsigned char>(color.b * 255);
+	mA = static_cast<unsigned char>(color.a * 255);
 }
 
-glm::vec3 Color::GetColor()
+glm::vec4 Color::GetColor()
 {
-	return glm::vec3(mR, mG, mB);
+	float r = static_cast<float>(mR) / 255.0F;
+	float g = static_cast<float>(mG) / 255.0F;
+	float b = static_cast<float>(mB) / 255.0F;
+	float a = static_cast<float>(mA) / 255.0F;
+
+	return glm::vec4(r, g, b, a);
 }
 
 

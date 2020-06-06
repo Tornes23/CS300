@@ -286,13 +286,13 @@ void GameObjectManager::EditObj(GameObject* obj)
 	{
 		ImGui::DragFloat("Shininess", &obj->mMaterial.mShininess);
 
-		glm::vec4 diffuse = glm::vec4(obj->mMaterial.mDiffuseColor.GetColor(), 1.0F);
-		glm::vec4 specular = glm::vec4(obj->mMaterial.mSpecularColor.GetColor(), 1.0F);
-		glm::vec4 ambient = glm::vec4(obj->mMaterial.mAmbientColor.GetColor(), 1.0F);
+		glm::vec4 diffuse = obj->mMaterial.mDiffuseColor.GetColor();
+		glm::vec4 specular = obj->mMaterial.mSpecularColor.GetColor();
+		glm::vec4 ambient = obj->mMaterial.mAmbientColor.GetColor();
 
-		ImGui::ColorEdit4("Ambient Color", glm::value_ptr(specular));
+		ImGui::ColorEdit4("Ambient Color", glm::value_ptr(ambient));
 		ImGui::ColorEdit4("Diffuse Color", glm::value_ptr(diffuse));
-		ImGui::ColorEdit4("Specular Color", glm::value_ptr(ambient));
+		ImGui::ColorEdit4("Specular Color", glm::value_ptr(specular));
 
 		obj->mMaterial.mDiffuseColor.SetColor(diffuse);
 		obj->mMaterial.mSpecularColor.SetColor(specular);

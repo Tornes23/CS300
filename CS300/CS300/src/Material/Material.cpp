@@ -51,13 +51,9 @@ void Material::SetUniforms(ShaderProgram * shader)
 	mTexture.SetActiveTexture();
 
 	//CKECK THIS
-	//shader->SetVec3Uniform("material.AmbientColor",  mAmbientColor.GetColor());
-	//shader->SetVec3Uniform("material.DiffuseColor",  mDiffuseColor.GetColor());
-	//shader->SetVec3Uniform("material.SpecularColor", mSpecularColor.GetColor());
-
-	shader->SetVec3Uniform("material.AmbientColor",  glm::vec3(0, 0, 0));
-	shader->SetVec3Uniform("material.DiffuseColor",  glm::vec3(1, 1, 1));
-	shader->SetVec3Uniform("material.SpecularColor", glm::vec3(1, 1, 1));
+	shader->SetVec3Uniform("material.AmbientColor",  mAmbientColor.GetColor());
+	shader->SetVec3Uniform("material.DiffuseColor",  mDiffuseColor.GetColor());
+	shader->SetVec3Uniform("material.SpecularColor", mSpecularColor.GetColor());
 
 	shader->SetFloatUniform("material.Shininess", mShininess);
 }
