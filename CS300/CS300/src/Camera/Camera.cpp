@@ -148,16 +148,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 	if (mLighting)
 	{
-		ShaderProgram lighShader = mLights[0].GetShader();
-
-		lighShader.Use();
-
-		glm::mat4x4 m2w= mLights[0].GetM2W();
-
-		lighShader.SetMatUniform("m2w", glm::value_ptr(m2w));
-		lighShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
-		lighShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
-
 		DrawLights();
 	}
 
@@ -305,6 +295,16 @@ void Camera::DrawLights()
 {
 	for (unsigned i = 0; i < mLights.size(); i++)
 	{
+		ShaderProgram lightShader = mLights[i].GetShader();
+
+		lightShader.Use();
+
+		glm::mat4x4 m2w = mLights[i].GetM2W();
+
+		lightShader.SetMatUniform("m2w", glm::value_ptr(m2w));
+		lightShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
+		lightShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
+
 		mLights[i].Render();
 	}
 }

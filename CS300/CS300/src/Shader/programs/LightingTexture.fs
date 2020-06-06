@@ -176,7 +176,7 @@ vec3 ApplyPhongLight()
             //return finalCol;
         }
         
-        finalCol += color * attenuation; //* clamp(SpotLight, 0.0, 1.0);;
+        finalCol += color * attenuation * textureCol; //* clamp(SpotLight, 0.0, 1.0);;
     }
     
     return finalCol;
