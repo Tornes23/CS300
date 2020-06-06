@@ -350,7 +350,7 @@ void Camera::AddLight()
 	if (!mLights.empty())
 		mLights.clear();
 
-	float angleStep = glm::two_pi<float>() / (size + 1);
+	float angleStep = 360 / (size + 1);
 
 	for (size_t i = 0; i < size + 1; i++)
 	{
