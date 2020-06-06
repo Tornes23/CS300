@@ -146,8 +146,10 @@ ShaderProgram Light::GetShader() const
 	return mShader;
 }
 
-void Light::Edit()
+void Light::Edit(int id)
 {
+	ImGui::PushID(id);
+
 	if (ImGui::TreeNode("Transform"))
 	{
 		ImGui::DragFloat3("Position", glm::value_ptr(mRotations));
@@ -201,5 +203,7 @@ void Light::Edit()
 
 		ImGui::TreePop();
 	}
+
+	ImGui::PopID();
 
 }

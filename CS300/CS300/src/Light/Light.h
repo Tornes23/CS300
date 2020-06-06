@@ -37,7 +37,7 @@ public:
 	void  SetType(LightType mode);
 	ShaderProgram GetShader() const;
 
-	void Edit();
+	void Edit(int id);
 
 private:
 

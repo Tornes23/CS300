@@ -402,7 +402,7 @@ void Camera::Edit()
 
 		if (ImGui::CollapsingHeader(title.c_str()))
 		{
-			mLights[i].Edit();
+			mLights[i].Edit(i);
 		}
 	}
 
