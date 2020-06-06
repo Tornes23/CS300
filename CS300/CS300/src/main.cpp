@@ -44,7 +44,6 @@ int main()
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cylinder", Model::Shape::Cylinder));
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Sphere",   Model::Shape::Sphere));
 
-
 	while (!myWindow.IsClosed())
 	{
 		myEditor.StartFrame();

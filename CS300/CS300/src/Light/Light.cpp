@@ -47,7 +47,7 @@ void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::m
 	shader->SetIntUniform(shaderString + ".Type", mType);
 
 	shader->SetVec3Uniform(shaderString + ".Position",  mPosition);
-	shader->SetVec3Uniform(shaderString + ".Direction", -mPosition);
+	shader->SetVec3Uniform(shaderString + ".Direction", w2Cam * glm::vec4(-mPosition, 1.0));
 	//shader->SetVec3Uniform(shaderString + ".Direction", w2Cam * glm::vec4(camPos - mPosition, 1.0));
 	shader->SetVec3Uniform(shaderString + ".PosInCamSpc", w2Cam * glm::vec4(mPosition, 1.0));
 
@@ -66,8 +66,6 @@ void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::m
 
 void Light::Update()
 {
-	Edit();
-
 	if (KeyDown(I))
 		mRotations.y += 1.0F;
 
@@ -154,13 +152,6 @@ ShaderProgram Light::GetShader() const
 
 void Light::Edit()
 {
-	if (!ImGui::Begin("Light"))
-	{
-		// Early out if the window is collapsed, as an optimization.
-		ImGui::End();
-		return;
-	}
-
 	if (ImGui::TreeNode("Transform"))
 	{
 		ImGui::DragFloat3("Position", glm::value_ptr(mRotations));
@@ -215,5 +206,4 @@ void Light::Edit()
 		ImGui::TreePop();
 	}
 
-	ImGui::End();
 }

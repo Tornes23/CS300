@@ -59,6 +59,7 @@ public:
 	void RemoveLight();
 	void ChangeLights();
 	void UpdateLights();
+	void Edit();
 
 	glm::mat4x4 CreatePerspective();
 	glm::mat4x4 CreateCameraMat();

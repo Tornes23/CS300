@@ -28,11 +28,10 @@ The functions included are:
 
 ***************************************************************************/
 
-
-#include <iostream>
 #include <GLM/gtc/matrix_transform.hpp>
 #include <GLM/gtc/type_ptr.hpp>
 #include <SDL2/SDL.h>
+#include <IMGUI/imgui.h>
 #include "Camera.h"
 #include "../GameObject/GameObject.h"
 #include "../Input/Input.h"
@@ -167,6 +166,7 @@ The update function for the class
 **************************************************************************/
 void Camera::Update()
 {	
+	Edit();
 
 #pragma region CAMERA MOVEMENT
 
@@ -383,6 +383,30 @@ void Camera::UpdateLights()
 {
 	for (int i = 0; i < mLights.size(); i++)
 		mLights[i].Update();
+}
+
+void Camera::Edit()
+{
+	if (!ImGui::Begin("Lights"))
+	{
+		// Early out if the window is collapsed, as an optimization.
+		ImGui::End();
+		return;
+	}
+
+	for (unsigned i = 0; i < mLights.size(); i++)
+	{
+		std::string title = "Light";
+
+		title += std::to_string(i);
+
+		if (ImGui::CollapsingHeader(title.c_str()))
+		{
+			mLights[i].Edit();
+		}
+	}
+
+	ImGui::End();
 }
 
 /**************************************************************************
