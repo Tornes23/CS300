@@ -150,6 +150,8 @@ based on the info provided in the http://www.songho.ca/opengl/gl_sphere.html web
 **************************************************************************/
 void Model::CreateSphere(int slices, float radius)
 {
+	mIndexed = false;
+
 	//constants used later
 	int ringCount = 2 * slices;
 	float twoPI = glm::two_pi<float>();
@@ -161,78 +163,85 @@ void Model::CreateSphere(int slices, float radius)
 	float ringAngleStep = pi / ringCount;
 
 	//computing vertices
-	for (int i = 0; i <= ringCount; ++i)
+	for (int i = 0; i < ringCount; ++i)
 	{
 		//the current angle
 		float ringAngle = piOver2 - i * ringAngleStep;
+		float ringAngle2 = piOver2 - (i + 1) * ringAngleStep;
 
-		for (int j = 0; j <= slices; ++j)
+		for (int j = 0; j < slices; ++j)
 		{
 			//the current angle
 			float sliceAngle = j * sliceAngleStep;
+			float sliceAngle1 = (j + 1) * sliceAngleStep;
+
+			glm::vec3 v0;
+			glm::vec3 v1;
+			glm::vec3 v2;
 
 			//computing the x y z coords using the sphere parametric formula
-			float xCoord = (radius * cosf(ringAngle)) * sinf(sliceAngle);
-			float yCoord = (radius * sinf(ringAngle));
-			float zCoord = (radius * cosf(ringAngle)) * cosf(sliceAngle);
+			v0.x = (radius * cosf(ringAngle)) * sinf(sliceAngle);
+			v0.y = (radius * sinf(ringAngle));
+			v0.z = (radius * cosf(ringAngle)) * cosf(sliceAngle);
 
-			mAveraged.push_back(glm::normalize(glm::vec3(xCoord, yCoord, zCoord)));
+			v1.x = (radius * cosf(ringAngle2)) * sinf(sliceAngle);
+			v1.y = (radius * sinf(ringAngle2));
+			v1.z = (radius * cosf(ringAngle2)) * cosf(sliceAngle);
+
+			v2.x = (radius * cosf(ringAngle)) * sinf(sliceAngle1);
+			v2.y = (radius * sinf(ringAngle));
+			v2.z = (radius * cosf(ringAngle)) * cosf(sliceAngle1);
 
 			//computing the u v coordinates
-			float u = static_cast<float>(j) / slices;
-			float v = static_cast<float>(i) / ringCount;
+			float u0 = static_cast<float>(j) / slices;
+			float u1 = static_cast<float>(j + 1) / slices;
 
-			//adding the position texture coordinates and normal values for the four vertices
-			mVertices.push_back(glm::vec3(xCoord, yCoord, zCoord));
-			mTextureCoords.push_back(glm::vec2(u, v));
+			float t0 = static_cast<float>(i) / ringCount;
+			float t2 = static_cast<float>(i + 1) / ringCount;
 
-		}
-	}
+			//adding the position texture coordinates and normal values for the first triangle
+			mVertices.push_back(v0);
+			mVertices.push_back(v1);
+			mVertices.push_back(v2);
 
-	mNormalVecs.resize(mVertices.size());
+			glm::vec3 normal = glm::normalize(glm::triangleNormal(v0, v1, v2));
 
-	//adding indexes
-	for (int i = 0; i < ringCount; ++i)
-	{
-		//computing the indexes for the triangles
-		int index1 = i * (slices + 1);
-		int index2 = index1 + slices + 1;
+			mNormalVecs.push_back(normal);
+			mNormalVecs.push_back(normal);
+			mNormalVecs.push_back(normal);
 
-		for (int j = 0; j < slices; ++j, ++index1, ++index2)
-		{
-			//adding the indexes for the 2 triangles that will form each piece of the sphere
-			if (i != 0)
-			{
-				glm::vec3 v0 = mVertices[index1];
-				glm::vec3 v1 = mVertices[index2];
-				glm::vec3 v2 = mVertices[index1 + 1];
-				glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
+			mAveraged.push_back(v0);
+			mAveraged.push_back(v1);
+			mAveraged.push_back(v2);
+
+			mTextureCoords.push_back(glm::vec2(u0, t0));
+			mTextureCoords.push_back(glm::vec2(u1, t2));
+			mTextureCoords.push_back(glm::vec2(u1, t0));
 			
-				mIndexes.push_back(index1);
-				mIndexes.push_back(index2);
-				mIndexes.push_back(index1 + 1);
-				
-				mNormalVecs[index1] = normal;
-				mNormalVecs[index2] = normal;
-				mNormalVecs[index1 + 1] = normal;
+
+			//adding the position texture coordinates and normal values for the first triangle
+			v0.x = (radius * cosf(ringAngle2)) * sinf(sliceAngle1);
+			v0.y = (radius * sinf(ringAngle2));
+			v0.z = (radius * cosf(ringAngle2)) * cosf(sliceAngle1);
 			
-			}
-
-			if (i != (ringCount - 1))
-			{
-				glm::vec3 v0 = mVertices[index1 + 1];
-				glm::vec3 v1 = mVertices[index2];
-				glm::vec3 v2 = mVertices[index2 + 1];
-				glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
-
-				mIndexes.push_back(index1 + 1);
-				mIndexes.push_back(index2);
-				mIndexes.push_back(index2 + 1);
-
-				mNormalVecs[index1 + 1] = normal;
-				mNormalVecs[index2] = normal;
-				mNormalVecs[index2 + 1] = normal;
-			}
+			mVertices.push_back(v2);
+			mVertices.push_back(v1);
+			mVertices.push_back(v0);
+			
+			normal = glm::normalize(glm::triangleNormal(v2, v1, v0));
+			
+			mNormalVecs.push_back(normal);
+			mNormalVecs.push_back(normal);
+			mNormalVecs.push_back(normal);
+			
+			mAveraged.push_back(v2);
+			mAveraged.push_back(v1);
+			mAveraged.push_back(v0);
+			
+			mTextureCoords.push_back(glm::vec2(u1, t0));
+			mTextureCoords.push_back(glm::vec2(u0, t2));
+			mTextureCoords.push_back(glm::vec2(u1, t2));
+			
 		}
 	}
 
