@@ -47,7 +47,8 @@ void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::m
 	shader->SetIntUniform(shaderString + ".Type", mType);
 
 	shader->SetVec3Uniform(shaderString + ".Position",  mPosition);
-	shader->SetVec3Uniform(shaderString + ".Direction", w2Cam * glm::vec4(-mPosition, 1.0));
+	shader->SetVec3Uniform(shaderString + ".Direction", -mPosition);
+	//shader->SetVec3Uniform(shaderString + ".Direction", w2Cam * glm::vec4(camPos - mPosition, 1.0));
 	shader->SetVec3Uniform(shaderString + ".PosInCamSpc", w2Cam * glm::vec4(mPosition, 1.0));
 
 	//CHECK THIS SHI
