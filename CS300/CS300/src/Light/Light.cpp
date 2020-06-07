@@ -302,7 +302,7 @@ void Light::ComputePos()
 {
 	//computing the position and setting it
 	float posX = mRadius * cosf(glm::radians(mRotations.x));
-	float posY = mRadius * sinf(glm::radians(mRotations.y) * 2);
+	float posY = (mRadius / 2.0F) * sinf(glm::radians(mRotations.y) * 2);
 	float posZ = mRadius * sinf(glm::radians(mRotations.x));
 
 	mPosition = glm::vec3(posX, posY, posZ);
@@ -471,9 +471,7 @@ void Light::Edit(int id)
 	//tree to modify the transform of the light
 	if (ImGui::TreeNode("Transform"))
 	{
-		ImGui::DragFloat3("Position", glm::value_ptr(mRotations));
-		ImGui::DragFloat3("Scale", glm::value_ptr(mScale));
-
+		ImGui::DragFloat("Rotation Radius", &mRadius);
 		ImGui::TreePop();
 	}
 
@@ -494,7 +492,6 @@ void Light::Edit(int id)
 				break;
 			case 1:
 				mType = Directional;
-
 				break;
 			case 2:
 				mType = Spotlight;
