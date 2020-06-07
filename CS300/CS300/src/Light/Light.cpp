@@ -80,7 +80,8 @@ the cosine of the outer angle for the attenuation
 
 *
 **************************************************************************/
-Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color ambient, Color diffuse, Color specular, float constant, float linear, float quadratic, float inner, float outer)
+Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color ambient, Color diffuse,
+			 Color specular, float constant, float linear, float quadratic, float inner, float outer, float falloff)
 			: mModel(Model::Shape::Sphere), mShader("./src/Shader/programs/Light.vs", "./src/Shader/programs/Light.fs")
 {
 	//setting the rotations
@@ -96,7 +97,7 @@ Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color amb
 	mPosition = glm::vec3(posX, posY, posZ);
 
 	//setting the direction
-	mDirection = direction;
+	mDirection = -mPosition;
 
 	//setting the color
 	mAmbientColor = ambient;
@@ -113,7 +114,7 @@ Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color amb
 
 	mCosInner = inner;
 	mCosOuter = outer;
-
+	mFallOff = falloff;
 }
 
 /**************************************************************************
@@ -179,17 +180,19 @@ void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::m
 	shader->SetIntUniform(shaderString + ".Type", mType);
 
 	shader->SetVec3Uniform(shaderString + ".Position",  mPosition);
-	shader->SetVec3Uniform(shaderString + ".Direction", w2Cam * glm::vec4(-mPosition, 0.0));
+	shader->SetVec3Uniform(shaderString + ".Direction", w2Cam * glm::vec4(mDirection, 0.0));
 	shader->SetVec3Uniform(shaderString + ".PosInCamSpc", w2Cam * glm::vec4(mPosition, 1.0));
 
 	shader->SetVec3Uniform(shaderString + ".AmbientColor", mAmbientColor.GetColor());
 	shader->SetVec3Uniform(shaderString + ".DiffuseColor", mDiffuseColor.GetColor());
 	shader->SetVec3Uniform(shaderString + ".SpecularColor", mSpecularColor.GetColor());
+	shader->SetVec3Uniform(shaderString + ".Attenuation", mAttenuation);
+
 
 	shader->SetFloatUniform(shaderString + ".CosInner", mCosInner);
 	shader->SetFloatUniform(shaderString + ".CosOuter", mCosOuter);
+	shader->SetFloatUniform(shaderString + ".FallOff", mFallOff);
 	
-	shader->SetVec3Uniform(shaderString + ".Attenuation", mAttenuation);
 
 }
 
@@ -301,6 +304,10 @@ void Light::ComputePos()
 	float posZ = (mRadius * cosf(glm::radians(mRotations.y))) * cosf(glm::radians(mRotations.x));
 
 	mPosition = glm::vec3(posX, posY, posZ);
+
+	//setting the light direction
+	mDirection = -mPosition;
+
 }
 
 /**************************************************************************
