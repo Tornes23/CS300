@@ -36,13 +36,13 @@ int main()
 	Utils::InitGL(&myWindow);
 	Camera myCamera(glm::vec3(0, 0, 10));
 
-	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(50, 50, 1), "Floor", Model::Shape::Plane, true, glm::vec3(0, 0, 1), glm::vec3(0, 1, 0)));
+	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(50, 50, 1), "Floor", Model::Shape::Plane, true, "./src/Texture/resources/normal_map.png", glm::vec3(0, 0, 1), glm::vec3(0, 1, 0)));
 
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Plane",    Model::Shape::Plane, true));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cube",     Model::Shape::Cube));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cone",     Model::Shape::Cone));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cylinder", Model::Shape::Cylinder));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Sphere",   Model::Shape::Sphere));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Plane",    Model::Shape::Plane,    true,  "./src/Texture/resources/normal_map.png"));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cube",     Model::Shape::Cube,     false, "./src/Texture/resources/normal_map.png"));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cone",     Model::Shape::Cone,     false, "./src/Texture/resources/normal_map.png"));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cylinder", Model::Shape::Cylinder, false, "./src/Texture/resources/normal_map.png"));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Sphere",   Model::Shape::Sphere,   false, "./src/Texture/resources/normal_map.png"));
 
 	while (!myWindow.IsClosed())
 	{
