@@ -14,7 +14,7 @@ in VS_OUT {
 //setting the length of the lines
 const float Length = 3;
 
-/function to draw the lines
+//function to draw the lines
 void DrawLine(int index)
 {
     gl_Position = gl_in[index].gl_Position;

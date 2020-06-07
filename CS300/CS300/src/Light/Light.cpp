@@ -86,7 +86,7 @@ Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color amb
 	//setting the rotations
 	mRotations = rotations;
 	mScale = glm::vec3(0.5, 0.5, 0.5);
-	mRadius = 15.0F;
+	mRadius = 20.0F;
 
 	//computing the position
 	float posX = (mRadius * cosf(glm::radians(mRotations.y))) * sinf(glm::radians(mRotations.x));
@@ -179,7 +179,7 @@ void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::m
 	shader->SetIntUniform(shaderString + ".Type", mType);
 
 	shader->SetVec3Uniform(shaderString + ".Position",  mPosition);
-	shader->SetVec3Uniform(shaderString + ".Direction", w2Cam * glm::vec4(mPosition, 1.0));
+	shader->SetVec3Uniform(shaderString + ".Direction", w2Cam * glm::vec4(-mPosition, 0.0));
 	shader->SetVec3Uniform(shaderString + ".PosInCamSpc", w2Cam * glm::vec4(mPosition, 1.0));
 
 	shader->SetVec3Uniform(shaderString + ".AmbientColor", mAmbientColor.GetColor());

@@ -1,5 +1,6 @@
 #version 400 core
 
+//Light structure
 struct Light{
     
     int Type;
@@ -18,7 +19,7 @@ struct Light{
     
 };
 
-
+//Material structure
 struct Material{
 
     vec3 AmbientColor;
@@ -29,10 +30,16 @@ struct Material{
     
 };
 
+//uniform variable to store all the lights
 uniform Light lightSources[8];
+
+//uniform variable to store the number ofg lights
 uniform int lightCount; 
+
+//uniform variable to store the material
 uniform Material material;
 
+//output color
 out vec4 FragColor; 
  
 in vec3 PosInCamSpc; 
@@ -81,7 +88,7 @@ vec3 DirectionalLight(vec3 initialCol, int i)
     //computing specular color
     vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
     
-    vec3 reflectDir = reflect(lightDir, Normal);  
+    vec3 reflectDir = reflect(-lightDir, Normal);  
     
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
     
