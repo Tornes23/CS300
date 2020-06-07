@@ -11,10 +11,12 @@
 
 \date    Sun Jun 07 02:42:05 2020
 
-\brief   This file contains the definition of the light class
+\brief   This file contains the implementation of the light class
 
 The functions included are:
-- Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color ambient, Color diffuse, Color specular, float constant, float linear, float quadratic, float inner, float outer);
+- Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, 
+				Color ambient, Color diffuse, Color specular, float constant, 
+				float linear, float quadratic, float inner, float outer, float falloff);
 - const glm::vec3 Light::GetPosition() const;
 - const glm::vec3 Light::GetDirection() const;
 - void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::mat4x4& w2Cam, glm::vec3& camPos);
@@ -28,6 +30,8 @@ The functions included are:
 - void Light::SetType(LightType mode);
 - ShaderProgram Light::GetShader() const;
 - void Light::Edit(int id);
+- const bool Light::GetAnimation()
+- void Light::SetAnimation(bool toSet)
 
 ***************************************************************************/
 
@@ -53,7 +57,7 @@ public:
 
 	Light(LightType type = LightType::Point, glm::vec3 rotations = glm::vec3(0, 0, 0), glm::vec3 direction = glm::vec3(0, 0, 0),
 		 Color ambient = Color::Black, Color diffuse = Color::White, Color specular = Color::White, float constant = 0.0F, float linear = 0.0F,
-		float quadratic = 0.001F, float inner = 0.984F, float outer = 0.866F, float falloff = 3);
+		 float quadratic = 0.001F, float inner = 0.984F, float outer = 0.866F, float falloff = 3);
 
 	const glm::vec3 GetPosition() const;
 	const glm::vec3 GetDirection() const;
@@ -67,6 +71,8 @@ public:
 	const glm::vec3 GetAmbient();
 	const glm::vec3 GetDiffuse();
 	const glm::vec3 GetSpecular();
+	const bool GetAnimation();
+	void SetAnimation(bool toSet);
 
 	LightType GetType() const;
 	void  SetType(LightType mode);
@@ -97,4 +103,6 @@ private:
 	float mCosOuter;
 	float mFallOff;
 	float mRadius;
+
+	bool mbAnimation;
 };

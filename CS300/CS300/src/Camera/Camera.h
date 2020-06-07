@@ -29,6 +29,7 @@ The functions included are:
 - void Camera::ChangeLights();
 - void Camera::UpdateLights();
 - void Camera::Edit();
+- void SetAnimation();
 - void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam);
 - void Camera::AddShader(const std::string & vertex, const std::string & fragment);
 - void Camera::AddAllShaders();
@@ -69,6 +70,7 @@ public:
 	void ChangeLights();
 	void UpdateLights();
 	void Edit();
+	void SetAnimation();
 
 	glm::mat4x4 CreatePerspective();
 	glm::mat4x4 CreateCameraMat();
@@ -92,6 +94,7 @@ private:
 	bool mTextureMapping;
 	bool mAveragedNormals;
 	bool mLighting;
+	bool mLightAnimation;
 
 	//the needed matrices
 	glm::mat4x4 mPerspective;

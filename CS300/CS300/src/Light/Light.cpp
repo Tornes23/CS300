@@ -14,7 +14,9 @@
 \brief   This file contains the implementation of the light class
 
 The functions included are:
-- Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color ambient, Color diffuse, Color specular, float constant, float linear, float quadratic, float inner, float outer);
+- Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction,
+				Color ambient, Color diffuse, Color specular, float constant,
+				float linear, float quadratic, float inner, float outer, float falloff);
 - const glm::vec3 Light::GetPosition() const;
 - const glm::vec3 Light::GetDirection() const;
 - void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::mat4x4& w2Cam, glm::vec3& camPos);
@@ -28,6 +30,8 @@ The functions included are:
 - void Light::SetType(LightType mode);
 - ShaderProgram Light::GetShader() const;
 - void Light::Edit(int id);
+- const bool Light::GetAnimation()
+- void Light::SetAnimation(bool toSet)
 
 ***************************************************************************/
 
@@ -115,6 +119,9 @@ Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color amb
 	mCosInner = inner;
 	mCosOuter = outer;
 	mFallOff = falloff;
+
+	//setting the animation variable
+	mbAnimation = true;
 }
 
 /**************************************************************************
@@ -208,28 +215,23 @@ Updates the light
 void Light::Update()
 {
 #pragma region MOVEMENT
-	if (KeyDown(I))
-		mRotations.y += 1.0F;
 
-	if (KeyDown(J))
-		mRotations.x -= 1.0F;
+	if(mRotations.x >= 360.0F)
+		mRotations.x = 0.0F;
 
-	if (KeyDown(K))
-		mRotations.y -= 1.0F;
-
-	if (KeyDown(L))
-		mRotations.x += 1.0F;
-
-	if (KeyDown(U))
-		mRadius -= 0.5F;
-
-	if (KeyDown(O))
-		mRadius += 0.5F;
+	if (mRotations.y >= 360.0F)
+		mRotations.y = 0.0F;
 
 #pragma endregion
 
 	//computing the position
-	ComputePos();
+	if (mbAnimation)
+	{
+		mRotations.x += 1.0F;
+		mRotations.y += 1.0F;
+
+		ComputePos();
+	}
 
 	//computing the model to world matrix
 	GetM2W();
@@ -299,9 +301,9 @@ Computes the position of the light
 void Light::ComputePos()
 {
 	//computing the position and setting it
-	float posX = (mRadius * cosf(glm::radians(mRotations.y))) * sinf(glm::radians(mRotations.x));
-	float posY = (mRadius * sinf(glm::radians(mRotations.y)));
-	float posZ = (mRadius * cosf(glm::radians(mRotations.y))) * cosf(glm::radians(mRotations.x));
+	float posX = mRadius * cosf(glm::radians(mRotations.x));
+	float posY = mRadius * sinf(glm::radians(mRotations.y) * 2);
+	float posZ = mRadius * sinf(glm::radians(mRotations.x));
 
 	mPosition = glm::vec3(posX, posY, posZ);
 
@@ -362,6 +364,37 @@ const glm::vec3 Light::GetSpecular()
 {
 	//returning the color
 	return mSpecularColor.GetColor();
+}
+
+/**************************************************************************
+*!
+\fn     Light::GetAnimation
+
+\brief
+Returns the animation boolean
+
+\return bool
+a boolean indicating if is animated or not
+
+*
+**************************************************************************/
+const bool Light::GetAnimation()
+{
+	return mbAnimation;
+}
+
+/**************************************************************************
+*!
+\fn     Light::SetAnimation
+
+\brief
+Sets the animation variable
+
+*
+**************************************************************************/
+void Light::SetAnimation(bool toSet)
+{
+	mbAnimation = toSet;
 }
 
 /**************************************************************************

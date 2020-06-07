@@ -29,6 +29,7 @@ The functions included are:
 - void Camera::ChangeLights();
 - void Camera::UpdateLights();
 - void Camera::Edit();
+- void SetAnimation();
 - void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam);
 - void Camera::AddShader(const std::string & vertex, const std::string & fragment);
 - void Camera::AddAllShaders();
@@ -64,13 +65,14 @@ Camera::Camera(glm::vec3 direction)
 	ComputePos();
 	mNear = 0.1F;
 	mFar = 100.0F;
-	mRadius = 25.0F;
+	mRadius = 40.0F;
 
 	mWireframe = false;
 	mRenderNormals = false;
 	mAveragedNormals = false;
 	mTextureMapping = false;
 	mLighting = true;
+	mLightAnimation = true;
 
 	mLightMode = Light::LightType::Point;
 
@@ -210,6 +212,8 @@ void Camera::Update()
 
 #pragma region RENDER MODIFICATIONS
 
+	bool lastAnimation = mLightAnimation;
+
 	if (KeyTriggered(M))
 		mWireframe = !mWireframe;
 
@@ -222,8 +226,11 @@ void Camera::Update()
 	if (KeyTriggered(F))
 		mAveragedNormals = !mAveragedNormals;
 
-	if (KeyTriggered(P))
+	if (KeyTriggered(num6))
 		mLighting = !mLighting;
+
+	if (KeyTriggered(P))
+		mLightAnimation = !mLightAnimation;
 
 	Light::LightType lastMode = mLightMode;
 
@@ -246,6 +253,9 @@ void Camera::Update()
 
 	if (lastMode != mLightMode)
 		ChangeLights();
+
+	if (lastAnimation != mLightAnimation)
+		SetAnimation();
 
 	//updating the matrices and the vectors
 	ComputePos();
@@ -540,6 +550,24 @@ void Camera::Edit()
 	}
 
 	ImGui::End();
+}
+
+/**************************************************************************
+*!
+\fn     Camera::SetAnimation
+
+\brief
+Sets the animation boolean for the lights
+
+
+*
+**************************************************************************/
+void Camera::SetAnimation()
+{
+	for (unsigned i = 0; i < mLights.size(); i++)
+	{
+		mLights[i].SetAnimation(mLightAnimation);
+	}
 }
 
 /**************************************************************************
