@@ -196,8 +196,8 @@ void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::m
 	shader->SetVec3Uniform(shaderString + ".Attenuation", mAttenuation);
 
 
-	shader->SetFloatUniform(shaderString + ".CosInner", mCosInner);
-	shader->SetFloatUniform(shaderString + ".CosOuter", mCosOuter);
+	shader->SetFloatUniform(shaderString + ".CosInner", cosf(glm::radians(mCosInner)));
+	shader->SetFloatUniform(shaderString + ".CosOuter", cosf(glm::radians(mCosOuter)));
 	shader->SetFloatUniform(shaderString + ".FallOff", mFallOff);
 	
 
