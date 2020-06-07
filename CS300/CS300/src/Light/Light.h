@@ -56,7 +56,7 @@ public:
 	};
 
 	Light(LightType type = LightType::Point, glm::vec3 rotations = glm::vec3(0, 0, 0), glm::vec3 direction = glm::vec3(0, 0, 0),
-		 Color ambient = Color::Black, Color diffuse = Color(0.5F, 0.5F, 0.5F), Color specular = Color::White, float constant = 0.0F, float linear = 0.0F,
+		 Color ambient = Color::Black, Color diffuse = Color::White, Color specular = Color(0.5F, 0.5F, 0.5F), float constant = 0.0F, float linear = 0.0F,
 		 float quadratic = 0.001F, float inner = 10.0F, float outer = 30.0F, float falloff = 3);
 
 	const glm::vec3 GetPosition() const;
