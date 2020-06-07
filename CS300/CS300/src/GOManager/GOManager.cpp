@@ -300,17 +300,19 @@ void GameObjectManager::EditObj(GameObject* obj)
 	{
 		ImGui::DragFloat("Shininess", &obj->mMaterial.mShininess);
 
-		glm::vec4 diffuse = obj->mMaterial.mDiffuseColor.GetColor();
-		glm::vec4 specular = obj->mMaterial.mSpecularColor.GetColor();
-		glm::vec4 ambient = obj->mMaterial.mAmbientColor.GetColor();
+		//getting the colors and storing them in temporals
+		glm::vec3 diffuse = obj->mMaterial.mDiffuseColor.GetColor();
+		glm::vec3 specular = obj->mMaterial.mSpecularColor.GetColor();
+		glm::vec3 ambient = obj->mMaterial.mAmbientColor.GetColor();
 
-		ImGui::ColorEdit4("Ambient Color", glm::value_ptr(ambient));
-		ImGui::ColorEdit4("Diffuse Color", glm::value_ptr(diffuse));
-		ImGui::ColorEdit4("Specular Color", glm::value_ptr(specular));
+		//imgui interface to edit the color
+		ImGui::ColorEdit3("Ambient Color", glm::value_ptr(ambient));
+		ImGui::ColorEdit3("Diffuse Color", glm::value_ptr(diffuse));
+		ImGui::ColorEdit3("Specular Color", glm::value_ptr(specular));
 
+		obj->mMaterial.mAmbientColor.SetColor(ambient);
 		obj->mMaterial.mDiffuseColor.SetColor(diffuse);
 		obj->mMaterial.mSpecularColor.SetColor(specular);
-		obj->mMaterial.mAmbientColor.SetColor(specular);
 
 		ImGui::TreePop();
 	}

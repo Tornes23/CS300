@@ -40,7 +40,7 @@ public:
 	static Color Pink;
 	static Color Yellow;
 
-	void SetColor(glm::vec4& color);
+	void SetColor(glm::vec3& color);
 	glm::vec4 GetColor();
 
 	unsigned char mR;

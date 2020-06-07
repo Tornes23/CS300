@@ -101,12 +101,12 @@ Color::Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 	mA = a;
 }
 
-void Color::SetColor(glm::vec4& color)
+void Color::SetColor(glm::vec3& color)
 {
 	mR = static_cast<unsigned char>(color.r * 255);
 	mG = static_cast<unsigned char>(color.g * 255);
 	mB = static_cast<unsigned char>(color.b * 255);
-	mA = static_cast<unsigned char>(color.a * 255);
+	mA = 255;
 }
 
 glm::vec4 Color::GetColor()

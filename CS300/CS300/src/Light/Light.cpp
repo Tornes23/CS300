@@ -500,14 +500,14 @@ void Light::Edit(int id)
 		}
 
 		//getting the colors and storing them in temporals
-		glm::vec4 diffuse = mDiffuseColor.GetColor();
-		glm::vec4 specular = mSpecularColor.GetColor();
-		glm::vec4 ambient = mAmbientColor.GetColor();
+		glm::vec3 diffuse = mDiffuseColor.GetColor();
+		glm::vec3 specular = mSpecularColor.GetColor();
+		glm::vec3 ambient = mAmbientColor.GetColor();
 
 		//imgui interface to edit the color
-		ImGui::ColorEdit4("Ambient Color", glm::value_ptr(ambient));
-		ImGui::ColorEdit4("Diffuse Color", glm::value_ptr(diffuse));
-		ImGui::ColorEdit4("Specular Color", glm::value_ptr(specular));
+		ImGui::ColorEdit3("Ambient Color", glm::value_ptr(ambient));
+		ImGui::ColorEdit3("Diffuse Color", glm::value_ptr(diffuse));
+		ImGui::ColorEdit3("Specular Color", glm::value_ptr(specular));
 
 		//to mnodify the attenuation factors
 		ImGui::DragFloat3("Attenuation", glm::value_ptr(mAttenuation));
