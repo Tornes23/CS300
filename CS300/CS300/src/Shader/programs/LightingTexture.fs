@@ -12,6 +12,10 @@ struct Light{
     vec3 DiffuseColor;
     vec3 SpecularColor;
     vec3 Attenuation;
+    
+    float CosInner;
+    float CosOuter;
+    
 };
 
 

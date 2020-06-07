@@ -1,10 +1,10 @@
 #version 400 core
 
+//output fragmet color
 out vec3 FragColor;  
-
-uniform sampler2D textureData;
  
 void main()
 {
+    //setting the color of the pixel to white
     FragColor = vec3(1,1,1);
 }

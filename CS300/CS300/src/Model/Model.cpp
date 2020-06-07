@@ -165,13 +165,13 @@ void Model::CreateSphere(int slices, float radius)
 	{
 		//the current angle
 		float ringAngle = piOver2 - i * ringAngleStep;
-		float ringAngle2 = piOver2 - (i + 1) * ringAngleStep;
+		float nextRingAngle = piOver2 - (i + 1) * ringAngleStep;
 
 		for (int j = 0; j < slices; ++j)
 		{
 			//the current angle
 			float sliceAngle = j * sliceAngleStep;
-			float sliceAngle1 = (j + 1) * sliceAngleStep;
+			float nextSliceAngle = (j + 1) * sliceAngleStep;
 
 			glm::vec3 v0;
 			glm::vec3 v1;
@@ -182,20 +182,20 @@ void Model::CreateSphere(int slices, float radius)
 			v0.y = (radius * sinf(ringAngle));
 			v0.z = (radius * cosf(ringAngle)) * cosf(sliceAngle);
 
-			v1.x = (radius * cosf(ringAngle2)) * sinf(sliceAngle);
-			v1.y = (radius * sinf(ringAngle2));
-			v1.z = (radius * cosf(ringAngle2)) * cosf(sliceAngle);
+			v1.x = (radius * cosf(nextRingAngle)) * sinf(sliceAngle);
+			v1.y = (radius * sinf(nextRingAngle));
+			v1.z = (radius * cosf(nextRingAngle)) * cosf(sliceAngle);
 
-			v2.x = (radius * cosf(ringAngle)) * sinf(sliceAngle1);
+			v2.x = (radius * cosf(ringAngle)) * sinf(nextSliceAngle);
 			v2.y = (radius * sinf(ringAngle));
-			v2.z = (radius * cosf(ringAngle)) * cosf(sliceAngle1);
+			v2.z = (radius * cosf(ringAngle)) * cosf(nextSliceAngle);
 
 			//computing the u v coordinates
-			float u0 = static_cast<float>(j) / slices;
-			float u1 = static_cast<float>(j + 1) / slices;
+			float s = static_cast<float>(j) / slices;
+			float sNext = static_cast<float>(j + 1) / slices;
 
-			float t0 = static_cast<float>(i) / ringCount;
-			float t2 = static_cast<float>(i + 1) / ringCount;
+			float t = static_cast<float>(i) / ringCount;
+			float tNext = static_cast<float>(i + 1) / ringCount;
 
 			//adding the position texture coordinates and normal values for the first triangle
 			mVertices.push_back(v0);
@@ -212,15 +212,15 @@ void Model::CreateSphere(int slices, float radius)
 			mAveraged.push_back(v1);
 			mAveraged.push_back(v2);
 
-			mTextureCoords.push_back(glm::vec2(u0, t0));
-			mTextureCoords.push_back(glm::vec2(u0, t2));
-			mTextureCoords.push_back(glm::vec2(u1, t0));
+			mTextureCoords.push_back(glm::vec2(s, t));
+			mTextureCoords.push_back(glm::vec2(s, tNext));
+			mTextureCoords.push_back(glm::vec2(sNext, t));
 			
 
 			//adding the position texture coordinates and normal values for the second triangle
-			v0.x = (radius * cosf(ringAngle2)) * sinf(sliceAngle1);
-			v0.y = (radius * sinf(ringAngle2));
-			v0.z = (radius * cosf(ringAngle2)) * cosf(sliceAngle1);
+			v0.x = (radius * cosf(nextRingAngle)) * sinf(nextSliceAngle);
+			v0.y = (radius * sinf(nextRingAngle));
+			v0.z = (radius * cosf(nextRingAngle)) * cosf(nextSliceAngle);
 			
 			mVertices.push_back(v0);
 			mVertices.push_back(v2);
@@ -236,9 +236,9 @@ void Model::CreateSphere(int slices, float radius)
 			mAveraged.push_back(v2);
 			mAveraged.push_back(v1);
 			
-			mTextureCoords.push_back(glm::vec2(u1, t2));
-			mTextureCoords.push_back(glm::vec2(u1, t0));
-			mTextureCoords.push_back(glm::vec2(u0, t2));
+			mTextureCoords.push_back(glm::vec2(sNext, tNext));
+			mTextureCoords.push_back(glm::vec2(sNext, t));
+			mTextureCoords.push_back(glm::vec2(s, tNext));
 			
 		}
 	}

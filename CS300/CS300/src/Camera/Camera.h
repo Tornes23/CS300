@@ -7,9 +7,9 @@
 
 \par     Course:    CS300
 
-\par     assignemnt 0
+\par     assignemnt 1
 
-\date    Mon May 25 06:44:41 2020
+\date    Sun Jun 7 06:44:41 2020
 
 \brief
 This file contains the definition of the camera class
@@ -18,11 +18,20 @@ The functions included are:
 - Camera::Camera();
 - void Camera::Render(Window& target, std::vector<GameObject*>& objects);
 - void Camera::Update();
+- void Camera::ComputePos();
 - void Camera::DrawTriangle(GameObject* target);
 - void Camera::DrawNormals(GameObject * target);
+- void Camera::DrawLights();
 - glm::mat4x4 Camera::CreatePerspective();
 - glm::mat4x4 Camera::CreateCameraMat();
+- void Camera::AddLight();
+- void Camera::RemoveLight();
+- void Camera::ChangeLights();
+- void Camera::UpdateLights();
+- void Camera::Edit();
+- void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam);
 - void Camera::AddShader(const std::string & vertex, const std::string & fragment);
+- void Camera::AddAllShaders();
 - ShaderProgram Camera::GetShader();
 - ShaderProgram Camera::GetNormalsShader();
 
@@ -68,7 +77,7 @@ public:
 	ShaderProgram GetShader();
 	ShaderProgram GetNormalShader();
 
-	const Light GetLight(Light::LightType mode) const;
+	const Light GetLight() const;
 
 private:
 

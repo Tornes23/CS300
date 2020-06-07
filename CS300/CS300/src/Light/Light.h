@@ -1,3 +1,36 @@
+/*!**************************************************************************
+\file    Light.cpp
+
+\author  Nestor Uriarte
+
+\par     DP email:  nestor.uriarte@digipen.edu
+
+\par     Course:    CS300
+
+\par     Assignemnt 1
+
+\date    Sun Jun 07 02:42:05 2020
+
+\brief   This file contains the definition of the light class
+
+The functions included are:
+- Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color ambient, Color diffuse, Color specular, float constant, float linear, float quadratic, float inner, float outer);
+- const glm::vec3 Light::GetPosition() const;
+- const glm::vec3 Light::GetDirection() const;
+- void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::mat4x4& w2Cam, glm::vec3& camPos);
+- void Light::Update();
+- void Light::Render();
+- glm::mat4x4 Light::GetM2W();
+- const glm::vec3 Light::GetAmbient();
+- const glm::vec3 Light::GetDiffuse();
+- const glm::vec3 Light::GetSpecular();
+- Light::LightType Light::GetType() const;
+- void Light::SetType(LightType mode);
+- ShaderProgram Light::GetShader() const;
+- void Light::Edit(int id);
+
+***************************************************************************/
+
 #pragma once
 #include <GLM/vec3.hpp>
 #include <GLM/mat4x4.hpp>
@@ -19,7 +52,8 @@ public:
 	};
 
 	Light(LightType type = LightType::Point, glm::vec3 rotations = glm::vec3(0, 0, 0), glm::vec3 direction = glm::vec3(0, 0, 0),
-		 Color ambient = Color::Black, Color diffuse = Color::White, Color specular = Color::White, float constant = 0.0F, float linear = 0.0F, float quadratic = 0.001F);
+		 Color ambient = Color::Black, Color diffuse = Color::White, Color specular = Color::White, float constant = 0.0F, float linear = 0.0F,
+		float quadratic = 0.001F, float inner = -0.984F, float outer = 0.866F);
 
 	const glm::vec3 GetPosition() const;
 	const glm::vec3 GetDirection() const;
@@ -28,6 +62,7 @@ public:
 	void Update();
 	void Render();
 	glm::mat4x4 GetM2W();
+	void ComputePos();
 
 	const glm::vec3 GetAmbient();
 	const glm::vec3 GetDiffuse();

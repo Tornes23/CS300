@@ -1,3 +1,30 @@
+/*!**************************************************************************
+\file    Material.cpp
+
+\author  Nestor Uriarte
+
+\par     DP email:  nestor.uriarte@digipen.edu
+
+\par     Course:    CS300
+
+\par     Assignemnt 1
+
+\date    Sun Jun 07 02:59:33 2020
+
+\brief   This file contains the definition of
+the Material class
+
+The functions included are:
+- Material::Material(std::string texture, Color ambient, Color diffuse, Color specular, float shininess);
+- Texture& Material::GetTexture();
+- const Color Material::GetDiffuse() const;
+- const Color Material::GetSpecular() const;
+- float Material::GetShininess() const;
+- const Color Material::GetAmbient() const;
+- void Material::SetUniforms(ShaderProgram * shader);
+
+***************************************************************************/
+
 #pragma once
 #include "../Texture/Texture.h"
 
@@ -7,8 +34,7 @@ class Material
 {
 public:
 
-	Material(Color diffuse, Color specular, Color ambient, float shininess, std::string texture);
-	Material(std::string texture);
+	Material(std::string texture, Color ambient = Color::Black, Color diffuse = Color::White, Color specular = Color::White, float shininess = 50);
 
 	Texture& GetTexture();
 

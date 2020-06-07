@@ -1,15 +1,15 @@
 /*!**************************************************************************
 \file    Camera.cpp
 
-\author  Nestor Uriarte 
+\author  Nestor Uriarte
 
-\par     DP email:  nestor.uriarte@digipen.edu 
+\par     DP email:  nestor.uriarte@digipen.edu
 
 \par     Course:    CS300
 
-\par     assignemnt 0
+\par     assignemnt 1
 
-\date    Mon May 25 06:44:41 2020
+\date    Sun Jun 7 06:44:41 2020
 
 \brief
 This file contains the implementation of the camera class
@@ -18,11 +18,20 @@ The functions included are:
 - Camera::Camera();
 - void Camera::Render(Window& target, std::vector<GameObject*>& objects);
 - void Camera::Update();
+- void Camera::ComputePos();
 - void Camera::DrawTriangle(GameObject* target);
 - void Camera::DrawNormals(GameObject * target);
+- void Camera::DrawLights();
 - glm::mat4x4 Camera::CreatePerspective();
 - glm::mat4x4 Camera::CreateCameraMat();
+- void Camera::AddLight();
+- void Camera::RemoveLight();
+- void Camera::ChangeLights();
+- void Camera::UpdateLights();
+- void Camera::Edit();
+- void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam);
 - void Camera::AddShader(const std::string & vertex, const std::string & fragment);
+- void Camera::AddAllShaders();
 - ShaderProgram Camera::GetShader();
 - ShaderProgram Camera::GetNormalsShader();
 
@@ -274,6 +283,18 @@ void Camera::DrawTriangle(GameObject* target)
 	error = glGetError();
 }
 
+/**************************************************************************
+*!
+\fn     Camera::DrawNormals
+
+\brief
+Renders the normals
+
+\param  GameObject* target
+the object to be rendered
+
+*
+**************************************************************************/
 void Camera::DrawNormals(GameObject * target)
 {
 	GLenum error = glGetError();
@@ -291,29 +312,61 @@ void Camera::DrawNormals(GameObject * target)
 	error = glGetError();
 }
 
+/**************************************************************************
+*!
+\fn     Camera::DrawLights
+
+\brief
+Renders the light object
+
+*
+**************************************************************************/
 void Camera::DrawLights()
 {
+	//for each light we have
 	for (unsigned i = 0; i < mLights.size(); i++)
 	{
+		//getting and using the shader
 		ShaderProgram lightShader = mLights[i].GetShader();
-
 		lightShader.Use();
 
+		//getting the model to world matrix
 		glm::mat4x4 m2w = mLights[i].GetM2W();
 
+		//setting the necessary matrices for the render
 		lightShader.SetMatUniform("m2w", glm::value_ptr(m2w));
 		lightShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
 		lightShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
 
+		//rendering
 		mLights[i].Render();
 	}
 }
 
+/**************************************************************************
+*!
+\fn     Camera::ApplyLight
+
+\brief
+Renders the light object
+
+\param  ShaderProgram& shader
+the shader program to apply the light on
+
+\param  glm::mat4x4& w2Cam
+the world to camera matrix
+
+*
+**************************************************************************/
 void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam)
 {
+	//setting if the averaged normals are used or not
 	shader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
+
+	//setting the number of light sources
 	shader.SetIntUniform("lightCount", (int)mLights.size());
 
+	//for each light set the uniforms
 	for (int i = 0; i < mLights.size(); i++)
 	{
 		mLights[i].Setuniforms("lightSources[" + std::to_string(i) + "]", &shader, w2Cam, mPosition);
@@ -321,8 +374,18 @@ void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam)
 
 }
 
+/**************************************************************************
+*!
+\fn     Camera::ComputePos
+
+\brief
+Recomputes the position of the camera
+
+*
+**************************************************************************/
 void Camera::ComputePos()
 {
+	//cmoputing the position and setting it
 	float posX = (mRadius * cosf(glm::radians(mRotations.y))) * sinf(glm::radians(mRotations.x));
 	float posY = (mRadius * sinf(glm::radians(mRotations.y)));
 	float posZ = (mRadius * cosf(glm::radians(mRotations.y))) * cosf(glm::radians(mRotations.x));
@@ -330,8 +393,18 @@ void Camera::ComputePos()
 	mPosition = glm::vec3(posX, posY, posZ);
 }
 
+/**************************************************************************
+*!
+\fn     Camera::AddAllShaders
+
+\brief
+Adds all the necessary shader for the camera to work
+
+*
+**************************************************************************/
 void Camera::AddAllShaders()
 {
+	//adding the shaders
 	AddShader("./src/Shader/programs/Texture.vs"          , "./src/Shader/programs/Texture.fs"        );
 	AddShader("./src/Shader/programs/Mapping.vs"          , "./src/Shader/programs/Mapping.fs"        );
 	AddShader("./src/Shader/programs/LightingTexture.vs"  , "./src/Shader/programs/LightingTexture.fs");
@@ -340,53 +413,110 @@ void Camera::AddAllShaders()
 	AddShader("./src/Shader/programs/NormalsAverage.vs"   , "./src/Shader/programs/NormalsAverage.fs" , "./src/Shader/programs/Normals.gs");
 }
 
+/**************************************************************************
+*!
+\fn     Camera::AddLight
+
+\brief
+Adds a light to the level
+
+*
+**************************************************************************/
 void Camera::AddLight()
 {
+	//getting the size
 	size_t size = mLights.size();
 
+	//if is 8 (the limit)
 	if (size == 8)
 		return;
 
+	//clearing the vector
 	if (!mLights.empty())
 		mLights.clear();
 
+	//computing the angle step
 	float angleStep = 360.0F / (size + 1);
 
+	//for the number of light + 1 (the added one)
 	for (size_t i = 0; i < size + 1; i++)
 	{
+		//compute the angle of start
 		float angle = i * angleStep;
 
+		//setting the initial position
 		glm::vec3 initPos(angle, 0, 0);
 
+		//adding it to the container
 		mLights.push_back(Light(mLightMode, initPos));
 	}
 }
 
+/**************************************************************************
+*!
+\fn     Camera::RemoveLight
+
+\brief
+Removes a light from the level
+
+*
+**************************************************************************/
 void Camera::RemoveLight()
 {
+	//if there is only one light return
 	if (mLights.size() == 1)
 		return;
 
+	//removing the las added light
 	if (!mLights.empty())
 		mLights.pop_back();
 }
 
+/**************************************************************************
+*!
+\fn     Camera::ChangeLights
+
+\brief
+Changes the light to a specific mode
+
+*
+**************************************************************************/
 void Camera::ChangeLights()
 {
+	//for each light in the container
 	for (unsigned i = 0; i < mLights.size(); i++)
 	{
+		//setting the type
 		mLights[i].SetType(mLightMode);
 	}
 }
 
+/**************************************************************************
+*!
+\fn     Camera::UpdateLights
+
+\brief
+Upadtes the lights
+*
+**************************************************************************/
 void Camera::UpdateLights()
 {
+	//updating the lights
 	for (int i = 0; i < mLights.size(); i++)
 		mLights[i].Update();
 }
 
+/**************************************************************************
+*!
+\fn     Camera::Edit
+
+\brief
+Wrapping function for imgui
+*
+**************************************************************************/
 void Camera::Edit()
 {
+	//creating a window
 	if (!ImGui::Begin("Lights"))
 	{
 		// Early out if the window is collapsed, as an optimization.
@@ -394,12 +524,15 @@ void Camera::Edit()
 		return;
 	}
 
+	//for each light
 	for (unsigned i = 0; i < mLights.size(); i++)
 	{
+		//setting the tab title
 		std::string title = "Light";
 
 		title += std::to_string(i);
 
+		//calling to the edit of the light
 		if (ImGui::CollapsingHeader(title.c_str()))
 		{
 			mLights[i].Edit(i);
@@ -525,29 +658,16 @@ returns the shader program
 **************************************************************************/
 ShaderProgram Camera::GetNormalShader()
 {
+	//if the averaged normals is on
 	if (mAveragedNormals)
 		return mShaders[5];
 
 	return mShaders[4];//normals shader
 }
 
-const Light Camera::GetLight(Light::LightType mode) const
+const Light Camera::GetLight() const
 {
-	switch (mode)
-	{
-	case Light::Point:
-		return mLights[0];
-		break;
-	case Light::Directional:
-		return mLights[1];
-		break;
-	case Light::Spotlight:
-		return mLights[2];
-		break;
-	default:
-		break;
-	}
-
+	//returning the light
 	return mLights[0];
 }
 
