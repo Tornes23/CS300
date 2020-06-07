@@ -7,17 +7,18 @@
 
 \par     Course:    CS300
 
-\par     assignemnt 0
+\par     assignemnt 1
 
 \date    Mon May 25 07:02:20 2020
 
 \brief   This file contains the
-definition of the GameObjectManager class
+implementation of the GameObjectManager class
 
 The functions included are:
 - void GameObjectManager::AddObject(GameObject* obj);
 - GameObject* GameObjectManager::CreateObject(glm::vec3 position, glm::vec3 scale, const char * name, Model::Shape shape, bool active, std::string textureName);
 - void GameObjectManager::Update();
+- void GameObjectManager::EditObj(GameObject* obj);
 - GameObject * GameObjectManager::FindObject(const char * name);
 - GameObject * GameObjectManager::FindActiveObject();
 - GameObjectManager::~GameObjectManager();

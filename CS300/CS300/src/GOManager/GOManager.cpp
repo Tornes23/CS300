@@ -18,6 +18,7 @@ The functions included are:
 - void GameObjectManager::AddObject(GameObject* obj);
 - GameObject* GameObjectManager::CreateObject(glm::vec3 position, glm::vec3 scale, const char * name, Model::Shape shape, bool active, std::string textureName);
 - void GameObjectManager::Update();
+- void GameObjectManager::EditObj(GameObject* obj);
 - GameObject * GameObjectManager::FindObject(const char * name);
 - GameObject * GameObjectManager::FindActiveObject();
 - GameObjectManager::~GameObjectManager();
@@ -228,11 +229,25 @@ void GameObjectManager::Update()
 	}
 }
 
+/**************************************************************************
+*!
+\fn     GameObjectManager::EditObj
+
+\brief
+Finds a object given the name of it
+
+\param GameObject *
+The object to be edited
+
+*
+**************************************************************************/
 void GameObjectManager::EditObj(GameObject* obj)
 {
+	//if is a valid obj
 	if (obj == nullptr)
 		return;
 
+	//creating the window
 	if (!ImGui::Begin("Game Object"))
 	{
 		// Early out if the window is collapsed, as an optimization.
@@ -240,10 +255,7 @@ void GameObjectManager::EditObj(GameObject* obj)
 		return;
 	}
 
-	char* tempName = (char*)obj->mName.c_str();
-
-	ImGui::InputText("Name", tempName, IM_ARRAYSIZE(tempName));
-
+	//to edit the transform
 	if (ImGui::TreeNode("Transform"))
 	{
 		ImGui::DragFloat3("Position", glm::value_ptr(obj->mPosition));
@@ -252,6 +264,7 @@ void GameObjectManager::EditObj(GameObject* obj)
 		ImGui::TreePop();
 	}
 
+	//to edit the model
 	if (ImGui::TreeNode("Model"))
 	{
 		int shape = obj->mModel.GetShape();
@@ -282,6 +295,7 @@ void GameObjectManager::EditObj(GameObject* obj)
 		ImGui::TreePop();
 	}
 
+	//to edit the material properties
 	if (ImGui::TreeNode("Material"))
 	{
 		ImGui::DragFloat("Shininess", &obj->mMaterial.mShininess);
