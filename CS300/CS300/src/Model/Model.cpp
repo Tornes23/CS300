@@ -895,39 +895,76 @@ void Model::CreatePlane()
 	glm::vec3 v0 = glm::vec3(-0.5, -0.5, 0.0);
 	glm::vec3 v1 = glm::vec3(0.5, -0.5, 0.0);
 	glm::vec3 v2 = glm::vec3(0.5, 0.5, 0.0);
+	glm::vec3 v3 = glm::vec3(-0.5, 0.5, 0.0);
+
+	glm::vec2 uv0 = glm::vec2(0, 0);
+	glm::vec2 uv1 = glm::vec2(1, 0);
+	glm::vec2 uv2 = glm::vec2(1, 1);
+	glm::vec2 uv3 = glm::vec2(0, 1);
+
+	glm::vec3 side1 = v1 - v2;
+	glm::vec3 side2 = v0 - v2;
+
+	glm::vec2 deltaUV1 = uv1 - uv2;
+	glm::vec2 deltaUV2 = uv0 - uv2;
+
+	glm::vec3 tangent;
+
+	float variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
+	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
+	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
 
 	//adding the position texture coordinates and normal values for the four vertices
 	mVertices.push_back(v0);
-	mTextureCoords.push_back(glm::vec2(0, 0));
+	mTextureCoords.push_back(uv0);
 	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
 	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
+	mTangents.push_back(tangent);
 
 	mVertices.push_back(v1);
-	mTextureCoords.push_back(glm::vec2(1, 0));
+	mTextureCoords.push_back(uv1);
 	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
 	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
+	mTangents.push_back(tangent);
 
 	mVertices.push_back(v2);
-	mTextureCoords.push_back(glm::vec2(1, 1));
+	mTextureCoords.push_back(uv2);
 	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
 	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
+	mTangents.push_back(tangent);
 
-	v1 = glm::vec3(-0.5, 0.5, 0.0);
+	//TRIANGLE 2
+	side1 = v3 - v0;
+	side2 = v2 - v0;
+
+	deltaUV1 = uv3 - uv0;
+	deltaUV2 = uv2 - uv0;
+
+	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
+	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
+	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
 
 	mVertices.push_back(v2);
-	mTextureCoords.push_back(glm::vec2(1, 1));
-	mNormalVecs.push_back(glm::triangleNormal(v1, v0, v2));
-	mAveraged.push_back(glm::triangleNormal(v1, v0, v2));
+	mTextureCoords.push_back(uv2);
+	mNormalVecs.push_back(glm::triangleNormal(v3, v0, v2));
+	mAveraged.push_back(glm::triangleNormal(v3, v0, v2));
+	mTangents.push_back(tangent);
 
-	mVertices.push_back(v1);
-	mTextureCoords.push_back(glm::vec2(0, 1));
-	mNormalVecs.push_back(glm::triangleNormal(v1, v0, v2));
-	mAveraged.push_back(glm::triangleNormal(v1, v0, v2));
+	mVertices.push_back(v3);
+	mTextureCoords.push_back(uv3);
+	mNormalVecs.push_back(glm::triangleNormal(v3, v0, v2));
+	mAveraged.push_back(glm::triangleNormal(v3, v0, v2));
+	mTangents.push_back(tangent);
 
 	mVertices.push_back(v0);
-	mTextureCoords.push_back(glm::vec2(0, 0));
-	mNormalVecs.push_back(glm::triangleNormal(v1, v0, v2));
-	mAveraged.push_back(glm::triangleNormal(v1, v0, v2));
+	mTextureCoords.push_back(uv0);
+	mNormalVecs.push_back(glm::triangleNormal(v3, v0, v2));
+	mAveraged.push_back(glm::triangleNormal(v3, v0, v2));
+	mTangents.push_back(tangent);
 
 	BindBuffers();
 }
@@ -985,7 +1022,7 @@ void Model::BindNormalBuffer()
 	if (mIndexed)
 	{
 		//adding triangle indexes
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[4]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[5]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
 	}
 
@@ -1032,10 +1069,16 @@ void Model::BindModelBuffer()
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
+	//adding tangents
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[4]);
+	glBufferData(GL_ARRAY_BUFFER, mAveraged.size() * sizeof(glm::vec3), &mAveraged[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
 	if (mIndexed)
 	{
 		//adding triangle indexes
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[4]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[5]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
 	}
 
@@ -1071,7 +1114,7 @@ void Model::GenBuffers()
 {
 	//generating the VAO and VBO buffers
 	glGenVertexArrays(3, mVAO);
-	glGenBuffers(5, mVBO);
+	glGenBuffers(6, mVBO);
 }
 
 /**************************************************************************

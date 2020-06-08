@@ -67,8 +67,8 @@ public:
 	void CreatePlane();
 
 	void BindBuffers();
-	void BindNormalBuffer();
 	void BindModelBuffer();
+	void BindNormalBuffer();
 	void FreeBuffers();
 	void GenBuffers();
 
@@ -86,6 +86,7 @@ private:
 	std::vector<glm::vec2> mTextureCoords;
 	std::vector<glm::vec3> mNormalVecs;
 	std::vector<glm::vec3> mAveraged;
+	std::vector<glm::vec3> mTangents;
 	std::vector<unsigned short> mIndexes;
 	
 
@@ -93,5 +94,5 @@ private:
 	int mPrecision;
 	Shape mShape;
 	GLuint mVAO[3];
-	GLuint mVBO[5];
+	GLuint mVBO[6];
 };
