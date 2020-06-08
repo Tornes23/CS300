@@ -73,6 +73,7 @@ Camera::Camera(glm::vec3 direction)
 	mTextureMapping = false;
 	mLighting = true;
 	mLightAnimation = true;
+	mNormalMapping = false;
 
 	mLightMode = Light::LightType::Point;
 
@@ -231,6 +232,9 @@ void Camera::Update()
 
 	if (KeyTriggered(P))
 		mLightAnimation = !mLightAnimation;
+
+	if (KeyTriggered(B))
+		mNormalMapping = !mNormalMapping;
 
 	Light::LightType lastMode = mLightMode;
 
@@ -421,6 +425,7 @@ void Camera::AddAllShaders()
 	AddShader("./src/Shader/programs/LightingColor.vs"    , "./src/Shader/programs/LightingColor.fs"  );
 	AddShader("./src/Shader/programs/Normals.vs"          , "./src/Shader/programs/Normals.fs"        , "./src/Shader/programs/Normals.gs");
 	AddShader("./src/Shader/programs/NormalsAverage.vs"   , "./src/Shader/programs/NormalsAverage.fs" , "./src/Shader/programs/Normals.gs");
+	AddShader("./src/Shader/programs/NormalMap.vs"        , "./src/Shader/programs/NormalMap.fs"  );
 }
 
 /**************************************************************************
@@ -653,6 +658,9 @@ ShaderProgram Camera::GetShader()
 	{
 		if (mLighting)
 			return mShaders[3];
+
+		if (mNormalMapping)
+			return mShaders[6];
 
 		//return the shader that renders colors based on UV coords
 		return mShaders[1];

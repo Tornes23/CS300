@@ -95,6 +95,7 @@ private:
 	bool mAveragedNormals;
 	bool mLighting;
 	bool mLightAnimation;
+	bool mNormalMapping;
 
 	//the needed matrices
 	glm::mat4x4 mPerspective;
