@@ -62,7 +62,7 @@ in VS_OUT{
 //uniform variable to get the data of the texture
 uniform sampler2D textureData;
 
-vec3 PointLight(vec3 initialCol, int i)
+vec3 PointLight(vec3 initialCol, int i, vec3 normal)
 {
     //computing the distance
     float distance = length(lightSources[i].PosInCamSpc - fs_in.PosInCamSpc);
@@ -71,7 +71,7 @@ vec3 PointLight(vec3 initialCol, int i)
     vec3 lightDir = normalize(lightSources[i].PosInCamSpc - fs_in.PosInCamSpc);
     
     //computing diffuse value and color
-    float diffuseVal = max(dot(fs_in.Normal, lightDir), 0.0);
+    float diffuseVal = max(dot(normal, lightDir), 0.0);
     vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSources[i].DiffuseColor;
     
     //adding it to the color
@@ -81,7 +81,7 @@ vec3 PointLight(vec3 initialCol, int i)
     vec3 viewDir = normalize(-fs_in.PosInCamSpc);//since im cam space cam pos = origin
 
     //computing the reflection direction
-    vec3 reflectDir = reflect(-lightDir, fs_in.Normal);  
+    vec3 reflectDir = reflect(-lightDir, normal);  
     
     //computing the speculat factor and color
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
@@ -102,13 +102,13 @@ vec3 PointLight(vec3 initialCol, int i)
     return initialCol;
 }
 
-vec3 DirectionalLight(vec3 initialCol, int i)
+vec3 DirectionalLight(vec3 initialCol, int i, vec3 normal)
 {   
     //computing the light direction
     vec3 lightDir = normalize(-lightSources[i].Direction);
     
     //computing diffuse value and color
-    float diffuseVal = max(dot(fs_in.Normal, lightDir), 0.0);
+    float diffuseVal = max(dot(normal, lightDir), 0.0);
     vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSources[i].DiffuseColor;
     
     //adding it to the color
@@ -118,7 +118,7 @@ vec3 DirectionalLight(vec3 initialCol, int i)
     vec3 viewDir = normalize(-fs_in.PosInCamSpc);//since im cam space cam pos = origin
     
     //computing the reflection direction
-    vec3 reflectDir = reflect(-lightDir, fs_in.Normal);  
+    vec3 reflectDir = reflect(-lightDir, normal);  
     
     //computing the speculat factor and color
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
@@ -131,7 +131,7 @@ vec3 DirectionalLight(vec3 initialCol, int i)
     return initialCol; 
 }
 
-vec3 SpotLight(vec3 initialCol, int i)
+vec3 SpotLight(vec3 initialCol, int i, vec3 normal)
 {
     //computing the distance
     float distance = length(lightSources[i].PosInCamSpc - fs_in.PosInCamSpc);
@@ -140,7 +140,7 @@ vec3 SpotLight(vec3 initialCol, int i)
     vec3 lightDir = normalize(lightSources[i].PosInCamSpc - fs_in.PosInCamSpc);
     
     //computing diffuse value and color
-    float diffuseVal = max(dot(fs_in.Normal, lightDir), 0.0);
+    float diffuseVal = max(dot(normal, lightDir), 0.0);
     vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSources[i].DiffuseColor;
     
     //adding it to the color
@@ -150,7 +150,7 @@ vec3 SpotLight(vec3 initialCol, int i)
     vec3 viewDir = normalize(-fs_in.PosInCamSpc);//since im cam space cam pos = origin
 
     //computing the reflection direction
-    vec3 reflectDir = reflect(-lightDir, fs_in.Normal);  
+    vec3 reflectDir = reflect(-lightDir, normal);  
     
     //computing the speculat factor and color
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
@@ -198,15 +198,15 @@ vec3 ApplyPhongLight()
  
         //if the light type is point light
         if(lightSources[i].Type == 0)
-            color = PointLight(ambientCol, i);
+            color = PointLight(ambientCol, i, fs_in.Normal);
         
         //if the light type is directional light
         if(lightSources[i].Type == 1)
-            color = DirectionalLight(ambientCol, i);
+            color = DirectionalLight(ambientCol, i, fs_in.Normal);
         
         //if the light type is SpotLight
         if(lightSources[i].Type == 2)
-            color = SpotLight(ambientCol, i);
+            color = SpotLight(ambientCol, i, fs_in.Normal);
         
         //computing the final color
         finalCol += color * textureCol;

@@ -70,10 +70,9 @@ Camera::Camera(glm::vec3 direction)
 	mWireframe = false;
 	mRenderNormals = false;
 	mAveragedNormals = false;
-	mTextureMapping = false;
-	mLighting = true;
 	mLightAnimation = true;
-	mNormalMapping = false;
+
+	mMode = Lighting;
 
 	mLightMode = Light::LightType::Point;
 
@@ -128,7 +127,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		//setting the texture of the object as active
 		objects[i]->mMaterial.SetUniforms(&currentShader);
 
-		if (mLighting)
+		if (mMode >= LightingMap && mMode < Regular)
 			ApplyLight(currentShader, mCameraMatrix);
 
 
@@ -157,10 +156,8 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		}
 	}
 
-	if (mLighting)
-	{
+	if (mMode >= LightingMap && mMode < Regular)
 		DrawLights();
-	}
 
 	//unbinding the VAOs
 	glBindVertexArray(0);
@@ -222,19 +219,9 @@ void Camera::Update()
 		mRenderNormals = !mRenderNormals;
 
 	if (KeyTriggered(T))
-		mTextureMapping = !mTextureMapping;
-
-	if (KeyTriggered(F))
-		mAveragedNormals = !mAveragedNormals;
-
-	if (KeyTriggered(num6))
-		mLighting = !mLighting;
-
-	if (KeyTriggered(P))
-		mLightAnimation = !mLightAnimation;
-
-	if (KeyTriggered(B))
-		mNormalMapping = !mNormalMapping;
+	{
+		mMode = static_cast<RenderMode>((mMode + 1) % Count);
+	}
 
 	Light::LightType lastMode = mLightMode;
 
@@ -419,13 +406,19 @@ Adds all the necessary shader for the camera to work
 void Camera::AddAllShaders()
 {
 	//adding the shaders
-	AddShader("./src/Shader/programs/Texture.vs"          , "./src/Shader/programs/Texture.fs"        );
-	AddShader("./src/Shader/programs/Mapping.vs"          , "./src/Shader/programs/Mapping.fs"        );
-	AddShader("./src/Shader/programs/LightingTexture.vs"  , "./src/Shader/programs/LightingTexture.fs");
-	AddShader("./src/Shader/programs/LightingColor.vs"    , "./src/Shader/programs/LightingColor.fs"  );
-	AddShader("./src/Shader/programs/Normals.vs"          , "./src/Shader/programs/Normals.fs"        , "./src/Shader/programs/Normals.gs");
-	AddShader("./src/Shader/programs/NormalsAverage.vs"   , "./src/Shader/programs/NormalsAverage.fs" , "./src/Shader/programs/Normals.gs");
-	AddShader("./src/Shader/programs/NormalMap.vs"        , "./src/Shader/programs/NormalMap.fs"  );
+	AddShader("./src/Shader/programs/NormalMap.vs"         , "./src/Shader/programs/NormalMap.fs"         );
+	AddShader("./src/Shader/programs/NormalMap.vs"         , "./src/Shader/programs/NormalMap.fs"         );
+	AddShader("./src/Shader/programs/LightingTexture.vs"   , "./src/Shader/programs/LightingTexture.fs"   );
+	AddShader("./src/Shader/programs/LightingColor.vs"     , "./src/Shader/programs/LightingColor.fs"     );
+	AddShader("./src/Shader/programs/Texture.vs"           , "./src/Shader/programs/Texture.fs"           );
+	AddShader("./src/Shader/programs/Mapping.vs"           , "./src/Shader/programs/Mapping.fs"           );
+	AddShader("./src/Shader/programs/NormalColoring.vs"    , "./src/Shader/programs/NormalColoring.fs"    );
+	AddShader("./src/Shader/programs/TangentColoring.vs"   , "./src/Shader/programs/TangentColoring.fs"   );
+	AddShader("./src/Shader/programs/BitangentColoring.vs" , "./src/Shader/programs/BitangentColoring.fs" );
+	AddShader("./src/Shader/programs/Mapping.vs"           , "./src/Shader/programs/Mapping.fs"           );
+	AddShader("./src/Shader/programs/Normals.vs"           , "./src/Shader/programs/Normals.fs"        , "./src/Shader/programs/Normals.gs");
+	AddShader("./src/Shader/programs/NormalsAverage.vs"    , "./src/Shader/programs/NormalsAverage.fs" , "./src/Shader/programs/Normals.gs");
+
 }
 
 /**************************************************************************
@@ -653,29 +646,9 @@ returns the shader program
 **************************************************************************/
 ShaderProgram Camera::GetShader()
 {
-	//if texture mapping is on
-	if (mTextureMapping)
-	{
-		if (mLighting)
-			return mShaders[3];
-
-		if (mNormalMapping)
-			return mShaders[6];
-
-		//return the shader that renders colors based on UV coords
-		return mShaders[1];
-	}
-	else
-	{
-		if (mLighting)
-			return mShaders[2];
-
-		//return the shader that renders the texture
-		return mShaders[0];
-	}
-
-	//by default return the texture shader
-	return mShaders[2];
+	//returning the shader
+	return mShaders[mMode];
+	
 }
 
 /**************************************************************************
@@ -696,9 +669,9 @@ ShaderProgram Camera::GetNormalShader()
 {
 	//if the averaged normals is on
 	if (mAveragedNormals)
-		return mShaders[5];
+		return mShaders[11];
 
-	return mShaders[4];//normals shader
+	return mShaders[10];//normals shader
 }
 
 const Light Camera::GetLight() const

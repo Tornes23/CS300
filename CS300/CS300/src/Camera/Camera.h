@@ -53,6 +53,21 @@ class Camera
 {
 public:
 
+	typedef enum RenderMode
+	{
+		LightingMap,
+		LightingTexMapMap,
+		Lighting,
+		LightingTexMap,
+		Regular,
+		TextureMapping,
+		NormalColoring,
+		TangentColoring,
+		BitangentColoring,
+		Count
+
+	} RenderMode;
+
 	Camera(glm::vec3 direction = glm::vec3(0,0,-1));
 	void Render(std::vector<GameObject*>& objects);
 	void ComputePos();
@@ -91,11 +106,10 @@ private:
 	//booleans to know how to render
 	bool mWireframe;
 	bool mRenderNormals;
-	bool mTextureMapping;
 	bool mAveragedNormals;
-	bool mLighting;
 	bool mLightAnimation;
-	bool mNormalMapping;
+
+	RenderMode mMode;
 
 	//the needed matrices
 	glm::mat4x4 mPerspective;

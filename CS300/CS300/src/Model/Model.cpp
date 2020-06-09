@@ -1169,6 +1169,10 @@ void Model::GenTangents()
 		tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
 		tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
 
+		mTangents.push_back(tangent);
+		mTangents.push_back(tangent);
+		mTangents.push_back(tangent);
+
 	}
 }
 
