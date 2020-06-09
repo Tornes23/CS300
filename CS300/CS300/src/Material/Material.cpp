@@ -87,6 +87,24 @@ Texture& Material::GetTexture()
 
 /**************************************************************************
 *!
+\fn     Material::GetNormalMap
+
+\brief
+Getter function for the normal map
+
+\return Texture&
+the normal map
+
+*
+**************************************************************************/
+Texture & Material::GetNormalMap()
+{
+	//returning the texture
+	return mNormalMap;
+}
+
+/**************************************************************************
+*!
 \fn     Material::GetDiffuse
 
 \brief 

@@ -37,6 +37,7 @@ public:
 	Material(std::string texture, std::string normalMap, Color ambient = Color::Black, Color diffuse = Color::White, Color specular = Color::White, float shininess = 50);
 
 	Texture& GetTexture();
+	Texture& GetNormalMap();
 
 	const Color GetDiffuse() const;
 	const Color GetSpecular() const;
