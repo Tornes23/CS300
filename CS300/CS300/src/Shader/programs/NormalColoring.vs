@@ -6,7 +6,6 @@ layout(location = 2) in vec3 vNormal;
 layout(location = 3) in vec3 vAverage;
 
 //out variables for the fragment shader
-out vec2 UV;
 out vec3 Normal;
 
 //uniform variables for the transformation

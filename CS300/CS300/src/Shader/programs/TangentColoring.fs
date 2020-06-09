@@ -4,7 +4,7 @@
 out vec4 FragColor;  
 
 in vec3 Tangent;
- 
+
 void main()
 {
     //getting and setting the color of the pixel from the texture

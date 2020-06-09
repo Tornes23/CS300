@@ -37,7 +37,7 @@ The functions included are:
 - ShaderProgram Camera::GetNormalsShader();
 
 ***************************************************************************/
-
+#include <iostream>
 #include <GLM/gtc/matrix_transform.hpp>
 #include <GLM/gtc/type_ptr.hpp>
 #include <SDL2/SDL.h>
@@ -106,6 +106,9 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		//if is not active skip it
 		if (!(objects[i]->mActive))
 			continue;
+
+		//if (mMode == TangentColoring)
+		//	std::cout << "Verga";
 
 		ShaderProgram currentShader = GetShader();
 		Light lightSource;
