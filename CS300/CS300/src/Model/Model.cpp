@@ -1016,8 +1016,8 @@ void Model::BindModelBuffer()
 	//adding tangents
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[4]);
 	glBufferData(GL_ARRAY_BUFFER, mTangents.size() * sizeof(glm::vec3), &mTangents[0].x, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
 	if (mIndexed)
 	{
