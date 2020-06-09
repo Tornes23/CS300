@@ -218,6 +218,9 @@ void Camera::Update()
 	if (KeyTriggered(N))
 		mRenderNormals = !mRenderNormals;
 
+	if (KeyTriggered(F))
+		mAveragedNormals = !mAveragedNormals;
+
 	if (KeyTriggered(T))
 	{
 		mMode = static_cast<RenderMode>((mMode + 1) % Count);
