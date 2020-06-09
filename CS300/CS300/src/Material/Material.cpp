@@ -57,7 +57,7 @@ the shininess of the material
 
 *
 **************************************************************************/
-Material::Material(std::string texture, std::string normalMap, Color ambient, Color diffuse, Color specular, float shininess) : mTexture(texture)
+Material::Material(std::string texture, std::string normalMap, Color ambient, Color diffuse, Color specular, float shininess) : mTexture(texture), mNormalMap(normalMap)
 {
 	//setting the variables
 	mAmbientColor = ambient;
