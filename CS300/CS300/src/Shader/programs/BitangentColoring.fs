@@ -3,10 +3,10 @@
 //output fragmet color
 out vec4 FragColor;  
 
-in vec3 Tangent;
+in vec3 BitTangent;
  
 void main()
 {
     //getting and setting the color of the pixel from the texture
-    FragColor = vec4(Tangent, 1.0F);
+    FragColor = vec4(BitTangent, 1.0F);
 }
