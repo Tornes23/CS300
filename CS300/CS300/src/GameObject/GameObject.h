@@ -43,7 +43,7 @@ struct GameObject
 	};
 
 	GameObject(glm::vec3 position = glm::vec3(0.0F,0.0F,-100.0F), glm::vec3 scale = glm::vec3(50.0F,50.0F,50.0F), 
-				const char* name = "Box", Model::Shape shape = Model::Shape::Cube, 
+				const char* name = "Box", Model::Shape shape = Model::Shape::Cube, std::string normalMap = "./src/Texture/resources/normal_map.png", 
 				std::string textureFile = "./src/Texture/resources/default.png" , bool active = false, glm::vec3 up = glm::vec3(0,1,0), glm::vec3 forward = glm::vec3(0, 0, 1));
 	
 	//member functions

@@ -202,12 +202,6 @@ void Model::CreateSphere(int slices, float radius)
 			mVertices.push_back(v1);
 			mVertices.push_back(v2);
 
-			glm::vec3 normal = glm::normalize(glm::triangleNormal(v0, v1, v2));
-
-			mNormalVecs.push_back(normal);
-			mNormalVecs.push_back(normal);
-			mNormalVecs.push_back(normal);
-
 			mAveraged.push_back(v0);
 			mAveraged.push_back(v1);
 			mAveraged.push_back(v2);
@@ -226,12 +220,6 @@ void Model::CreateSphere(int slices, float radius)
 			mVertices.push_back(v2);
 			mVertices.push_back(v1);
 			
-			normal = glm::normalize(glm::triangleNormal(v0, v2, v1));
-			
-			mNormalVecs.push_back(normal);
-			mNormalVecs.push_back(normal);
-			mNormalVecs.push_back(normal);
-			
 			mAveraged.push_back(v0);
 			mAveraged.push_back(v2);
 			mAveraged.push_back(v1);
@@ -242,6 +230,10 @@ void Model::CreateSphere(int slices, float radius)
 			
 		}
 	}
+
+	GenNormals();
+
+	GenTangents();
 
 	//calling to bind the buffers
 	BindBuffers();
@@ -320,7 +312,6 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		glm::vec3 v0 = glm::vec3(xCoord2 * radius, botY, zCoord2 * radius);
 		glm::vec3 v1 = glm::vec3(xCoord * radius, botY, zCoord * radius);
 		glm::vec3 v2 = glm::vec3(xCoord * radius, topY, zCoord * radius);
-		glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
 
 #pragma region TRIANGLE 1
 		//adding the position texture coordinates and normal values for the four vertices
@@ -338,11 +329,6 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 1));
 		mAveraged.push_back(v2);
 
-		//once per vertex
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
-
 #pragma endregion
 
 #pragma region TRIANGLE 2
@@ -350,7 +336,6 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		v0 = glm::vec3(xCoord * radius, topY, zCoord * radius);
 		v1 = glm::vec3(xCoord2 * radius, topY, zCoord2 * radius);
 		v2 = glm::vec3(xCoord2 * radius, botY, zCoord2 * radius);
-		normal = glm::triangleNormal(v0, v1, v2);
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v0);
@@ -366,11 +351,6 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
 		mAveraged.push_back(v2);
-
-		//once per vertex
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
 #pragma endregion
 
 #pragma endregion 
@@ -382,7 +362,6 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		v0 = glm::vec3(xCoord * radius, topY, zCoord * radius);
 		v1 = glm::vec3(0, topY, 0);
 		v2 = glm::vec3(xCoord2 * radius, topY, zCoord2 * radius);
-		normal = glm::triangleNormal(v0, v1, v2);
 
 		float uMid = (static_cast<float>(i) / slices + static_cast<float>(i + 1) / slices) / 2.0F;
 
@@ -399,11 +378,6 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		mVertices.push_back(v2);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 1));
 		mAveraged.push_back(v2);
-
-		//once per vertex
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
 #pragma endregion
 
 #pragma region BOT TRIANGLE
@@ -411,7 +385,6 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		v0 = glm::vec3(xCoord2 * radius, botY, zCoord2 * radius);
 		v1 = glm::vec3(0, botY, 0);
 		v2 = glm::vec3(xCoord * radius, botY, zCoord * radius);
-		normal = glm::triangleNormal(v0, v1, v2);
 
 		mVertices.push_back(v0);
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
@@ -427,16 +400,16 @@ void Model::CreateCylinder(int slices, float radius, float height)
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i) / slices, 0));
 		mAveraged.push_back(v2);
 
-		//once per vertex
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
 #pragma endregion
 
 #pragma endregion
 
 		k += 3;
 	}
+
+	GenNormals();
+
+	GenTangents();
 
 	//binding the buffers
 	BindBuffers();
@@ -527,7 +500,6 @@ void Model::CreateCone(int slices, float radius, float height)
 		glm::vec3 v0 = glm::vec3(xCoord * radius, botY, zCoord * radius);
 		glm::vec3 v1 = glm::vec3(xCoord2 * radius, botY, zCoord2 * radius);
 		glm::vec3 v2 = glm::vec3(0, topY, 0);
-		glm::vec3 normal = glm::triangleNormal(v1, v0, v2);
 
 		glm::vec3 xVec = glm::vec3(1, 0, 0);
 		glm::vec3 yVec = glm::vec3(0, -1, 0);
@@ -558,16 +530,11 @@ void Model::CreateCone(int slices, float radius, float height)
 		mTextureCoords.push_back(glm::vec2(uMid, 1));
 		mAveraged.push_back(glm::vec3(0, 1, 0));
 
-		//once per vertex
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
 #pragma endregion
 
 #pragma region BOTTOM TRIANGLE
 
 		v2 = glm::vec3(0, botY, 0);
-		normal = glm::triangleNormal(v0, v1, v2);
 
 		//adding the position texture coordinates and normal values for the four vertices
 		mVertices.push_back(v2);
@@ -584,14 +551,14 @@ void Model::CreateCone(int slices, float radius, float height)
 		mTextureCoords.push_back(glm::vec2(static_cast<float>(i + 1) / slices, 0));
 		mAveraged.push_back(rotationMat2 * glm::vec4(average, 1.0));
 
-		//once per vertex
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
-		mNormalVecs.push_back(normal);
 #pragma endregion
 
 		k += 3;
 	}
+
+	GenNormals();
+
+	GenTangents();
 
 	//calling to bind the buffers
 	BindBuffers();
@@ -621,25 +588,9 @@ void Model::CreateCube()
 	glm::vec2 uv2 = glm::vec2(1, 1);
 	glm::vec2 uv3 = glm::vec2(0, 1);
 
-	glm::vec3 side1 = v1 - v2;
-	glm::vec3 side2 = v0 - v2;
-
-	glm::vec2 deltaUV1 = uv1 - uv2;
-	glm::vec2 deltaUV2 = uv0 - uv2;
-
-	glm::vec3 tangent;
-
 #pragma region FRONT
 
 #pragma region TRIANGLE 1
-
-	float variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-
-	glm::vec3 normal = glm::triangleNormal(v0, v1, v2);
 
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
@@ -649,17 +600,9 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv1);
 	mTextureCoords.push_back(uv2);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
-
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
 
 #pragma endregion
 
@@ -669,20 +612,6 @@ void Model::CreateCube()
 	v1 = glm::vec3(-0.5, 0.5, 0.5);
 	v2 = glm::vec3(-0.5, -0.5, 0.5);
 
-	side1 = v2 - v0;
-	side2 = v1 - v0;
-
-	deltaUV1 = uv3 - uv0;
-	deltaUV2 = uv2 - uv0;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-
-	normal = glm::triangleNormal(v0, v1, v2);
-
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
@@ -691,17 +620,9 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv3);
 	mTextureCoords.push_back(uv0);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
-
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
 
 #pragma endregion
 
@@ -715,20 +636,6 @@ void Model::CreateCube()
 	v1 = glm::vec3(0.5, -0.5, -0.5);
 	v2 = glm::vec3(0.5, 0.5, -0.5);
 
-	side1 = v1 - v2;
-	side2 = v0 - v2;
-
-	deltaUV1 = uv1 - uv2;
-	deltaUV2 = uv0 - uv2;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-
-	normal = glm::triangleNormal(v0, v1, v2);
-
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
@@ -737,17 +644,9 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv1);
 	mTextureCoords.push_back(uv2);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
-
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
 
 #pragma endregion
 
@@ -757,20 +656,6 @@ void Model::CreateCube()
 	v1 = glm::vec3(0.5, 0.5, 0.5);
 	v2 = glm::vec3(0.5, -0.5, 0.5);
 
-	side1 = v2 - v0;
-	side2 = v1 - v0;
-
-	deltaUV1 = uv3 - uv0;
-	deltaUV2 = uv2 - uv0;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-
-	normal = glm::triangleNormal(v0, v1, v2);
-
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
@@ -779,17 +664,9 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv3);
 	mTextureCoords.push_back(uv0);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
-
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
 
 #pragma endregion
 
@@ -803,20 +680,6 @@ void Model::CreateCube()
 	v1 = glm::vec3(-0.5, -0.5,  0.5);
 	v2 = glm::vec3(-0.5,  0.5,  0.5);
 
-	side1 = v1 - v2;
-	side2 = v0 - v2;
-
-	deltaUV1 = uv1 - uv2;
-	deltaUV2 = uv0 - uv2;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-
-	normal = glm::triangleNormal(v0, v1, v2);
-
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
@@ -825,17 +688,9 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv1);
 	mTextureCoords.push_back(uv2);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
-
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
 
 #pragma endregion
 
@@ -845,20 +700,6 @@ void Model::CreateCube()
 	v1 = glm::vec3(-0.5,  0.5, -0.5);
 	v2 = glm::vec3(-0.5, -0.5, -0.5);
 
-	side1 = v2 - v0;
-	side2 = v1 - v0;
-
-	deltaUV1 = uv3 - uv0;
-	deltaUV2 = uv2 - uv0;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-
-	normal = glm::triangleNormal(v0, v1, v2);
-
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
@@ -867,17 +708,9 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv3);
 	mTextureCoords.push_back(uv0);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
-
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
 
 #pragma endregion
 
@@ -891,20 +724,6 @@ void Model::CreateCube()
 	v1 = glm::vec3(0.5, 0.5, -0.5);
 	v2 = glm::vec3(0.5, -0.5, -0.5);
 
-	side1 = v1 - v2;
-	side2 = v0 - v2;
-
-	deltaUV1 = uv1 - uv2;
-	deltaUV2 = uv0 - uv2;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-
-	normal = glm::triangleNormal(v0, v1, v2);
-
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
@@ -913,17 +732,9 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv1);
 	mTextureCoords.push_back(uv2);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
-
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
 
 #pragma endregion
 
@@ -933,20 +744,6 @@ void Model::CreateCube()
 	v1 = glm::vec3(-0.5, -0.5, -0.5);
 	v2 = glm::vec3(-0.5, 0.5, -0.5);
 
-	side1 = v2 - v0;
-	side2 = v1 - v0;
-
-	deltaUV1 = uv3 - uv0;
-	deltaUV2 = uv2 - uv0;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-
-	normal = glm::triangleNormal(v0, v1, v2);
-
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
@@ -955,17 +752,9 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv3);
 	mTextureCoords.push_back(uv0);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
-
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
 
 #pragma endregion
 
@@ -979,20 +768,6 @@ void Model::CreateCube()
 	v1 = glm::vec3(0.5, -0.5, 0.5);
 	v2 = glm::vec3(-0.5, -0.5, 0.5);
 
-	side1 = v1 - v2;
-	side2 = v0 - v2;
-
-	deltaUV1 = uv1 - uv2;
-	deltaUV2 = uv0 - uv2;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-
-	normal = glm::triangleNormal(v0, v1, v2);
-
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
@@ -1001,17 +776,9 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv1);
 	mTextureCoords.push_back(uv2);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
-
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
 
 #pragma endregion
 
@@ -1021,20 +788,6 @@ void Model::CreateCube()
 	v1 = glm::vec3(-0.5, -0.5, -0.5);
 	v2 = glm::vec3(0.5, -0.5, -0.5);
 
-	side1 = v2 - v0;
-	side2 = v1 - v0;
-
-	deltaUV1 = uv3 - uv0;
-	deltaUV2 = uv2 - uv0;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-	
-	normal = glm::triangleNormal(v0, v1, v2);
-
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
@@ -1043,17 +796,9 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv3);
 	mTextureCoords.push_back(uv0);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
-
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
 
 #pragma endregion
 
@@ -1068,20 +813,6 @@ void Model::CreateCube()
 	v1 = glm::vec3(0.5, 0.5, -0.5);
 	v2 = glm::vec3(-0.5, 0.5, -0.5);
 
-	side1 = v1 - v2;
-	side2 = v0 - v2;
-
-	deltaUV1 = uv1 - uv2;
-	deltaUV2 = uv0 - uv2;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-
-	normal = glm::triangleNormal(v0, v1, v2);
-
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
@@ -1090,17 +821,9 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv1);
 	mTextureCoords.push_back(uv2);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
-
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
 
 #pragma endregion
 
@@ -1110,20 +833,6 @@ void Model::CreateCube()
 	v1 = glm::vec3(-0.5, 0.5, 0.5);
 	v2 = glm::vec3(0.5, 0.5, 0.5);
 
-	side1 = v1 - v2;
-	side2 = v0 - v2;
-
-	deltaUV1 = uv1 - uv2;
-	deltaUV2 = uv0 - uv2;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-	
-	normal = glm::triangleNormal(v0, v1, v2);
-
 	mVertices.push_back(v0);
 	mVertices.push_back(v1);
 	mVertices.push_back(v2);
@@ -1132,21 +841,17 @@ void Model::CreateCube()
 	mTextureCoords.push_back(uv3);
 	mTextureCoords.push_back(uv0);
 
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-	mNormalVecs.push_back(normal);
-
 	mAveraged.push_back(v0);
 	mAveraged.push_back(v1);
 	mAveraged.push_back(v2);
 
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-	mTangents.push_back(tangent);
-
 #pragma endregion
 
 #pragma endregion
+
+	GenNormals();
+
+	GenTangents();
 
 	//binding buffers
 	BindBuffers();
@@ -1174,69 +879,36 @@ void Model::CreatePlane()
 	glm::vec2 uv2 = glm::vec2(1, 1);
 	glm::vec2 uv3 = glm::vec2(0, 1);
 
-	glm::vec3 side1 = v1 - v2;
-	glm::vec3 side2 = v0 - v2;
-
-	glm::vec2 deltaUV1 = uv1 - uv2;
-	glm::vec2 deltaUV2 = uv0 - uv2;
-
-	glm::vec3 tangent;
-
-	float variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
-
 	//adding the position texture coordinates and normal values for the four vertices
 	mVertices.push_back(v0);
 	mTextureCoords.push_back(uv0);
-	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
 	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
-	mTangents.push_back(tangent);
 
 	mVertices.push_back(v1);
 	mTextureCoords.push_back(uv1);
-	mNormalVecs.push_back(glm::triangleNormal(v0, v1, v2));
 	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
-	mTangents.push_back(tangent);
 
 	mVertices.push_back(v2);
 	mTextureCoords.push_back(uv2);
-	mNormalVecs.push_back(glm::triangleNormal(v1, v2, v0));
 	mAveraged.push_back(glm::triangleNormal(v0, v1, v2));
-	mTangents.push_back(tangent);
 
 	//TRIANGLE 2
-	side1 = v3 - v0;
-	side2 = v2 - v0;
-
-	deltaUV1 = uv3 - uv0;
-	deltaUV2 = uv2 - uv0;
-
-	variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-	tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-	tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-	tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
 
 	mVertices.push_back(v2);
 	mTextureCoords.push_back(uv2);
-	mNormalVecs.push_back(glm::triangleNormal(v3, v0, v2));
 	mAveraged.push_back(glm::triangleNormal(v3, v0, v2));
-	mTangents.push_back(tangent);
 
 	mVertices.push_back(v3);
 	mTextureCoords.push_back(uv3);
-	mNormalVecs.push_back(glm::triangleNormal(v3, v0, v2));
 	mAveraged.push_back(glm::triangleNormal(v3, v0, v2));
-	mTangents.push_back(tangent);
 
 	mVertices.push_back(v0);
 	mTextureCoords.push_back(uv0);
-	mNormalVecs.push_back(glm::triangleNormal(v3, v0, v2));
 	mAveraged.push_back(glm::triangleNormal(v3, v0, v2));
-	mTangents.push_back(tangent);
+
+	GenNormals();
+
+	GenTangents();
 
 	BindBuffers();
 }
@@ -1387,6 +1059,90 @@ void Model::GenBuffers()
 	//generating the VAO and VBO buffers
 	glGenVertexArrays(3, mVAO);
 	glGenBuffers(6, mVBO);
+}
+
+void Model::GenNormals()
+{
+	int size = mIndexed ? static_cast<int>(mIndexes.size()) : static_cast<int>(mVertices.size());
+
+	glm::vec3 v0;
+	glm::vec3 v1;
+	glm::vec3 v2;
+
+	for (int i = 0; i < size; i += 3)
+	{
+		if (!mIndexed)
+		{
+			v0 = mVertices[i + 0];
+			v1 = mVertices[i + 1];
+			v2 = mVertices[i + 2];
+		}
+		else
+		{
+			v0 = mVertices[mIndexes[i + 0]];
+			v1 = mVertices[mIndexes[i + 1]];
+			v2 = mVertices[mIndexes[i + 2]];
+		}
+
+		glm::vec3 normal = glm::normalize(glm::triangleNormal(v0, v1, v2));
+
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
+		mNormalVecs.push_back(normal);
+	}
+
+}
+
+void Model::GenTangents()
+{
+	int size = mIndexed ? static_cast<int>(mIndexes.size()) : static_cast<int>(mVertices.size());
+
+	glm::vec3 v0;
+	glm::vec3 v1;
+	glm::vec3 v2;
+
+	glm::vec2 uv0;
+	glm::vec2 uv1;
+	glm::vec2 uv2;
+
+	for (int i = 0; i < size; i += 3)
+	{
+		if (!mIndexed)
+		{
+			v0 = mVertices[i + 0];
+			v1 = mVertices[i + 1];
+			v2 = mVertices[i + 2];
+
+			uv0 = mTextureCoords[i + 0];
+			uv1 = mTextureCoords[i + 1];
+			uv2 = mTextureCoords[i + 2];
+		}
+		else
+		{
+			v0 = mVertices[mIndexes[i + 0]];
+			v1 = mVertices[mIndexes[i + 1]];
+			v2 = mVertices[mIndexes[i + 2]];
+
+			uv0 = mTextureCoords[mIndexes[i + 0]];
+			uv1 = mTextureCoords[mIndexes[i + 1]];
+			uv2 = mTextureCoords[mIndexes[i + 2]];
+		}
+
+		glm::vec3 side1 = v1 - v2;
+		glm::vec3 side2 = v0 - v2;
+
+		glm::vec2 deltaUV1 = uv1 - uv2;
+		glm::vec2 deltaUV2 = uv0 - uv2;
+
+		glm::vec3 tangent;
+
+		float variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+		tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
+		tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
+		tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
+
+	}
 }
 
 /**************************************************************************

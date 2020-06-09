@@ -86,10 +86,10 @@ Returns the game Object
 
 *
 **************************************************************************/
-GameObject* GameObjectManager::CreateObject(glm::vec3 position, glm::vec3 scale, const char * name, Model::Shape shape, bool active, std::string textureName, glm::vec3 up, glm::vec3 forward)
+GameObject* GameObjectManager::CreateObject(glm::vec3 position, glm::vec3 scale, const char * name, Model::Shape shape, bool active, glm::vec3 up, glm::vec3 forward, std::string normalMap, std::string textureName)
 {
 	//creating a object with the values and returning it
-	return new GameObject(position, scale, name, shape, textureName, active, up, forward);
+	return new GameObject(position, scale, name, shape, normalMap, textureName, active, up, forward);
 }
 
 /**************************************************************************

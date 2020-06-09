@@ -72,6 +72,9 @@ public:
 	void FreeBuffers();
 	void GenBuffers();
 
+	void GenNormals();
+	void GenTangents();
+
 	GLsizei GetDrawElements() const;
 	bool GetIndexed();
 

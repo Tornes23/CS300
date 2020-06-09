@@ -15,7 +15,7 @@
 the Material class
 
 The functions included are:
-- Material::Material(std::string texture, Color ambient, Color diffuse, Color specular, float shininess);
+- Material::Material(std::string texture, std::string normalMap, Color ambient, Color diffuse, Color specular, float shininess);
 - Texture& Material::GetTexture();
 - const Color Material::GetDiffuse() const;
 - const Color Material::GetSpecular() const;
@@ -40,6 +40,9 @@ The constructor of the class
 \param  std::string texture
  string containing the path of the texture to use
 
+\param  std::string normalMap
+ string containing the path of the normalMap to use
+
 \param  Color ambient
 the ambient color
 
@@ -54,7 +57,7 @@ the shininess of the material
 
 *
 **************************************************************************/
-Material::Material(std::string texture, Color ambient, Color diffuse, Color specular, float shininess) : mTexture(texture)
+Material::Material(std::string texture, std::string normalMap, Color ambient, Color diffuse, Color specular, float shininess) : mTexture(texture)
 {
 	//setting the variables
 	mAmbientColor = ambient;

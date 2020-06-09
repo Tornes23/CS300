@@ -62,8 +62,8 @@ if is active or not
 
 *
 **************************************************************************/
-GameObject::GameObject(glm::vec3 position, glm::vec3 scale, const char* name, Model::Shape shape
-						, std::string textureFile,  bool active, glm::vec3 up, glm::vec3 forward) : mMaterial(textureFile), mModel(shape)
+GameObject::GameObject(glm::vec3 position, glm::vec3 scale, const char* name, Model::Shape shape, 
+						std::string normalMap, std::string textureFile,  bool active, glm::vec3 up, glm::vec3 forward) : mMaterial(textureFile, normalMap), mModel(shape)
 {
 #pragma region INITIALIZING THE VARIABLES
 	mPosition = position;

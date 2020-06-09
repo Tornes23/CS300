@@ -34,7 +34,7 @@ class Material
 {
 public:
 
-	Material(std::string texture, Color ambient = Color::Black, Color diffuse = Color::White, Color specular = Color::White, float shininess = 50);
+	Material(std::string texture, std::string normalMap, Color ambient = Color::Black, Color diffuse = Color::White, Color specular = Color::White, float shininess = 50);
 
 	Texture& GetTexture();
 
@@ -47,6 +47,7 @@ public:
 	void SetUniforms(ShaderProgram* shader);
 
 	Texture mTexture;
+	Texture mNormalMap;
 
 	Color mAmbientColor;
 	Color mDiffuseColor;
