@@ -16,7 +16,8 @@ implementation of the GameObjectManager class
 
 The functions included are:
 - void GameObjectManager::AddObject(GameObject* obj);
-- GameObject* GameObjectManager::CreateObject(glm::vec3 position, glm::vec3 scale, const char * name, Model::Shape shape, bool active, std::string textureName);
+- GameObject* GameObjectManager::CreateObject(glm::vec3 position, glm::vec3 scale, const char * name, Model::Shape shape,
+											bool active, glm::vec3 up, glm::vec3 forward, std::string normalMap, std::string textureName);
 - void GameObjectManager::Update();
 - void GameObjectManager::EditObj(GameObject* obj);
 - GameObject * GameObjectManager::FindObject(const char * name);

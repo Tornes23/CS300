@@ -32,8 +32,8 @@ The functions included are:
 - GLsizei Model::GetNormalCount() const;
 - const GLuint Model::GetVAO() const;
 - const GLuint Model::GetNormalVAO() const;
-- void Model::ComputeNormals()
-- void Model::ComputeAverage()
+- void Model::GenNormals()
+- void Model::GenTangents()
 
 ***************************************************************************/
 
@@ -1054,6 +1054,15 @@ void Model::FreeBuffers()
 	mIndexes.clear();
 }
 
+/**************************************************************************
+*!
+\fn     Model::GenBuffers
+
+\brief
+Generates the buffers
+
+*
+**************************************************************************/
 void Model::GenBuffers()
 {
 	//generating the VAO and VBO buffers
@@ -1061,6 +1070,15 @@ void Model::GenBuffers()
 	glGenBuffers(6, mVBO);
 }
 
+/**************************************************************************
+*!
+\fn     Model::GenNormals
+
+\brief
+Generates the normals
+
+*
+**************************************************************************/
 void Model::GenNormals()
 {
 	int size = mIndexed ? static_cast<int>(mIndexes.size()) : static_cast<int>(mVertices.size());
@@ -1093,6 +1111,15 @@ void Model::GenNormals()
 
 }
 
+/**************************************************************************
+*!
+\fn     Model::GenTangents
+
+\brief
+Generates the tangents
+
+*
+**************************************************************************/
 void Model::GenTangents()
 {
 	int size = mIndexed ? static_cast<int>(mIndexes.size()) : static_cast<int>(mVertices.size());

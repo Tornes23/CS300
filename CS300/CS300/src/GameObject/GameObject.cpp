@@ -15,8 +15,8 @@
 implementation for the game object class
 
 The functions included are:
-- GameObject::GameObject(glm::vec3 position, glm::vec3 scale, const char* name, Model::Shape shape
-						, std::string textureFile,  bool active);
+- GameObject::GameObject(glm::vec3 position, glm::vec3 scale, const char* name, Model::Shape shape, 
+						std::string normalMap, std::string textureFile,  bool active, glm::vec3 up, glm::vec3 forward);
 - glm::mat4x4 GameObject::GenerateM2W();
 - glm::mat4x4 GameObject::GenerateOrthogonal();
 - glm::mat4x4 GameObject::GenerateInverseM2W();
@@ -50,9 +50,11 @@ the scale of the object
 \param  const char* name
 the name for the object
 
-\param  Model::Shape shape
-						
+\param  Model::Shape shape				
 the model shape it wil have
+
+\param  std::string normalMap
+the address of the normal map we want the object to have
 
 \param  std::string textureFile
 the address of the texture we want the object to have
@@ -63,7 +65,8 @@ if is active or not
 *
 **************************************************************************/
 GameObject::GameObject(glm::vec3 position, glm::vec3 scale, const char* name, Model::Shape shape, 
-						std::string normalMap, std::string textureFile,  bool active, glm::vec3 up, glm::vec3 forward) : mMaterial(textureFile, normalMap), mModel(shape)
+						std::string normalMap, std::string textureFile,  bool active, glm::vec3 up, glm::vec3 forward)
+						: mMaterial(textureFile, normalMap), mModel(shape)
 {
 #pragma region INITIALIZING THE VARIABLES
 	mPosition = position;

@@ -60,29 +60,29 @@ void GameObjectManager::AddLevelObject(GameObject * obj)
 *!
 \fn     GameObjectManager::CreateObject
 
-\brief 
-Creates a Game Object
+\brief
+The default contructor for the class
 
 \param  glm::vec3 position
-
+the position of the objects
 
 \param  glm::vec3 scale
+the scale of the object
 
-
-\param  const char * name
-
+\param  const char* name
+the name for the object
 
 \param  Model::Shape shape
+the model shape it wil have
 
+\param  std::string normalMap
+the address of the normal map we want the object to have
+
+\param  std::string textureFile
+the address of the texture we want the object to have
 
 \param  bool active
-
-
-\param  std::string textureName
-
-
-\return GameObject*
-Returns the game Object
+if is active or not
 
 *
 **************************************************************************/

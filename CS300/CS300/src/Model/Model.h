@@ -32,8 +32,8 @@ The functions included are:
 - GLsizei Model::GetNormalCount() const;
 - const GLuint Model::GetVAO() const;
 - const GLuint Model::GetNormalVAO() const;
-- void Model::ComputeNormals()
-- void Model::ComputeAverage()
+- void Model::GenNormals()
+- void Model::GenTangents()
 
 ***************************************************************************/
 
