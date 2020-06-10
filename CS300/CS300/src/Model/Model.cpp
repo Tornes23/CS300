@@ -1155,11 +1155,11 @@ void Model::GenTangents()
 			uv2 = mTextureCoords[mIndexes[i + 2]];
 		}
 
-		glm::vec3 side1 = v1 - v2;
-		glm::vec3 side2 = v0 - v2;
+		glm::vec3 side1 = v1 - v0;
+		glm::vec3 side2 = v2 - v0;
 
-		glm::vec2 deltaUV1 = uv1 - uv2;
-		glm::vec2 deltaUV2 = uv0 - uv2;
+		glm::vec2 deltaUV1 = uv1 - uv0;
+		glm::vec2 deltaUV2 = uv2 - uv0;
 
 		glm::vec3 tangent;
 
