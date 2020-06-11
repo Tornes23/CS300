@@ -1161,18 +1161,12 @@ void Model::GenTangents()
 		glm::vec2 deltaUV1 = uv1 - uv0;
 		glm::vec2 deltaUV2 = uv2 - uv0;
 
-		glm::vec3 tangent;
-
-		float variation = 1.0F / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-		tangent.x = variation * (deltaUV2.y * side1.x - deltaUV1.y * side2.x);
-		tangent.y = variation * (deltaUV2.y * side1.y - deltaUV1.y * side1.y);
-		tangent.z = variation * (deltaUV2.y * side1.z - deltaUV1.y * side1.z);
+		glm::vec3 tangent = (deltaUV1.y * side2 - deltaUV2.y * side1) /
+			(deltaUV1.y * deltaUV2.x - deltaUV2.y * deltaUV1.x);
 
 		mTangents.push_back(tangent);
 		mTangents.push_back(tangent);
 		mTangents.push_back(tangent);
-
 	}
 }
 
