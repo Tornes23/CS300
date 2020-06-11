@@ -54,6 +54,7 @@ in VS_OUT{
     vec3 BitTangent;
     
     vec3 TangentFragPos;
+    vec3 CamTanSpc;
     
     mat3 TangentMat;
     
@@ -61,14 +62,18 @@ in VS_OUT{
 
 //uniform variable to get the data of the texture
 uniform sampler2D textureData;
+uniform sampler2D normalMap;
 
 vec3 PointLight(vec3 initialCol, int i, vec3 normal)
 {
+    
+    vec3 lightTanSpc = fs_in.TangentMat * lightSources[i].Position;
+    
     //computing the distance
     float distance = length(lightSources[i].PosInCamSpc - fs_in.PosInCamSpc);
     
     //computing the light direction
-    vec3 lightDir = normalize(lightSources[i].PosInCamSpc - fs_in.PosInCamSpc);
+    vec3 lightDir = normalize(lightTanSpc - fs_in.TangentFragPos);
     
     //computing diffuse value and color
     float diffuseVal = max(dot(normal, lightDir), 0.0);
@@ -78,7 +83,7 @@ vec3 PointLight(vec3 initialCol, int i, vec3 normal)
     initialCol += diffuseCol;
     
     //computing specular color
-    vec3 viewDir = normalize(-fs_in.PosInCamSpc);//since im cam space cam pos = origin
+    vec3 viewDir = normalize(fs_in.CamTanSpc - fs_in.TangentFragPos);
 
     //computing the reflection direction
     vec3 reflectDir = reflect(-lightDir, normal);  
@@ -104,6 +109,9 @@ vec3 PointLight(vec3 initialCol, int i, vec3 normal)
 
 vec3 DirectionalLight(vec3 initialCol, int i, vec3 normal)
 {   
+
+    vec3 lightTanSpc = fs_in.TangentMat * lightSources[i].Position;
+
     //computing the light direction
     vec3 lightDir = normalize(-lightSources[i].Direction);
     
@@ -115,7 +123,7 @@ vec3 DirectionalLight(vec3 initialCol, int i, vec3 normal)
     initialCol += diffuseCol;
     
     //computing specular color
-    vec3 viewDir = normalize(-fs_in.PosInCamSpc);//since im cam space cam pos = origin
+    vec3 viewDir = normalize(fs_in.CamTanSpc - fs_in.TangentFragPos);
     
     //computing the reflection direction
     vec3 reflectDir = reflect(-lightDir, normal);  
@@ -133,11 +141,14 @@ vec3 DirectionalLight(vec3 initialCol, int i, vec3 normal)
 
 vec3 SpotLight(vec3 initialCol, int i, vec3 normal)
 {
+    
+    vec3 lightTanSpc = fs_in.TangentMat * lightSources[i].Position;
+     
     //computing the distance
     float distance = length(lightSources[i].PosInCamSpc - fs_in.PosInCamSpc);
     
     //computing the light direction
-    vec3 lightDir = normalize(lightSources[i].PosInCamSpc - fs_in.PosInCamSpc);
+    vec3 lightDir = normalize(lightTanSpc - fs_in.TangentFragPos);
     
     //computing diffuse value and color
     float diffuseVal = max(dot(normal, lightDir), 0.0);
@@ -147,7 +158,7 @@ vec3 SpotLight(vec3 initialCol, int i, vec3 normal)
     initialCol += diffuseCol;
     
     //computing specular color
-    vec3 viewDir = normalize(-fs_in.PosInCamSpc);//since im cam space cam pos = origin
+    vec3 viewDir = normalize(fs_in.CamTanSpc - fs_in.TangentFragPos);
 
     //computing the reflection direction
     vec3 reflectDir = reflect(-lightDir, normal);  
@@ -189,6 +200,7 @@ vec3 ApplyPhongLight()
     {
         //get the texture color
         vec3  textureCol = texture(textureData, fs_in.UV).rgb;
+        vec3  normal     = texture(normalMap, fs_in.UV).rgb;
         
         //computing the ambient color
         vec3  ambientCol = lightSources[i].AmbientColor * material.AmbientColor;
@@ -198,15 +210,15 @@ vec3 ApplyPhongLight()
  
         //if the light type is point light
         if(lightSources[i].Type == 0)
-            color = PointLight(ambientCol, i, fs_in.Normal);
+            color = PointLight(ambientCol, i, normal);
         
         //if the light type is directional light
         if(lightSources[i].Type == 1)
-            color = DirectionalLight(ambientCol, i, fs_in.Normal);
+            color = DirectionalLight(ambientCol, i, normal);
         
         //if the light type is SpotLight
         if(lightSources[i].Type == 2)
-            color = SpotLight(ambientCol, i, fs_in.Normal);
+            color = SpotLight(ambientCol, i, normal);
         
         //computing the final color
         finalCol += color * textureCol;

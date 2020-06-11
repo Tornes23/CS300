@@ -18,6 +18,7 @@ out VS_OUT{
     vec3 BitTangent;
     
     vec3 TangentFragPos;
+    vec3 CamTanSpc;
     
     mat3 TangentMat;
     
@@ -29,6 +30,7 @@ uniform mat4 m2w;
 uniform mat4 m2w_normal;
 uniform mat4 view;
 uniform mat4 projection;
+uniform vec3 camPosition;
 
 void main()
 {
@@ -58,5 +60,7 @@ void main()
     vs_out.TangentMat = transpose(mat3(vs_out.Tangent, vs_out.BitTangent, vs_out.Normal));
     
     vs_out.TangentFragPos = vs_out.TangentMat * vec3(gl_Position);
+    
+    vs_out.CamTanSpc = vs_out.TangentMat * vec3(camPosition);
     
 } 

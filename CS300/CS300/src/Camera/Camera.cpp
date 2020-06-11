@@ -126,6 +126,8 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		//setting the uniform matrix
 		currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
 		currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
+		
+		currentShader.SetVec3Uniform("camPositon", mPosition);
 
 		//setting the texture of the object as active
 		objects[i]->mMaterial.SetUniforms(&currentShader);
