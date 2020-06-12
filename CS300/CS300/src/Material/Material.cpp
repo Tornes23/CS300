@@ -193,8 +193,9 @@ void Material::SetUniforms(ShaderProgram * shader)
 	mTexture.SetActiveTexture();
 	mNormalMap.SetNormalMap();
 	
-	//shader->SetIntUniform("textureData", mTexture.GetHandle());
-	shader->SetIntUniform("normalMap", mNormalMap.GetHandle());
+	//por alguna razon si setteo este uniform no funciona
+	shader->SetIntUniform("textureData", mTexture.GetTexIndex());
+	shader->SetIntUniform("normalMap", mNormalMap.GetTexIndex());
 
 	//setting tne uniform variables
 	shader->SetVec3Uniform("material.AmbientColor",  mAmbientColor.GetColor());

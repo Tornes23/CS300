@@ -50,6 +50,7 @@ public:
 	const GLuint GetHandle() const;
 	void LoadImage(const std::string& image);
 	void FreeSurface(SDL_Surface* surface);
+	int GetTexIndex() const;
 
 private:
 

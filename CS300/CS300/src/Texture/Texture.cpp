@@ -113,7 +113,7 @@ void Texture::SetActiveTexture()
 void Texture::SetNormalMap()
 {
 	//setting the texture as active
-	glActiveTexture(GL_TEXTURE0 + 2);
+	glActiveTexture(GL_TEXTURE0 + 1);
 	glBindTexture(GL_TEXTURE_2D, mHandle);
 }
 
@@ -275,5 +275,15 @@ void Texture::FreeSurface(SDL_Surface* surface)
 	//if the pointer is valid call to free the memory
 	if (surface != nullptr)
 		SDL_FreeSurface(surface);
+}
+
+int Texture::GetTexIndex() const
+{
+	if (mFilename == "./src/Texture/resources/default.png")
+		return 0;
+	else
+		return 1;
+
+	return 0;
 }
 

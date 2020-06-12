@@ -107,9 +107,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		if (!(objects[i]->mActive))
 			continue;
 
-		//if (mMode == TangentColoring)
-		//	std::cout << "Verga";
-
 		ShaderProgram currentShader = GetShader();
 		Light lightSource;
 
