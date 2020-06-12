@@ -41,6 +41,7 @@ public:
 
 	Texture(std::string filename = "./src/Texture/resources/default.png");
 	void SetActiveTexture();
+	void SetNormalMap();
 	void UploadTexture(void* data);
 	void GenBuffers();
 	void GetFormat(SDL_Surface* texture = nullptr);

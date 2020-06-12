@@ -106,7 +106,14 @@ Sets the texture as the active one
 void Texture::SetActiveTexture()
 {
 	//setting the texture as active
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0 + 0);
+	glBindTexture(GL_TEXTURE_2D, mHandle);
+}
+
+void Texture::SetNormalMap()
+{
+	//setting the texture as active
+	glActiveTexture(GL_TEXTURE0 + 2);
 	glBindTexture(GL_TEXTURE_2D, mHandle);
 }
 
@@ -162,7 +169,7 @@ void Texture::GetFormat(SDL_Surface * texture)
 	if (texture == nullptr)
 		mFormat = GL_RGBA;
 	else
-		mFormat = texture->format->BytesPerPixel == 4 ? GL_RGB : GL_RGBA;
+		mFormat = texture->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
 }
 
 /**************************************************************************
