@@ -72,7 +72,7 @@ Camera::Camera(glm::vec3 direction)
 	mAveragedNormals = false;
 	mLightAnimation = true;
 
-	mMode = Lighting;
+	mMode = LightingMap;
 
 	mLightMode = Light::LightType::Point;
 
@@ -412,7 +412,7 @@ void Camera::AddAllShaders()
 {
 	//adding the shaders
 	AddShader("./src/Shader/programs/NormalMap.vs"         , "./src/Shader/programs/NormalMap.fs"         );
-	AddShader("./src/Shader/programs/NormalMap.vs"         , "./src/Shader/programs/NormalMap.fs"         );
+	AddShader("./src/Shader/programs/NormalMapColors.vs"   , "./src/Shader/programs/NormalMapColors.fs"   );
 	AddShader("./src/Shader/programs/LightingTexture.vs"   , "./src/Shader/programs/LightingTexture.fs"   );
 	AddShader("./src/Shader/programs/LightingColor.vs"     , "./src/Shader/programs/LightingColor.fs"     );
 	AddShader("./src/Shader/programs/Texture.vs"           , "./src/Shader/programs/Texture.fs"           );

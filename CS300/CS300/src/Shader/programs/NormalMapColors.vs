@@ -45,7 +45,7 @@ void main()
     gl_Position = MVP * vec4(vPos, 1.0);
     
     //setting the out variables
-    vs_out.UV = vec2(vTextCoords.x, 1 - vTextCoords.y);
+    vs_out.UV = vec2(vTextCoords.x, vTextCoords.y);
     vs_out.PosInCamSpc = vec3(MV * vec4(vPos, 1.0));
     
     //if average normals are used or not tranform one or the other and set it to the out variable
@@ -63,4 +63,4 @@ void main()
     //computing the tangent matrix 
     vs_out.TangentMat = transpose(mat3(vs_out.Tangent, vs_out.BitTangent, vs_out.Normal));
     
-} 
+}

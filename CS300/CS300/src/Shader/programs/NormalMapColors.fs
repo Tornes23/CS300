@@ -61,7 +61,6 @@ in VS_OUT{
 } fs_in;
 
 //uniform variable to get the data of the texture
-uniform sampler2D textureData;
 uniform sampler2D normalMap;
 
 vec3 PointLight(vec3 initialCol, int i, vec3 normal)
@@ -190,7 +189,7 @@ vec3 ApplyPhongLight()
     for(int i = 0; i < lightCount; i++)
     {
         //get the texture color
-        vec3  textureCol = texture(textureData, fs_in.UV).rgb;
+        vec3  textureCol = vec3(fs_in.UV, 0.0);
         vec3  normal     = texture(normalMap, fs_in.UV).rgb * 2.0F - 1.0F;
         
         normal = fs_in.TangentMat * normal;

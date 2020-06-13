@@ -1019,10 +1019,16 @@ void Model::BindModelBuffer()
 	glEnableVertexAttribArray(4);
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
+	//adding tangents
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[5]);
+	glBufferData(GL_ARRAY_BUFFER, mBitangents.size() * sizeof(glm::vec3), &mBitangents[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
 	if (mIndexed)
 	{
 		//adding triangle indexes
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[5]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[6]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
 	}
 
@@ -1043,7 +1049,7 @@ Deallocates the VBOs and VAOs
 void Model::FreeBuffers()
 {
 	//deallocating the 2 VAOs and the 4 VBOs
-	glDeleteBuffers(5, mVBO);
+	glDeleteBuffers(7, mVBO);
 	glDeleteVertexArrays(3, mVAO);
 
 	//clearing the vectors
@@ -1067,7 +1073,7 @@ void Model::GenBuffers()
 {
 	//generating the VAO and VBO buffers
 	glGenVertexArrays(3, mVAO);
-	glGenBuffers(6, mVBO);
+	glGenBuffers(7, mVBO);
 }
 
 /**************************************************************************
@@ -1128,7 +1134,7 @@ void Model::GenTangents()
 	mBitangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
 
 	//Loop through the triangles
-	for (unsigned i = 0; i < size; i += 3)
+	for (int i = 0; i < size; i += 3)
 	{
 		glm::vec3 v0;
 		glm::vec3 v1;

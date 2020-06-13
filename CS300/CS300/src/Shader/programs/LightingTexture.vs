@@ -35,8 +35,8 @@ void main()
     
     //if average normals are used or not tranform one or the other and set it to the out variable
     if(Average == 1)
-        Normal = vec3(normalize(vec4(mat3(m2w_normal) * vAverage, 0.0)));
+        Normal = normalize(vec4(mat3(m2w_normal) * vAverage, 0.0)).xyz;
     else
-        Normal = vec3(normalize(vec4(mat3(m2w_normal) * vNormal, 0.0)));
+        Normal = normalize(vec4(mat3(m2w_normal) * vNormal, 0.0)).xyz;
     
 } 
