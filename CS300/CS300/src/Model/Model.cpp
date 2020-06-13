@@ -1172,11 +1172,15 @@ void Model::GenTangents()
 		glm::vec2 deltaUV1 = uv1 - uv0;
 		glm::vec2 deltaUV2 = uv2 - uv0;
 
-		// Solve equations to find T and B for this triangle
-		glm::vec3 T = ((deltaUV1.y * side2) - (deltaUV2.y * side1)) / ((deltaUV1.y * deltaUV2.x) - (deltaUV2.y * deltaUV1.x));
+		float f = 0.0F;
 
-		glm::vec3 B = ((deltaUV2.x * side1) - (deltaUV1.x * side2)) /
-			((deltaUV1.y * deltaUV2.x) - (deltaUV2.y * deltaUV1.x));
+		if (((deltaUV1.y * deltaUV2.x) - (deltaUV2.y * deltaUV1.x)) != 0.0F)
+			f = 1.0F / ((deltaUV1.y * deltaUV2.x) - (deltaUV2.y * deltaUV1.x));
+
+		// Solve equations to find T and B for this triangle
+		glm::vec3 T = ((deltaUV1.y * side2) - (deltaUV2.y * side1)) * f;
+
+		glm::vec3 B = ((deltaUV2.x * side1) - (deltaUV1.x * side2)) * f;
 
 		// Accumulate tangent/bitangent for the 3 vertices of the triangle (to average after)
 		if (mIndexed)

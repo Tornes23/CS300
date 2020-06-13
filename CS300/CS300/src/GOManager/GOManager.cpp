@@ -388,10 +388,7 @@ GameObjectManager::~GameObjectManager()
 {
 	//freeing the memory
 	for (auto it = mAllObjects.begin(); it != mAllObjects.end(); it++)
-	{
 		(*it)->mModel.FreeBuffers();
-		delete *it;
-	}
 
 	//clearing the vector
 	mObjects.clear();
