@@ -1124,27 +1124,22 @@ void Model::GenTangents()
 {
 	int size = mIndexed ? static_cast<int>(mIndexes.size()) : static_cast<int>(mVertices.size());
 
-	glm::vec3 v0;
-	glm::vec3 v1;
-	glm::vec3 v2;
+	mTangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
+	mBitangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
 
-	glm::vec2 uv0;
-	glm::vec2 uv1;
-	glm::vec2 uv2;
-
-	for (int i = 0; i < size; i += 3)
+	//Loop through the triangles
+	for (unsigned i = 0; i < size; i += 3)
 	{
-		if (!mIndexed)
-		{
-			v0 = mVertices[i + 0];
-			v1 = mVertices[i + 1];
-			v2 = mVertices[i + 2];
+		glm::vec3 v0;
+		glm::vec3 v1;
+		glm::vec3 v2;
 
-			uv0 = mTextureCoords[i + 0];
-			uv1 = mTextureCoords[i + 1];
-			uv2 = mTextureCoords[i + 2];
-		}
-		else
+		glm::vec2 uv0;
+		glm::vec2 uv1;
+		glm::vec2 uv2;
+
+
+		if (mIndexed)
 		{
 			v0 = mVertices[mIndexes[i + 0]];
 			v1 = mVertices[mIndexes[i + 1]];
@@ -1154,6 +1149,16 @@ void Model::GenTangents()
 			uv1 = mTextureCoords[mIndexes[i + 1]];
 			uv2 = mTextureCoords[mIndexes[i + 2]];
 		}
+		else
+		{
+			v0 = mVertices[i + 0];
+			v1 = mVertices[i + 1];
+			v2 = mVertices[i + 2];
+
+			uv0 = mTextureCoords[i + 0];
+			uv1 = mTextureCoords[i + 1];
+			uv2 = mTextureCoords[i + 2];
+		}
 
 		glm::vec3 side1 = v1 - v0;
 		glm::vec3 side2 = v2 - v0;
@@ -1161,12 +1166,63 @@ void Model::GenTangents()
 		glm::vec2 deltaUV1 = uv1 - uv0;
 		glm::vec2 deltaUV2 = uv2 - uv0;
 
-		glm::vec3 tangent = (deltaUV1.y * side2 - deltaUV2.y * side1) /
-			(deltaUV1.y * deltaUV2.x - deltaUV2.y * deltaUV1.x);
+		// Solve equations to find T and B for this triangle
+		glm::vec3 T = ((deltaUV1.y * side2) - (deltaUV2.y * side1)) / ((deltaUV1.y * deltaUV2.x) - (deltaUV2.y * deltaUV1.x));
 
-		mTangents.push_back(tangent);
-		mTangents.push_back(tangent);
-		mTangents.push_back(tangent);
+		glm::vec3 B = ((deltaUV2.x * side1) - (deltaUV1.x * side2)) /
+			((deltaUV1.y * deltaUV2.x) - (deltaUV2.y * deltaUV1.x));
+
+		// Accumulate tangent/bitangent for the 3 vertices of the triangle (to average after)
+		if (mIndexed)
+		{
+			mTangents[mIndexes[i + 0]] += T;
+			mTangents[mIndexes[i + 1]] += T;
+			mTangents[mIndexes[i + 2]] += T;
+
+			mBitangents[mIndexes[i + 0]] += B;
+			mBitangents[mIndexes[i + 1]] += B;
+			mBitangents[mIndexes[i + 2]] += B;
+		}
+		else
+		{
+			mTangents[i + 0] += T;
+			mTangents[i + 1] += T;
+			mTangents[i + 2] += T;
+
+			mBitangents[i + 0] += B;
+			mBitangents[i + 1] += B;
+			mBitangents[i + 2] += B;
+		}
+	}
+
+
+	// Loop through every vertex
+	for (unsigned i = 0; i < mVertices.size(); i++)
+	{
+		glm::vec3 normal = mNormalVecs[i];
+		glm::vec3 tangent = mTangents[i];
+		glm::vec3 bitan = mBitangents[i];
+
+		// Gram-Schmidt orthogonalization of tangent respect to normal and normalize tangent
+		if (tangent != glm::vec3(0, 0, 0))
+			mTangents[i] = glm::normalize(tangent - normal * glm::dot(normal, tangent));
+		else
+			mTangents[i] = glm::vec3(1, 0, 0);
+
+		glm::vec3 finalBitan = bitan;
+
+		if (bitan != glm::vec3(0, 0, 0))
+		{
+			finalBitan = glm::normalize(glm::cross(normal, tangent));
+
+			// Compute the new perpendicular bitangent maintaining the original handeness of the previously 
+			finalBitan = glm::dot(finalBitan, bitan) >= 0 ? finalBitan : finalBitan;
+
+			// computed one (T,B,N need to be normalized and orthogonal at this point)
+			mBitangents[i] = finalBitan;
+		}
+		else
+			mBitangents[i] = glm::vec3(0, 1, 0);
 	}
 }
 

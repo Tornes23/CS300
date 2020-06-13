@@ -53,7 +53,7 @@ void main()
     else
         vs_out.Normal = vec3(normalize(vec4(mat3(m2w_normal) * vNormal, 0.0)));
     
-    vs_out.Tangent = vec3(normalize(vec4(mat3(m2w_normal) * vTangent, 0.0)));
+    vs_out.Tangent = vec3(normalize(vec4(mat3(m2w) * vTangent, 0.0)));
     
     vs_out.BitTangent = cross(vs_out.Normal, vs_out.Tangent);
     
