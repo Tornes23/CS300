@@ -153,6 +153,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 			currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 			currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
 			currentShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
+			currentShader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
 
 			DrawNormals(objects[i]);
 		}
@@ -423,7 +424,6 @@ void Camera::AddAllShaders()
 	AddShader("./src/Shader/programs/BitangentColoring.vs" , "./src/Shader/programs/BitangentColoring.fs" );
 	AddShader("./src/Shader/programs/Mapping.vs"           , "./src/Shader/programs/Mapping.fs"           );
 	AddShader("./src/Shader/programs/Normals.vs"           , "./src/Shader/programs/Normals.fs"        , "./src/Shader/programs/Normals.gs");
-	AddShader("./src/Shader/programs/NormalsAverage.vs"    , "./src/Shader/programs/NormalsAverage.fs" , "./src/Shader/programs/Normals.gs");
 
 }
 
@@ -673,10 +673,6 @@ returns the shader program
 **************************************************************************/
 ShaderProgram Camera::GetNormalShader()
 {
-	//if the averaged normals is on
-	if (mAveragedNormals)
-		return mShaders[11];
-
 	return mShaders[10];//normals shader
 }
 

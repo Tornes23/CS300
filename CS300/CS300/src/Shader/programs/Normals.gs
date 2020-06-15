@@ -9,7 +9,12 @@ layout (line_strip, max_vertices = 6) out;
 //structure from which to get the normal vector from the vertex shader
 in VS_OUT {
     vec4 normal;
+    
+    vec3 normalColor;
+    
 } gs_in[];
+
+out vec3 Color;
 
 //setting the length of the lines
 const float Length = 3;
@@ -18,8 +23,10 @@ const float Length = 3;
 void DrawLine(int index)
 {
     gl_Position = gl_in[index].gl_Position;
+    Color = gs_in[index].normalColor;
     EmitVertex();
     gl_Position = gl_in[index].gl_Position + gs_in[index].normal * Length;
+    Color = gs_in[index].normalColor;
     EmitVertex();
     EndPrimitive();
 }
