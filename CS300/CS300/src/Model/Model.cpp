@@ -1172,7 +1172,7 @@ void Model::GenTangents()
 		glm::vec2 deltaUV1 = uv1 - uv0;
 		glm::vec2 deltaUV2 = uv2 - uv0;
 
-		float f = 0.0F;
+		float f = 1.0F;
 
 		if (((deltaUV1.y * deltaUV2.x) - (deltaUV2.y * deltaUV1.x)) != 0.0F)
 			f = 1.0F / ((deltaUV1.y * deltaUV2.x) - (deltaUV2.y * deltaUV1.x));
@@ -1226,7 +1226,7 @@ void Model::GenTangents()
 			finalBitan = glm::normalize(glm::cross(normal, tangent));
 
 			// Compute the new perpendicular bitangent maintaining the original handeness of the previously 
-			finalBitan = glm::dot(finalBitan, bitan) >= 0 ? finalBitan : finalBitan;
+			finalBitan = glm::dot(finalBitan, bitan) >= 0 ? finalBitan : -finalBitan;
 
 			// computed one (T,B,N need to be normalized and orthogonal at this point)
 			mBitangents[i] = finalBitan;

@@ -224,9 +224,10 @@ void Camera::Update()
 		mAveragedNormals = !mAveragedNormals;
 
 	if (KeyTriggered(T))
-	{
 		mMode = static_cast<RenderMode>((mMode + 1) % Count);
-	}
+
+	if (KeyTriggered(P))
+		mLightAnimation = !mLightAnimation;
 
 	Light::LightType lastMode = mLightMode;
 
