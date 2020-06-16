@@ -181,7 +181,7 @@ vec3 ApplyPhongLight()
         //get the texture color
         vec3  textureCol;
         if(UseTexture == 1)
-            textureCol = texture(textureData, UV).rgb;
+            textureCol = texture(textureData, vec2(UV.x, 1- UV.y)).rgb;
         else
             textureCol = vec3(UV, 0.0F);
         

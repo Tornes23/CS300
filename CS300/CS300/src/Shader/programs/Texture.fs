@@ -16,7 +16,7 @@ void main()
 {
     //getting and setting the color of the pixel from the texture
     if(UseTexture == 1)
-        FragColor = texture(textureData, UV).rgba;
+        FragColor = texture(textureData, vec2(UV.x, 1 - UV.y)).rgba;
     else
         FragColor = vec4(UV, 0, 1);
         

@@ -30,7 +30,8 @@ void main()
     gl_Position = MVP * vec4(vPos, 1.0);
     
     //setting the out variables
-    UV = vec2(vTextCoords.x, 1 - vTextCoords.y);
+    UV = vTextCoords;
+    
     PosInCamSpc = vec3(MV * vec4(vPos, 1.0));
     
     //if average normals are used or not tranform one or the other and set it to the out variable
