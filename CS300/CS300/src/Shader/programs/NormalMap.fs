@@ -55,9 +55,6 @@ in VS_OUT{
     vec3 Tangent;
     vec3 BitTangent;
     
-    vec3 TangentFragPos;
-    vec3 CamTanSpc;
-    
     mat3 TangentMat;
     
 } fs_in;
@@ -76,7 +73,7 @@ vec3 PointLight(vec3 initialCol, int i, vec3 normal)
     
     //computing diffuse value and color
     float diffuseVal = max(dot(normal, lightDir), 0.0);
-    vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSources[i].DiffuseColor;
+    vec3 diffuseCol = diffuseVal * material.DiffuseColor * lightSources[i].DiffuseColor;
     
     //adding it to the color
     initialCol += diffuseCol;
@@ -199,9 +196,9 @@ vec3 ApplyPhongLight()
         else
             textureCol = vec3(fs_in.UV, 0.0F);
         
-        vec3  normal = texture(normalMap, fs_in.UV).rgb * 2.0F - 1.0F;
+        vec3  normalCol = normalize(texture(normalMap, vec2(fs_in.UV.x, 1- fs_in.UV.y)).rgb * 2.0F - 1.0F);
         
-        normal = fs_in.TangentMat * normal;
+        vec3 normal = fs_in.TangentMat * normalCol;
         
         //computing the ambient color
         vec3  ambientCol = lightSources[i].AmbientColor * material.AmbientColor;

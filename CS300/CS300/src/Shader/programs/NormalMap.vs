@@ -18,9 +18,6 @@ out VS_OUT{
     vec3 Tangent;
     vec3 BitTangent;
     
-    vec3 TangentFragPos;
-    vec3 CamTanSpc;
-    
     mat3 TangentMat;
     
 } vs_out;
@@ -46,21 +43,21 @@ void main()
     
     //setting the out variables
     vs_out.UV = vTextCoords;
-    vs_out.PosInCamSpc = vec3(MV * vec4(vPos, 1.0));
+    vs_out.PosInCamSpc = (MV * vec4(vPos, 1.0)).xyz;
     
     //if average normals are used or not tranform one or the other and set it to the out variable
     if(Average == 1)
-        vs_out.Normal = normalize(vec4(mat3(m2w_normal) * vAverage, 0.0)).xyz;
+        vs_out.Normal = mat3(m2w_normal) * vAverage;
     else
-        vs_out.Normal = normalize(vec4(mat3(m2w_normal) * vNormal, 0.0)).xyz;
+        vs_out.Normal = mat3(m2w_normal) * vNormal;
     
     //computing the tangent in camera space
-    vs_out.Tangent = normalize(MV * vec4(vTangent, 0.0)).xyz;
-    
     //computing the bitangent in camera space
-    vs_out.BitTangent = normalize(MV * vec4(vBitangent, 0.0)).xyz;
+    
+    vs_out.Tangent = mat3(MV) * vTangent;
+    vs_out.BitTangent =  mat3(MV) * vBitangent;
     
     //computing the tangent matrix 
-    vs_out.TangentMat = transpose(mat3(vs_out.Tangent, vs_out.BitTangent, vs_out.Normal));
+    vs_out.TangentMat = mat3(normalize(vs_out.Tangent), normalize(vs_out.BitTangent), normalize(vs_out.Normal));
     
 } 

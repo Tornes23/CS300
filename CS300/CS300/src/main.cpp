@@ -36,7 +36,7 @@ int main()
 	Utils::InitGL(&myWindow);
 	Camera myCamera(glm::vec3(0, 0, 10));
 
-	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(50, 50, 1), "Floor", Model::Shape::Plane, true, glm::vec3(0, 0, 1), glm::vec3(0, 1, 0)));
+	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(50, 50, 1), "Floor", Model::Shape::Plane, true, glm::vec3(0, 0, -1), glm::vec3(0, 1, 0)));
 
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Plane",    Model::Shape::Plane,    true));
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cube",     Model::Shape::Cube,     false));

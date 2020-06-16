@@ -20,6 +20,7 @@ void main()
 {
     //computing the model to projection matrix 
     mat4 MVP = projection * view * m2w;
+    mat4 MV = view * m2w;
     
     //applying the transformation to the vertex pos
     gl_Position = MVP * vec4(vPos, 1.0);
@@ -28,8 +29,8 @@ void main()
     if (Selection == 0)
         Vector = vec3(normalize(vec4(mat3(m2w_normal) * vNormal, 0.0)));
     else if (Selection == 1)
-        Vector = normalize(MVP        * vec4(vTangent,   0.0)).xyz;
+        Vector = normalize(MV        * vec4(vTangent,   0.0)).xyz;
     else if (Selection == 2)
-        Vector = normalize(MVP        * vec4(vBitangent, 0.0)).xyz;
+        Vector = normalize(MV        * vec4(vBitangent, 0.0)).xyz;
     
 } 
