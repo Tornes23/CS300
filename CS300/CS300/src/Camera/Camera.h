@@ -56,11 +56,11 @@ public:
 	typedef enum RenderMode
 	{
 		LightingMap,
-		LightingTexMapMap,
+		LightingMapUV,
 		Lighting,
-		LightingTexMap,
+		LightingUV,
 		Regular,
-		TextureMapping,
+		UV,
 		NormalColoring,
 		TangentColoring,
 		BitangentColoring,

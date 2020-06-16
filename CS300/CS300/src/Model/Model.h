@@ -90,13 +90,15 @@ private:
 	std::vector<glm::vec3> mNormalVecs;
 	std::vector<glm::vec3> mAveraged;
 	std::vector<glm::vec3> mTangents;
+	std::vector<glm::vec3> mAvgTangents;
 	std::vector<glm::vec3> mBitangents;
+	std::vector<glm::vec3> mAvgBitangents;
 	std::vector<unsigned short> mIndexes;
 	
 
 	bool mIndexed;
 	int mPrecision;
 	Shape mShape;
-	GLuint mVAO[3];
-	GLuint mVBO[6];
+	GLuint mVAO[2];
+	GLuint mVBO[9];
 };

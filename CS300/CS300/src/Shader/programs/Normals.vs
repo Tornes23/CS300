@@ -5,7 +5,9 @@ layout(location = 0) in vec3 vPos;
 layout(location = 1) in vec3 vNormal;
 layout(location = 2) in vec3 vAverage;
 layout(location = 3) in vec3 vTangent;
-layout(location = 4) in vec3 vBitangent;
+layout(location = 4) in vec3 vAvgTangent;
+layout(location = 5) in vec3 vBitangent;
+layout(location = 6) in vec3 vAvgBitangent;
 
 //structure from which to send the normal vector to the geometry shader
 out VS_OUT {
@@ -38,16 +40,21 @@ void main()
     {
         vs_out.normal = projection * normalize(vec4(mat3(m2w_normal) * vNormal, 0.0));
         vs_out.normalColor = vec3(0, 0, 1);
+        vs_out.tangent = normalize(MVP * vec4(vTangent, 0.0));
+        vs_out.tanColor = vec3(1, 0, 0);
+        vs_out.bitangent = normalize(MVP * vec4(vBitangent, 0.0));
+        vs_out.bitanColor = vec3(0, 1, 0);
     }
     else
     {
         vs_out.normal = projection * normalize(vec4(mat3(m2w_normal) * vAverage, 0.0));
-        vs_out.normalColor = vec3(1, 1, 1);
+        vs_out.normalColor = vec3(0, 0, 1);
+        vs_out.tangent = normalize(MVP * vec4(vAvgTangent, 0.0));
+        vs_out.tanColor = vec3(1, 0, 0);
+        vs_out.bitangent = normalize(MVP * vec4(vAvgBitangent, 0.0));
+        vs_out.bitanColor = vec3(0, 1, 0);
     }
     
-    vs_out.tangent = normalize(MVP * vec4(vTangent, 0.0));
-    vs_out.tanColor = vec3(1, 0, 0);
-    vs_out.bitangent = normalize(MVP * vec4(vBitangent, 0.0));
-    vs_out.bitanColor = vec3(0, 1, 0);
+   
         
 }

@@ -40,6 +40,8 @@ uniform int lightCount;
 //uniform variable to store the material
 uniform Material material;
 
+uniform int UseTexture;
+
 //output color
 out vec4 FragColor; 
 
@@ -190,8 +192,14 @@ vec3 ApplyPhongLight()
     for(int i = 0; i < lightCount; i++)
     {
         //get the texture color
-        vec3  textureCol = texture(textureData, fs_in.UV).rgb;
-        vec3  normal     = texture(normalMap, fs_in.UV).rgb * 2.0F - 1.0F;
+        vec3  textureCol;
+        
+        if(UseTexture == 1)
+            textureCol = texture(textureData, fs_in.UV).rgb;
+        else
+            textureCol = vec3(fs_in.UV, 0.0F);
+        
+        vec3  normal = texture(normalMap, fs_in.UV).rgb * 2.0F - 1.0F;
         
         normal = fs_in.TangentMat * normal;
         

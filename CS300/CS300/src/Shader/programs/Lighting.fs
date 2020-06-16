@@ -40,6 +40,8 @@ uniform int lightCount;
 //uniform variable to store the material
 uniform Material material;
 
+uniform int UseTexture;
+
 //output color
 out vec4 FragColor; 
 
@@ -47,6 +49,9 @@ out vec4 FragColor;
 in vec3 PosInCamSpc; 
 in vec2 UV;
 in vec3 Normal;
+
+//uniform variable to get the data of the texture
+uniform sampler2D textureData;
 
 vec3 PointLight(vec3 initialCol, int i)
 {
@@ -174,7 +179,11 @@ vec3 ApplyPhongLight()
     for(int i = 0; i < lightCount; i++)
     {
         //get the texture color
-        vec3  textureCol = vec3(UV, 0.0);
+        vec3  textureCol;
+        if(UseTexture == 1)
+            textureCol = texture(textureData, UV).rgb;
+        else
+            textureCol = vec3(UV, 0.0F);
         
         //computing the ambient color
         vec3  ambientCol = lightSources[i].AmbientColor * material.AmbientColor;

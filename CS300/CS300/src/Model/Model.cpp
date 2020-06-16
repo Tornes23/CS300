@@ -971,14 +971,26 @@ void Model::BindNormalBuffer()
 
 	//adding tangents
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[5]);
-	glBufferData(GL_ARRAY_BUFFER, mBitangents.size() * sizeof(glm::vec3), &mBitangents[0].x, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, mAvgTangents.size() * sizeof(glm::vec3), &mAvgTangents[0].x, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(4);
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	//adding tangents
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[6]);
+	glBufferData(GL_ARRAY_BUFFER, mBitangents.size() * sizeof(glm::vec3), &mBitangents[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	//adding tangents
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[7]);
+	glBufferData(GL_ARRAY_BUFFER, mAvgBitangents.size() * sizeof(glm::vec3), &mAvgBitangents[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
 	if (mIndexed)
 	{
 		//adding triangle indexes
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[5]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[8]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
 	}
 
@@ -1032,7 +1044,7 @@ void Model::BindModelBuffer()
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
 	//adding tangents
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[5]);
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[6]);
 	glBufferData(GL_ARRAY_BUFFER, mBitangents.size() * sizeof(glm::vec3), &mBitangents[0].x, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(5);
 	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
@@ -1040,7 +1052,7 @@ void Model::BindModelBuffer()
 	if (mIndexed)
 	{
 		//adding triangle indexes
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[6]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVBO[8]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexes.size() * sizeof(unsigned short), &mIndexes[0], GL_STATIC_DRAW);
 	}
 
@@ -1061,8 +1073,8 @@ Deallocates the VBOs and VAOs
 void Model::FreeBuffers()
 {
 	//deallocating the 2 VAOs and the 4 VBOs
-	glDeleteBuffers(7, mVBO);
-	glDeleteVertexArrays(3, mVAO);
+	glDeleteBuffers(9, mVBO);
+	glDeleteVertexArrays(2, mVAO);
 
 	//clearing the vectors
 	mVertices.clear();
@@ -1084,8 +1096,8 @@ Generates the buffers
 void Model::GenBuffers()
 {
 	//generating the VAO and VBO buffers
-	glGenVertexArrays(3, mVAO);
-	glGenBuffers(7, mVBO);
+	glGenVertexArrays(2, mVAO);
+	glGenBuffers(9, mVBO);
 }
 
 /**************************************************************************
@@ -1143,7 +1155,9 @@ void Model::GenTangents()
 	int size = mIndexed ? static_cast<int>(mIndexes.size()) : static_cast<int>(mVertices.size());
 
 	mTangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
+	mAvgTangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
 	mBitangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
+	mAvgBitangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
 
 	//Loop through the triangles
 	for (int i = 0; i < size; i += 3)
@@ -1229,7 +1243,12 @@ void Model::GenTangents()
 		if (tangent != glm::vec3(0, 0, 0))
 			mTangents[i] = glm::normalize(tangent - normal * glm::dot(normal, tangent));
 		else
-			mTangents[i] = glm::vec3(1, 0, 0);
+		{
+			tangent = glm::vec3(1, 0, 0);
+			mTangents[i] = tangent;
+		}
+
+		mAvgTangents[i] = glm::normalize(tangent);
 
 		glm::vec3 finalBitan = bitan;
 
@@ -1244,7 +1263,13 @@ void Model::GenTangents()
 			mBitangents[i] = finalBitan;
 		}
 		else
-			mBitangents[i] = glm::vec3(0, 1, 0);
+		{
+			bitan = glm::vec3(0, 1, 0);
+			mBitangents[i] = bitan;
+		}
+
+		mAvgBitangents[i] = glm::normalize(bitan);
+
 	}
 }
 

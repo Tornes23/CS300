@@ -9,9 +9,15 @@ in vec3 Normal;
 
 //uniform variable to get the texture data
 uniform sampler2D textureData;
+
+uniform int UseTexture;
  
 void main()
 {
     //getting and setting the color of the pixel from the texture
-    FragColor = texture(textureData, UV).rgba;
+    if(UseTexture == 1)
+        FragColor = texture(textureData, UV).rgba;
+    else
+        FragColor = vec4(UV, 0, 1);
+        
 }

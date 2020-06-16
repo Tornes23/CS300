@@ -59,7 +59,6 @@ public:
 
 	void Use();
 
-
 private:
 	Shader mFragment;
 	Shader mVertex;

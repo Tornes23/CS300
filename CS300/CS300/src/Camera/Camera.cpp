@@ -126,10 +126,17 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		
 		currentShader.SetVec3Uniform("camPositon", mPosition);
 
+		bool useTex = mMode < NormalColoring ? mMode % 2 == 0 ? true : false : false;
+
+		currentShader.SetIntUniform("UseTexture", useTex ? 1 : 0);
+
+		if(mMode >= NormalColoring)
+			currentShader.SetIntUniform("Selection", mMode - NormalColoring);
+
 		//setting the texture of the object as active
 		objects[i]->mMaterial.SetUniforms(&currentShader);
 
-		if (mMode >= LightingMap && mMode < Regular)
+		if (mMode < Regular)
 			ApplyLight(currentShader, mCameraMatrix);
 
 
@@ -414,15 +421,9 @@ void Camera::AddAllShaders()
 {
 	//adding the shaders
 	AddShader("./src/Shader/programs/NormalMap.vs"         , "./src/Shader/programs/NormalMap.fs"         );
-	AddShader("./src/Shader/programs/NormalMapColors.vs"   , "./src/Shader/programs/NormalMapColors.fs"   );
-	AddShader("./src/Shader/programs/LightingTexture.vs"   , "./src/Shader/programs/LightingTexture.fs"   );
-	AddShader("./src/Shader/programs/LightingColor.vs"     , "./src/Shader/programs/LightingColor.fs"     );
+	AddShader("./src/Shader/programs/Lighting.vs"          , "./src/Shader/programs/Lighting.fs"          );
 	AddShader("./src/Shader/programs/Texture.vs"           , "./src/Shader/programs/Texture.fs"           );
-	AddShader("./src/Shader/programs/Mapping.vs"           , "./src/Shader/programs/Mapping.fs"           );
-	AddShader("./src/Shader/programs/NormalColoring.vs"    , "./src/Shader/programs/NormalColoring.fs"    );
-	AddShader("./src/Shader/programs/TangentColoring.vs"   , "./src/Shader/programs/TangentColoring.fs"   );
-	AddShader("./src/Shader/programs/BitangentColoring.vs" , "./src/Shader/programs/BitangentColoring.fs" );
-	AddShader("./src/Shader/programs/Mapping.vs"           , "./src/Shader/programs/Mapping.fs"           );
+	AddShader("./src/Shader/programs/VectorColoring.vs"    , "./src/Shader/programs/VectorColoring.fs"    );
 	AddShader("./src/Shader/programs/Normals.vs"           , "./src/Shader/programs/Normals.fs"        , "./src/Shader/programs/Normals.gs");
 
 }
@@ -652,8 +653,41 @@ returns the shader program
 **************************************************************************/
 ShaderProgram Camera::GetShader()
 {
-	//returning the shader
-	return mShaders[mMode];
+
+	switch (mMode)
+	{
+	case LightingMap:
+		return mShaders[0];
+		break;
+	case LightingMapUV:
+		return mShaders[0];
+		break;
+	case Lighting:
+		return mShaders[1];
+		break;
+	case LightingUV:
+		return mShaders[1];
+		break;
+	case Regular:
+		return mShaders[2];
+		break;
+	case UV:
+		return mShaders[2];
+		break;
+	case NormalColoring:
+		return mShaders[3];
+		break;
+	case TangentColoring:
+		return mShaders[3];
+		break;
+	case BitangentColoring:
+		return mShaders[3];
+		break;
+	default:
+		return mShaders[0];
+		break;
+	}
+
 	
 }
 
@@ -673,7 +707,7 @@ returns the shader program
 **************************************************************************/
 ShaderProgram Camera::GetNormalShader()
 {
-	return mShaders[10];//normals shader
+	return mShaders[4];//normals shader
 }
 
 const Light Camera::GetLight() const
