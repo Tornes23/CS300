@@ -26,7 +26,7 @@ void main()
     
     //if average normals are used or not tranform one or the other and set it to the out variable
     if (Selection == 0)
-        Vector = normalize(projection * normalize(vec4(mat3(m2w_normal) * vNormal, 0.0))).xyz;
+        Vector = vec3(normalize(vec4(mat3(m2w_normal) * vNormal, 0.0)));
     else if (Selection == 1)
         Vector = normalize(MVP        * vec4(vTangent,   0.0)).xyz;
     else if (Selection == 2)
