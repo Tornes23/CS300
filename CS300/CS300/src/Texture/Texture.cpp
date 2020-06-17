@@ -79,7 +79,10 @@ Texture::Texture(std::string filename)
 	GetFormat(mTexture);
 	
 	//setting the sampling parameter
-	SetParameter();
+	if (filename != "./src/Texture/resources/default.png")
+		SetParameter();
+	else
+		SetParameter(GL_NEAREST, GL_NEAREST);
 	
 	//depending if an image was actually loaded or not upload the default texture or te loaded image
 	if (mTexture == nullptr)
@@ -199,15 +202,15 @@ The sampling parameter to set
 
 *
 **************************************************************************/
-void Texture::SetParameter(GLint param)
+void Texture::SetParameter(GLint param1, GLint param2)
 {
 	//setting the parameters for the texture to clamp to the maximum
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	//setting the sampling mode
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param2);
 
 }
 

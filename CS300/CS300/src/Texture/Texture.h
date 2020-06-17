@@ -46,7 +46,7 @@ public:
 	void GenBuffers();
 	void GetFormat(SDL_Surface* texture = nullptr);
 	void GenMipMap();
-	void SetParameter(GLint param = GL_NEAREST);
+	void SetParameter(GLint param1 = GL_LINEAR_MIPMAP_LINEAR, GLint param2 = GL_LINEAR);
 	const GLuint GetHandle() const;
 	void LoadImage(const std::string& image);
 	void FreeSurface(SDL_Surface* surface);
