@@ -1155,9 +1155,10 @@ void Model::GenTangents()
 	int size = mIndexed ? static_cast<int>(mIndexes.size()) : static_cast<int>(mVertices.size());
 
 	mTangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
-	mAvgTangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
 	mBitangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
-	mAvgBitangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
+
+	mTangetsPerVertex.resize(mVertices.size());
+	mBitangetsPerVertex.resize(mVertices.size());
 
 	//Loop through the triangles
 	for (int i = 0; i < size; i += 3)
@@ -1241,37 +1242,243 @@ void Model::GenTangents()
 
 		// Gram-Schmidt orthogonalization of tangent respect to normal and normalize tangent
 		if (tangent != glm::vec3(0, 0, 0))
+		{
 			mTangents[i] = glm::normalize(tangent - normal * glm::dot(normal, tangent));
+			mTangetsPerVertex[i].push_back(glm::normalize(tangent - normal * glm::dot(normal, tangent)));
+		}
 		else
 		{
 			tangent = glm::vec3(1, 0, 0);
 			mTangents[i] = tangent;
 		}
 
-		mAvgTangents[i] = glm::normalize(tangent);
-
 		glm::vec3 finalBitan = bitan;
 
-		if (bitan != glm::vec3(0, 0, 0))
+		finalBitan = glm::normalize(glm::cross(normal, tangent));
+
+		// Compute the new perpendicular bitangent maintaining the original handeness of the previously 
+		finalBitan = glm::dot(finalBitan, bitan) >= 0 ? finalBitan : -finalBitan;
+
+		// computed one (T,B,N need to be normalized and orthogonal at this point)
+		mBitangents[i] = finalBitan;
+
+		mBitangetsPerVertex[i].push_back(finalBitan);
+
+	}
+
+	GenAvgTangents();
+}
+
+/**************************************************************************
+*!
+\fn     Model::GenAvgTangents
+
+\brief
+Generates the average tangents
+
+*
+**************************************************************************/
+void Model::GenAvgTangents()
+{
+	mAvgTangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
+	mAvgBitangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
+
+	SortAvgTangents();
+	SortAvgBitangents();
+
+	//for each vertex
+	for (unsigned i = 0; i < mVertices.size(); i++)
+	{
+		//set the average to 0
+		glm::vec3 avgNormal = mAveraged[i];
+		glm::vec3 avgTangent = AddTangents(i);
+		glm::vec3 avgBitan = AddBitangents(i);
+
+
+		// Gram-Schmidt orthogonalization of tangent respect to normal and normalize tangent
+		if (avgTangent != glm::vec3(0, 0, 0))
 		{
-			finalBitan = glm::normalize(glm::cross(normal, tangent));
-
-			// Compute the new perpendicular bitangent maintaining the original handeness of the previously 
-			finalBitan = glm::dot(finalBitan, bitan) >= 0 ? finalBitan : -finalBitan;
-
-			// computed one (T,B,N need to be normalized and orthogonal at this point)
-			mBitangents[i] = finalBitan;
+			mAvgTangents[i] = glm::normalize(avgTangent - avgNormal * glm::dot(avgNormal, avgTangent));
 		}
 		else
 		{
-			bitan = glm::vec3(0, 1, 0);
-			mBitangents[i] = bitan;
+			avgTangent = glm::vec3(1, 0, 0);
+			mAvgTangents[i] = avgTangent;
 		}
 
-		mAvgBitangents[i] = glm::normalize(bitan);
+		glm::vec3 finalBitan = avgBitan;
 
+		finalBitan = glm::normalize(glm::cross(avgNormal, avgTangent));
+
+		// Compute the new perpendicular bitangent maintaining the original handeness of the previously 
+		finalBitan = glm::dot(finalBitan, avgBitan) >= 0 ? finalBitan : -finalBitan;
+
+		// computed one (T,B,N need to be normalized and orthogonal at this point)
+		mAvgBitangents[i] = finalBitan;
 	}
 }
+
+
+/**************************************************************************
+*!
+\fn     Model::SortAvgTangents
+
+\brief
+Sorts the tangents of each vertex if any is 
+repeated is set to the first coincidence
+
+*
+**************************************************************************/
+void Model::SortAvgTangents()
+{
+	//epsilon value to check the position
+	float errorVal = 0.1F;
+
+	//looping throught the vertices
+	for (unsigned i = 0; i < mTangetsPerVertex.size(); i++)
+	{
+		//another loop to compare the vertices
+		for (unsigned j = i + 1; j < mTangetsPerVertex.size(); j++)
+		{
+			//computing the difference between the two vertex
+			float differenceX = glm::abs(mVertices[i].x - mVertices[j].x);
+			float differenceY = glm::abs(mVertices[i].y - mVertices[j].y);
+			float differenceZ = glm::abs(mVertices[i].z - mVertices[j].z);
+
+			//if the difference is lower than the error value
+			if (differenceX < errorVal && differenceY < errorVal && differenceZ < errorVal)
+			{
+				//copy the tangents to the original vertex
+				for (unsigned k = 0; k < mTangetsPerVertex[j].size(); k++)
+				{
+					mTangetsPerVertex[i].push_back(mTangetsPerVertex[j][k]);
+				}
+				//clearing the normals of te duplicated vertex
+				mTangetsPerVertex[j].clear();
+			}
+		}
+	}
+
+}
+
+/**************************************************************************
+*!
+\fn     Model::SortAvgBitangents
+
+\brief
+Sorts the bitangents of each vertex if any is
+repeated is set to the first coincidence
+
+*
+**************************************************************************/
+void Model::SortAvgBitangents()
+{
+	//epsilon value to check the position
+	float errorVal = 0.1F;
+
+	//looping throught the vertices
+	for (unsigned i = 0; i < mBitangetsPerVertex.size(); i++)
+	{
+		//another loop to compare the vertices
+		for (unsigned j = i + 1; j < mTangetsPerVertex.size(); j++)
+		{
+			//computing the difference between the two vertex
+			float differenceX = glm::abs(mVertices[i].x - mVertices[j].x);
+			float differenceY = glm::abs(mVertices[i].y - mVertices[j].y);
+			float differenceZ = glm::abs(mVertices[i].z - mVertices[j].z);
+
+			//if the difference is lower than the error value
+			if (differenceX < errorVal && differenceY < errorVal && differenceZ < errorVal)
+			{
+				//copy the tangents to the original vertex
+				for (unsigned k = 0; k < mBitangetsPerVertex[j].size(); k++)
+				{
+					mBitangetsPerVertex[i].push_back(mBitangetsPerVertex[j][k]);
+				}
+				//clearing the normals of te duplicated vertex
+				mBitangetsPerVertex[j].clear();
+			}
+		}
+	}
+
+}
+
+/**************************************************************************
+*!
+\fn     Model::AddTangents
+
+\param int index
+the index of the vertex
+
+\brief
+Adds all the tangents of a specific vertex and returns it
+
+\return
+The addition vector
+
+*
+**************************************************************************/
+glm::vec3 Model::AddTangents(int index)
+{
+	glm::vec3 addition = glm::vec3(0, 0, 0);
+
+	//if is empty skip it
+	if (mTangetsPerVertex[index].empty())
+		return addition;
+
+	//adding all the normals
+	for (unsigned j = 0; j < mTangetsPerVertex[index].size(); j++)
+	{
+		addition += mTangetsPerVertex[index][j];
+	}
+
+	//dividing it over the added amount
+	addition /= mTangetsPerVertex[index].size();
+
+	//normalizing it
+	addition = glm::normalize(addition);
+
+	return addition;
+}
+
+/**************************************************************************
+*!
+\fn     Model::AddBitangents
+
+\param int index
+the index of the vertex
+
+\brief
+Adds all the bitangents of a specific vertex and returns it
+
+\return
+The addition vector
+
+*
+**************************************************************************/
+glm::vec3 Model::AddBitangents(int index)
+{
+	glm::vec3 addition = glm::vec3(0, 0, 0);
+
+	//if is empty skip it
+	if (mBitangetsPerVertex[index].empty())
+		return addition;
+
+	//adding all the normals
+	for (unsigned j = 0; j < mBitangetsPerVertex[index].size(); j++)
+	{
+		addition += mBitangetsPerVertex[index][j];
+	}
+
+	//dividing it over the added amount
+	addition /= mBitangetsPerVertex[index].size();
+
+	//normalizing it
+	addition = glm::normalize(addition);
+
+	return addition;
+}
+
 
 /**************************************************************************
 *!

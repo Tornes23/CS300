@@ -74,6 +74,13 @@ public:
 
 	void GenNormals();
 	void GenTangents();
+	void GenAvgTangents();
+
+	void SortAvgTangents();
+	void SortAvgBitangents();
+
+	glm::vec3 AddTangents(int index);
+	glm::vec3 AddBitangents(int index);
 
 	GLsizei GetDrawElements() const;
 	bool GetIndexed();
@@ -95,6 +102,8 @@ private:
 	std::vector<glm::vec3> mAvgBitangents;
 	std::vector<unsigned short> mIndexes;
 	
+	std::vector<std::vector<glm::vec3>> mTangetsPerVertex;
+	std::vector<std::vector<glm::vec3>> mBitangetsPerVertex;
 
 	bool mIndexed;
 	int mPrecision;

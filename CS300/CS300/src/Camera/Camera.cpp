@@ -108,7 +108,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 			continue;
 
 		ShaderProgram currentShader = GetShader();
-		Light lightSource;
 
 		currentShader.Use();
 
