@@ -1341,44 +1341,7 @@ void Model::SortAvgTangents()
 			if (differenceX < errorVal && differenceY < errorVal && differenceZ < errorVal)
 			{
 				mAvgTangents[i] += mAvgTangents[j];
-				mAvgTangents[j] = glm::vec3(0, 0, 0);
-			}
-		}
-	}
-
-}
-
-/**************************************************************************
-*!
-\fn     Model::SortAvgBitangents
-
-\brief
-Sorts the bitangents of each vertex if any is
-repeated is set to the first coincidence
-
-*
-**************************************************************************/
-void Model::SortAvgBitangents()
-{
-	//epsilon value to check the position
-	float errorVal = 0.1F;
-
-	//looping throught the vertices
-	for (unsigned i = 0; i < mAvgBitangents.size(); i++)
-	{
-		//another loop to compare the vertices
-		for (unsigned j = i + 1; j < mAvgBitangents.size(); j++)
-		{
-			//computing the difference between the two vertex
-			float differenceX = glm::abs(mVertices[i].x - mVertices[j].x);
-			float differenceY = glm::abs(mVertices[i].y - mVertices[j].y);
-			float differenceZ = glm::abs(mVertices[i].z - mVertices[j].z);
-
-			//if the difference is lower than the error value
-			if (differenceX < errorVal && differenceY < errorVal && differenceZ < errorVal)
-			{
-				mAvgBitangents[i] += mAvgBitangents[j];
-				mAvgBitangents[j] = glm::vec3(0, 0, 0);
+				mAvgTangents[j] = glm::vec3(0,0,0);
 			}
 		}
 	}

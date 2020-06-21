@@ -21,7 +21,7 @@ in VS_OUT {
 out vec3 lineColor;
 
 //setting the length of the lines
-const float Length = 1;
+const float Length = 2;
 
 //function to draw the lines
 void DrawLine(int index, vec4 vector, vec3 color)
