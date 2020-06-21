@@ -1292,11 +1292,10 @@ void Model::GenAvgTangents()
 		if (avgTangent != glm::vec3(0, 0, 0))
 			mAvgTangents[i] = glm::normalize(avgTangent - avgNormal * glm::dot(avgNormal, avgTangent));
 		else
-			continue;
-		//{
-		//	avgTangent = glm::vec3(1, 0, 0);
-		//	mAvgTangents[i] = avgTangent;
-		//}
+		{
+			avgTangent = glm::vec3(1, 0, 0);
+			mAvgTangents[i] = avgTangent;
+		}
 
 		glm::vec3 finalBitan = avgBitan;
 
@@ -1324,7 +1323,7 @@ repeated is set to the first coincidence
 void Model::SortAvgTangents()
 {
 	//epsilon value to check the position
-	float errorVal = 0.1F;
+	float errorVal = 0.001F;
 
 	//looping throught the vertices
 	for (unsigned i = 0; i < mAvgTangents.size(); i++)
@@ -1343,6 +1342,21 @@ void Model::SortAvgTangents()
 				mAvgTangents[i] += mAvgTangents[j];
 				mAvgTangents[j] = glm::vec3(0,0,0);
 			}
+		}
+	}
+
+	for (unsigned i = 0; i < mAvgTangents.size(); i++)
+	{
+		for (unsigned j = i + 1; j < mAvgTangents.size(); j++)
+		{
+			//computing the difference between the two vertex
+			float differenceX = glm::abs(mVertices[i].x - mVertices[j].x);
+			float differenceY = glm::abs(mVertices[i].y - mVertices[j].y);
+			float differenceZ = glm::abs(mVertices[i].z - mVertices[j].z);
+
+			//if the difference is lower than the error value
+			if (differenceX < errorVal && differenceY < errorVal && differenceZ < errorVal)
+				mAvgTangents[i] = mAvgTangents[j];
 		}
 	}
 
