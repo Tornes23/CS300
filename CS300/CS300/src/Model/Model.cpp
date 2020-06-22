@@ -1044,10 +1044,22 @@ void Model::BindModelBuffer()
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
 	//adding tangents
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[6]);
-	glBufferData(GL_ARRAY_BUFFER, mBitangents.size() * sizeof(glm::vec3), &mBitangents[0].x, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[5]);
+	glBufferData(GL_ARRAY_BUFFER, mAvgTangents.size() * sizeof(glm::vec3), &mAvgTangents[0].x, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(5);
 	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	//adding tangents
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[6]);
+	glBufferData(GL_ARRAY_BUFFER, mBitangents.size() * sizeof(glm::vec3), &mBitangents[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	//adding tangents
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[7]);
+	glBufferData(GL_ARRAY_BUFFER, mAvgBitangents.size() * sizeof(glm::vec3), &mAvgBitangents[0].x, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(7);
+	glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
 	if (mIndexed)
 	{
@@ -1082,6 +1094,11 @@ void Model::FreeBuffers()
 	mAveraged.clear();
 	mTextureCoords.clear();
 	mIndexes.clear();
+	mTangents.clear();
+	mBitangents.clear();
+	mAvgTangents.clear();
+	mAvgBitangents.clear();
+
 }
 
 /**************************************************************************
@@ -1157,6 +1174,9 @@ void Model::GenTangents()
 	mTangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
 	mBitangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
 
+	mAvgTangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
+	mAvgBitangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
+
 	//Loop through the triangles
 	for (int i = 0; i < size; i += 3)
 	{
@@ -1213,9 +1233,17 @@ void Model::GenTangents()
 			mTangents[mIndexes[i + 1]] += T;
 			mTangents[mIndexes[i + 2]] += T;
 
+			mAvgTangents[mIndexes[i + 0]] += T;
+			mAvgTangents[mIndexes[i + 1]] += T;
+			mAvgTangents[mIndexes[i + 2]] += T;
+
 			mBitangents[mIndexes[i + 0]] += B;
 			mBitangents[mIndexes[i + 1]] += B;
 			mBitangents[mIndexes[i + 2]] += B;
+
+			mAvgBitangents[mIndexes[i + 0]] += B;
+			mAvgBitangents[mIndexes[i + 1]] += B;
+			mAvgBitangents[mIndexes[i + 2]] += B;
 		}
 		else
 		{
@@ -1223,9 +1251,17 @@ void Model::GenTangents()
 			mTangents[i + 1] += T;
 			mTangents[i + 2] += T;
 
+			mAvgTangents[i + 0] += T;
+			mAvgTangents[i + 1] += T;
+			mAvgTangents[i + 2] += T;
+
 			mBitangents[i + 0] += B;
 			mBitangents[i + 1] += B;
 			mBitangents[i + 2] += B;
+
+			mAvgBitangents[i + 0] += B;
+			mAvgBitangents[i + 1] += B;
+			mAvgBitangents[i + 2] += B;
 		}
 	}
 
@@ -1272,12 +1308,8 @@ Generates the average tangents
 **************************************************************************/
 void Model::GenAvgTangents()
 {
-	mAvgTangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
-	mAvgBitangents.resize(mVertices.size(), glm::vec3(0, 0, 0));
-
-	mAvgTangents = mTangents;
-
 	SortAvgTangents();
+	SortAvgBitangents();
 
 	//for each vertex
 	for (unsigned i = 0; i < mVertices.size(); i++)
@@ -1323,7 +1355,7 @@ repeated is set to the first coincidence
 void Model::SortAvgTangents()
 {
 	//epsilon value to check the position
-	float errorVal = 0.001F;
+	float errorVal = 0.01F;
 
 	//looping throught the vertices
 	for (unsigned i = 0; i < mAvgTangents.size(); i++)
@@ -1343,6 +1375,8 @@ void Model::SortAvgTangents()
 				mAvgTangents[j] = glm::vec3(0,0,0);
 			}
 		}
+
+		mAvgTangents[i] = glm::normalize(mAvgTangents[i]);
 	}
 
 	for (unsigned i = 0; i < mAvgTangents.size(); i++)
@@ -1356,10 +1390,63 @@ void Model::SortAvgTangents()
 
 			//if the difference is lower than the error value
 			if (differenceX < errorVal && differenceY < errorVal && differenceZ < errorVal)
-				mAvgTangents[i] = mAvgTangents[j];
+				mAvgTangents[j] = mAvgTangents[i];
 		}
 	}
 
+}
+
+/**************************************************************************
+*!
+\fn     Model::SortAvgBitangents
+
+\brief
+Sorts the bitangents of each vertex if any is
+repeated is set to the first coincidence
+
+*
+**************************************************************************/
+void Model::SortAvgBitangents()
+{
+	//epsilon value to check the position
+	float errorVal = 0.01F;
+
+	//looping throught the vertices
+	for (unsigned i = 0; i < mAvgBitangents.size(); i++)
+	{
+		//another loop to compare the vertices
+		for (unsigned j = i + 1; j < mAvgBitangents.size(); j++)
+		{
+			//computing the difference between the two vertex
+			float differenceX = glm::abs(mVertices[i].x - mVertices[j].x);
+			float differenceY = glm::abs(mVertices[i].y - mVertices[j].y);
+			float differenceZ = glm::abs(mVertices[i].z - mVertices[j].z);
+
+			//if the difference is lower than the error value
+			if (differenceX < errorVal && differenceY < errorVal && differenceZ < errorVal)
+			{
+				mAvgBitangents[i] += mAvgBitangents[j];
+				mAvgBitangents[j] = glm::vec3(0, 0, 0);
+			}
+		}
+
+		mAvgBitangents[i] = glm::normalize(mAvgBitangents[i]);
+	}
+
+	for (unsigned i = 0; i < mAvgBitangents.size(); i++)
+	{
+		for (unsigned j = i + 1; j < mAvgBitangents.size(); j++)
+		{
+			//computing the difference between the two vertex
+			float differenceX = glm::abs(mVertices[i].x - mVertices[j].x);
+			float differenceY = glm::abs(mVertices[i].y - mVertices[j].y);
+			float differenceZ = glm::abs(mVertices[i].z - mVertices[j].z);
+
+			//if the difference is lower than the error value
+			if (differenceX < errorVal && differenceY < errorVal && differenceZ < errorVal)
+				mAvgBitangents[j] = mAvgBitangents[i];
+		}
+	}
 }
 
 /**************************************************************************

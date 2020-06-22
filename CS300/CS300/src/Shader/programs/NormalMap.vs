@@ -6,7 +6,9 @@ layout(location = 1) in vec2 vTextCoords;
 layout(location = 2) in vec3 vNormal;
 layout(location = 3) in vec3 vAverage;
 layout(location = 4) in vec3 vTangent;
-layout(location = 5) in vec3 vBitangent;
+layout(location = 5) in vec3 vAvgTangent;
+layout(location = 6) in vec3 vBitangent;
+layout(location = 7) in vec3 vAvgBitangent;
 
 //out variables for the fragment shader
 out VS_OUT{
@@ -47,15 +49,22 @@ void main()
     
     //if average normals are used or not tranform one or the other and set it to the out variable
     if(Average == 1)
+    {
         vs_out.Normal = mat3(m2w_normal) * vAverage;
+        //computing the tangent in camera space
+        vs_out.Tangent = mat3(MV) * vAvgTangent;
+        //computing the bitangent in camera space
+        vs_out.BitTangent =  mat3(MV) * vAvgBitangent;
+    }
     else
+    {
         vs_out.Normal = mat3(m2w_normal) * vNormal;
+        //computing the tangent in camera space
+        vs_out.Tangent = mat3(MV) * vTangent;
+        //computing the bitangent in camera space
+        vs_out.BitTangent =  mat3(MV) * vBitangent;
+    }
     
-    //computing the tangent in camera space
-    //computing the bitangent in camera space
-    
-    vs_out.Tangent = mat3(MV) * vTangent;
-    vs_out.BitTangent =  mat3(MV) * vBitangent;
     
     //computing the tangent matrix 
     vs_out.TangentMat = mat3(normalize(vs_out.Tangent), normalize(vs_out.BitTangent), normalize(vs_out.Normal));

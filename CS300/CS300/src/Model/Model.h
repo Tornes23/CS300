@@ -60,9 +60,9 @@ public:
 	Model(Shape form = Cube, int precision = 9);
 
 	void UpdateModel(int modification);
-	void CreateSphere(int slices = 9, float radius = 1.0F);
-	void CreateCylinder(int slices = 9, float radius = 1.0F, float height = 1.0F);
-	void CreateCone(int slices = 9, float radius = 1.0F, float height = 1.0F);
+	void CreateSphere(int slices = 20, float radius = 1.0F);
+	void CreateCylinder(int slices = 20, float radius = 1.0F, float height = 1.0F);
+	void CreateCone(int slices = 20, float radius = 1.0F, float height = 1.0F);
 	void CreateCube();
 	void CreatePlane();
 

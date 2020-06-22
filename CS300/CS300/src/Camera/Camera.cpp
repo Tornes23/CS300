@@ -111,6 +111,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 		currentShader.Use();
 
+		currentShader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
 		//Setting the matrix uniforms
 		currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
 		currentShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
