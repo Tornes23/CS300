@@ -59,11 +59,6 @@ public:
 		NormalColoring,
 		TangentColoring,
 		BitangentColoring,
-		LightingMapUV,
-		Lighting,
-		LightingUV,
-		Regular,
-		UV,
 		Count
 
 	} RenderMode;

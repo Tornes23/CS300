@@ -136,7 +136,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		//setting the texture of the object as active
 		objects[i]->mMaterial.SetUniforms(&currentShader);
 
-		if (mMode < Regular)
+		if (mMode == LightingMap)
 			ApplyLight(currentShader, mCameraMatrix);
 
 
@@ -166,7 +166,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		}
 	}
 
-	if (mMode >= LightingMap && mMode < Regular)
+	if (mMode >= LightingMap)
 		DrawLights();
 
 	//unbinding the VAOs
@@ -658,21 +658,6 @@ ShaderProgram Camera::GetShader()
 	{
 	case LightingMap:
 		return mShaders[0];
-		break;
-	case LightingMapUV:
-		return mShaders[0];
-		break;
-	case Lighting:
-		return mShaders[1];
-		break;
-	case LightingUV:
-		return mShaders[1];
-		break;
-	case Regular:
-		return mShaders[2];
-		break;
-	case UV:
-		return mShaders[2];
 		break;
 	case NormalColoring:
 		return mShaders[3];
