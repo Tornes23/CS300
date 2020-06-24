@@ -37,8 +37,8 @@ int main()
 	Camera myCamera(glm::vec3(0, 0, 10));
 
 	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(100, 100, 100), "Floor", Model::Shape::Plane, true, glm::vec3(0, 0, -1), glm::vec3(0, 1, 0)));
-	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(-20, 0, 0), glm::vec3(5, 5, 5), "SideKick1", Model::Shape::Plane, true));
-	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(20, 0, 0), glm::vec3(5, 5, 5), "SideKick2", Model::Shape::Plane, true));
+	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(-20, 0, 0), glm::vec3(5, 5, 5), "SideKickLeft", Model::Shape::Plane, true));
+	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(20, 0, 0), glm::vec3(5, 5, 5), "SideKickRight", Model::Shape::Plane, true));
 
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(20, 20, 20),  "Plane",    Model::Shape::Plane,    true));
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(20, 20, 20),  "Cube",     Model::Shape::Cube,     false));

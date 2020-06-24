@@ -52,6 +52,7 @@ struct GameObject
 	glm::mat4x4 GenerateAxisAngleMetod(Axis rotationAxis, float amount);
 	void UpdateModel(int modify);
 	void Update();
+	void Edit(int id);
 
 	//member variables
 	glm::mat4x4 mModel2World;

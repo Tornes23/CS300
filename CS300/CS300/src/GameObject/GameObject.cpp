@@ -31,6 +31,8 @@ The functions included are:
 #include <iostream>
 #include <GLM/gtc/constants.hpp>
 #include <GLM/gtc/matrix_transform.hpp>
+#include <GLM/gtc/type_ptr.hpp>
+#include <IMGUI/imgui.h>
 
 #include "GameObject.h"
 
@@ -311,6 +313,76 @@ void GameObject::Update()
 {
 	//creating a new model to world matrix
 	GenerateM2W();
+}
+
+void GameObject::Edit(int id)
+{
+	//pushing the id
+	ImGui::PushID(id);
+
+	if (ImGui::TreeNode("Transform"))
+	{
+		ImGui::DragFloat3("Position", glm::value_ptr(mPosition));
+		ImGui::DragFloat3("Scale", glm::value_ptr(mScale));
+
+		ImGui::TreePop();
+	}
+
+	//to edit the model
+	if (ImGui::TreeNode("Model"))
+	{
+		int shape = mModel.GetShape();
+
+		const char* model[5] = { "Plane","Cube", "Cone", "Cylinder", "Sphere" };
+
+		if (ImGui::Combo("Shape", &shape, model, 5, 6)) {
+			switch (shape)
+			{
+			case 0:
+				mModel.SetShape(Model::Shape::Plane);
+				break;
+			case 1:
+				mModel.SetShape(Model::Shape::Cube);
+				break;
+			case 2:
+				mModel.SetShape(Model::Shape::Cone);
+				break;
+			case 3:
+				mModel.SetShape(Model::Shape::Cylinder);
+				break;
+			case 4:
+				mModel.SetShape(Model::Shape::Sphere);
+				break;
+			}
+		}
+
+		ImGui::TreePop();
+	}
+
+	//to edit the material properties
+	if (ImGui::TreeNode("Material"))
+	{
+		ImGui::DragFloat("Shininess", &mMaterial.mShininess);
+
+		//getting the colors and storing them in temporals
+		glm::vec3 diffuse = mMaterial.mDiffuseColor.GetColor();
+		glm::vec3 specular = mMaterial.mSpecularColor.GetColor();
+		glm::vec3 ambient = mMaterial.mAmbientColor.GetColor();
+
+		//imgui interface to edit the color
+		ImGui::ColorEdit3("Ambient Color", glm::value_ptr(ambient));
+		ImGui::ColorEdit3("Diffuse Color", glm::value_ptr(diffuse));
+		ImGui::ColorEdit3("Specular Color", glm::value_ptr(specular));
+
+		mMaterial.mAmbientColor.SetColor(ambient);
+		mMaterial.mDiffuseColor.SetColor(diffuse);
+		mMaterial.mSpecularColor.SetColor(specular);
+
+		ImGui::TreePop();
+	}
+
+	//popping the id
+	ImGui::PopID();
 }
 
 

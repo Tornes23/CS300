@@ -47,7 +47,7 @@ class GameObjectManager
 								
 		void Update();
 		void UpdateSideKicks(GameObject* side1, GameObject* side2);
-		void EditObj(GameObject* obj);
+		void Edit();
 		GameObject* FindObject(const char* name = "Box");
 		GameObject* FindActiveObject();
 		~GameObjectManager();

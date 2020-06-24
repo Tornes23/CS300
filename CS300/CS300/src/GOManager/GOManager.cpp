@@ -105,8 +105,8 @@ void GameObjectManager::Update()
 {
 	//getting the active object
 	GameObject* obj = FindActiveObject();
-	GameObject* side1 = FindObject("SideKick1");
-	GameObject* side2 = FindObject("SideKick2");
+	GameObject* side1 = FindObject("SideKickLeft");
+	GameObject* side2 = FindObject("SideKickRight");
 
 	glm::vec4 temp;
 	glm::mat4x4 axis_angle;
@@ -238,7 +238,7 @@ void GameObjectManager::Update()
 
 #pragma endregion
 
-	EditObj(obj);
+	Edit();
 
 	//calling update for each object
 	for (unsigned i = 0; i < mObjects.size(); i++)
@@ -279,81 +279,33 @@ The object to be edited
 
 *
 **************************************************************************/
-void GameObjectManager::EditObj(GameObject* obj)
+void GameObjectManager::Edit()
 {
-	//if is a valid obj
-	if (obj == nullptr)
-		return;
-
 	//creating the window
-	if (!ImGui::Begin("Game Object"))
+	if (!ImGui::Begin("Game Objects"))
 	{
 		// Early out if the window is collapsed, as an optimization.
 		ImGui::End();
 		return;
 	}
 
-	//to edit the transform
-	if (ImGui::TreeNode("Transform"))
+	for (unsigned i = 0; i < mAllObjects.size(); i++)
 	{
-		ImGui::DragFloat3("Position", glm::value_ptr(obj->mPosition));
-		ImGui::DragFloat3("Scale", glm::value_ptr(obj->mScale));
+		//if not active
+		if (!mAllObjects[i]->mActive)
+			continue;
 
-		ImGui::TreePop();
-	}
+		//setting the tab title
+		std::string title = mAllObjects[i]->mName;
 
-	//to edit the model
-	if (ImGui::TreeNode("Model"))
-	{
-		int shape = obj->mModel.GetShape();
-
-		const char* model[5] = { "Plane","Cube", "Cone", "Cylinder", "Sphere" };
-
-		if (ImGui::Combo("Shape", &shape, model, 5, 6)) {
-			switch (shape)
-			{
-			case 0:
-				obj->mModel.SetShape(Model::Shape::Plane);
-				break;
-			case 1:
-				obj->mModel.SetShape(Model::Shape::Cube);
-				break;
-			case 2:
-				obj->mModel.SetShape(Model::Shape::Cone);
-				break;
-			case 3:
-				obj->mModel.SetShape(Model::Shape::Cylinder);
-				break;
-			case 4:
-				obj->mModel.SetShape(Model::Shape::Sphere);
-				break;
-			}
+		//calling to the edit of the object
+		if (ImGui::CollapsingHeader(title.c_str()))
+		{
+			mAllObjects[i]->Edit(i);
 		}
-
-		ImGui::TreePop();
 	}
-
-	//to edit the material properties
-	if (ImGui::TreeNode("Material"))
-	{
-		ImGui::DragFloat("Shininess", &obj->mMaterial.mShininess);
-
-		//getting the colors and storing them in temporals
-		glm::vec3 diffuse = obj->mMaterial.mDiffuseColor.GetColor();
-		glm::vec3 specular = obj->mMaterial.mSpecularColor.GetColor();
-		glm::vec3 ambient = obj->mMaterial.mAmbientColor.GetColor();
-
-		//imgui interface to edit the color
-		ImGui::ColorEdit3("Ambient Color", glm::value_ptr(ambient));
-		ImGui::ColorEdit3("Diffuse Color", glm::value_ptr(diffuse));
-		ImGui::ColorEdit3("Specular Color", glm::value_ptr(specular));
-
-		obj->mMaterial.mAmbientColor.SetColor(ambient);
-		obj->mMaterial.mDiffuseColor.SetColor(diffuse);
-		obj->mMaterial.mSpecularColor.SetColor(specular);
-
-		ImGui::TreePop();
-	}
+	//to edit the transform
+	
 	
 	ImGui::End();
 }

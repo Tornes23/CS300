@@ -65,7 +65,7 @@ Camera::Camera(glm::vec3 direction)
 	ComputePos();
 	mNear = 0.1F;
 	mFar = 100.0F;
-	mRadius = 40.0F;
+	mRadius = 50.0F;
 
 	mWireframe = false;
 	mRenderNormals = false;
