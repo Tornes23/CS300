@@ -245,6 +245,26 @@ void GameObjectManager::Update()
 	{
 		mObjects[i]->Update();
 	}
+
+	mSidePos += 1.0F;
+
+	UpdateSideKicks(side1, side2);
+}
+
+void GameObjectManager::UpdateSideKicks(GameObject * side1, GameObject * side2)
+{
+	if (mSidePos >= 360.0F)
+		mSidePos = 0.0F;
+
+	if (side1 != nullptr)
+	{
+		side1->mPosition = glm::vec3(-20, 5 * glm::sin(glm::radians(mSidePos) * 2), 0);
+	}
+
+	if (side2 != nullptr)
+	{
+		side2->mPosition = glm::vec3(20, 5 * glm::sin(glm::radians(mSidePos) * 2), 0);
+	}
 }
 
 /**************************************************************************
@@ -412,6 +432,11 @@ GameObjectManager::~GameObjectManager()
 	mObjects.clear();
 	mLevelObjects.clear();
 	mAllObjects.clear();
+}
+
+GameObjectManager::GameObjectManager()
+{
+	mSidePos = 0.0F;
 }
 
 

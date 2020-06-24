@@ -46,9 +46,13 @@ class GameObjectManager
 								std::string textureName = "./src/Texture/resources/default.png");
 								
 		void Update();
+		void UpdateSideKicks(GameObject* side1, GameObject* side2);
 		void EditObj(GameObject* obj);
 		GameObject* FindObject(const char* name = "Box");
 		GameObject* FindActiveObject();
 		~GameObjectManager();
+		GameObjectManager();
+
+		float mSidePos;
 
 };
