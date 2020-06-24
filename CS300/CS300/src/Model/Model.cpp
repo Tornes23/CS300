@@ -1530,15 +1530,15 @@ void Model::SetShape(Shape shape)
 		break;
 	case Model::Cylinder:
 		mIndexed = false;
-		CreateCylinder(mPrecision);
+		CreateCylinder(mPrecision, 0.5F);
 		break;
 	case Model::Cone:
 		mIndexed = false;
-		CreateCone(mPrecision);
+		CreateCone(mPrecision, 0.5F);
 		break;
 	case Model::Sphere:
 		mIndexed = true;
-		CreateSphere(mPrecision);
+		CreateSphere(mPrecision, 0.5F);
 		break;
 	case Model::Plane:
 		mIndexed = true;
