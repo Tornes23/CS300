@@ -236,19 +236,22 @@ void GameObjectManager::Update()
 		side2->mModel.SetShape(Model::Shape::Sphere);
 	}
 
+	if (KeyTriggered(O))
+		mbSideAnim = !mbSideAnim;
+
 #pragma endregion
 
 	Edit();
 
 	//calling update for each object
 	for (unsigned i = 0; i < mObjects.size(); i++)
-	{
 		mObjects[i]->Update();
+
+	if (mbSideAnim)
+	{
+		mSidePos += 1.0F;
+		UpdateSideKicks(side1, side2);
 	}
-
-	mSidePos += 1.0F;
-
-	UpdateSideKicks(side1, side2);
 }
 
 void GameObjectManager::UpdateSideKicks(GameObject * side1, GameObject * side2)
@@ -389,6 +392,7 @@ GameObjectManager::~GameObjectManager()
 GameObjectManager::GameObjectManager()
 {
 	mSidePos = 0.0F;
+	mbSideAnim = true;
 }
 
 

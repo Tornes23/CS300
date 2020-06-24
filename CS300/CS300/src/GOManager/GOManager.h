@@ -54,5 +54,6 @@ class GameObjectManager
 		GameObjectManager();
 
 		float mSidePos;
+		bool mbSideAnim;
 
 };

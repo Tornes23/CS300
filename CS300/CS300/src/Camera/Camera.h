@@ -121,4 +121,6 @@ private:
 
 	std::vector<ShaderProgram> mShaders;
 	std::vector<Light> mLights;
+
+	int mPCFSamples;
 };

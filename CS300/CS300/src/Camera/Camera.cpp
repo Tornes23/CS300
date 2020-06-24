@@ -67,6 +67,8 @@ Camera::Camera(glm::vec3 direction)
 	mFar = 100.0F;
 	mRadius = 50.0F;
 
+	mPCFSamples = 0;
+
 	mWireframe = false;
 	mRenderNormals = false;
 	mAveragedNormals = false;
@@ -236,6 +238,15 @@ void Camera::Update()
 
 	if (KeyTriggered(P))
 		mLightAnimation = !mLightAnimation;
+
+	if (KeyTriggered(Z))
+	{
+		if (mPCFSamples - 1 >= 0)
+			mPCFSamples--;
+	}
+
+	if (KeyTriggered(X))
+		mPCFSamples++;
 
 	Light::LightType lastMode = mLightMode;
 
