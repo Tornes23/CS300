@@ -36,13 +36,15 @@ int main()
 	Utils::InitGL(&myWindow);
 	Camera myCamera(glm::vec3(0, 0, 10));
 
-	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(50, 50, 1), "Floor", Model::Shape::Plane, true, glm::vec3(0, 0, -1), glm::vec3(0, 1, 0)));
+	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(100, 100, 100), "Floor", Model::Shape::Plane, true, glm::vec3(0, 0, -1), glm::vec3(0, 1, 0)));
+	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(-20, 0, 0), glm::vec3(5, 5, 5), "SideKick1", Model::Shape::Plane, true));
+	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(20, 0, 0), glm::vec3(5, 5, 5), "SideKick2", Model::Shape::Plane, true));
 
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Plane",    Model::Shape::Plane,    true));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cube",     Model::Shape::Cube,     false));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cone",     Model::Shape::Cone,     false));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Cylinder", Model::Shape::Cylinder, false));
-	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(10, 10, 10),  "Sphere",   Model::Shape::Sphere,   false));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(20, 20, 20),  "Plane",    Model::Shape::Plane,    true));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(20, 20, 20),  "Cube",     Model::Shape::Cube,     false));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(20, 20, 20),  "Cone",     Model::Shape::Cone,     false));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(20, 20, 20),  "Cylinder", Model::Shape::Cylinder, false));
+	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(20, 20, 20),  "Sphere",   Model::Shape::Sphere,   false));
 
 	while (!myWindow.IsClosed())
 	{

@@ -105,6 +105,9 @@ void GameObjectManager::Update()
 {
 	//getting the active object
 	GameObject* obj = FindActiveObject();
+	GameObject* side1 = FindObject("SideKick1");
+	GameObject* side2 = FindObject("SideKick2");
+
 	glm::vec4 temp;
 	glm::mat4x4 axis_angle;
 
@@ -192,30 +195,45 @@ void GameObjectManager::Update()
 	{
 		obj->mActive = false;
 		FindObject("Plane")->mActive = true;
+
+		side1->mModel.SetShape(Model::Shape::Plane);
+		side2->mModel.SetShape(Model::Shape::Plane);
 	}
 
 	if (KeyTriggered(num2))
 	{
 		obj->mActive = false;
 		FindObject("Cube")->mActive = true;
+
+		side1->mModel.SetShape(Model::Shape::Cube);
+		side2->mModel.SetShape(Model::Shape::Cube);
 	}
 
 	if (KeyTriggered(num3))
 	{
 		obj->mActive = false;
 		FindObject("Cone")->mActive = true;
+
+		side1->mModel.SetShape(Model::Shape::Cone);
+		side2->mModel.SetShape(Model::Shape::Cone);
 	}
 
 	if (KeyTriggered(num4))
 	{
 		obj->mActive = false;
 		FindObject("Cylinder")->mActive = true;
+
+		side1->mModel.SetShape(Model::Shape::Cylinder);
+		side2->mModel.SetShape(Model::Shape::Cylinder);
 	}
 
 	if (KeyTriggered(num5))
 	{
 		obj->mActive = false;
 		FindObject("Sphere")->mActive = true;
+
+		side1->mModel.SetShape(Model::Shape::Sphere);
+		side2->mModel.SetShape(Model::Shape::Sphere);
 	}
 
 #pragma endregion

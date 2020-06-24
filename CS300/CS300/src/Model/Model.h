@@ -49,13 +49,13 @@ class Model
 {
 public:
 
-	enum Shape {
+	typedef enum Shape {
 		Plane,
 		Cube,
 		Cone,
 		Cylinder,
 		Sphere
-	};
+	} Shape;
 
 	Model(Shape form = Cube, int precision = 9);
 

@@ -72,9 +72,9 @@ Camera::Camera(glm::vec3 direction)
 	mAveragedNormals = false;
 	mLightAnimation = true;
 
-	mMode = LightingMap;
+	mMode = Lighting;
 
-	mLightMode = Light::LightType::Point;
+	mLightMode = Light::LightType::Spotlight;
 
 	AddAllShaders();
 	AddLight();
@@ -136,7 +136,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		//setting the texture of the object as active
 		objects[i]->mMaterial.SetUniforms(&currentShader);
 
-		if (mMode == LightingMap)
+		if (mMode == Lighting)
 			ApplyLight(currentShader, mCameraMatrix);
 
 
@@ -166,7 +166,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		}
 	}
 
-	if (mMode >= LightingMap)
+	if (mMode >= Lighting)
 		DrawLights();
 
 	//unbinding the VAOs
@@ -248,11 +248,11 @@ void Camera::Update()
 	if (KeyDown(num9))
 		mLightMode = Light::LightType::Directional;
 
-	if (KeyTriggered(R))
-		AddLight();
-
-	if (KeyTriggered(Y))
-		RemoveLight();
+	//if (KeyTriggered(R))
+	//	AddLight();
+	//
+	//if (KeyTriggered(Y))
+	//	RemoveLight();
 
 #pragma endregion
 
@@ -656,8 +656,8 @@ ShaderProgram Camera::GetShader()
 
 	switch (mMode)
 	{
-	case LightingMap:
-		return mShaders[0];
+	case Lighting:
+		return mShaders[1];
 		break;
 	case NormalColoring:
 		return mShaders[3];
