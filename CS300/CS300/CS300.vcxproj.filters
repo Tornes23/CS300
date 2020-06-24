@@ -82,6 +82,9 @@
     <Filter Include="Source Files\Shader\Programs\Normals\Average">
       <UniqueIdentifier>{a8f9d983-af4d-416e-bf5f-d8a6e690897c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\FrameBuffer">
+      <UniqueIdentifier>{74964de9-bffb-442c-af7f-115c2ace4401}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -147,6 +150,9 @@
     <ClCompile Include="..\include\IMGUI\imgui_widgets.cpp">
       <Filter>Source Files\Editor\ImGUI</Filter>
     </ClCompile>
+    <ClCompile Include="src\FrameBuffer\FrameBuffer.cpp">
+      <Filter>Source Files\FrameBuffer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera\Camera.h">
@@ -193,6 +199,9 @@
     </ClInclude>
     <ClInclude Include="src\Editor\Editor.h">
       <Filter>Source Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FrameBuffer\FrameBuffer.h">
+      <Filter>Source Files\FrameBuffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

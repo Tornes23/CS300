@@ -39,6 +39,7 @@ The functions included are:
 ***************************************************************************/
 #include <iostream>
 #include <GLM/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform2.hpp>
 #include <GLM/gtc/type_ptr.hpp>
 #include <SDL2/SDL.h>
 #include <IMGUI/imgui.h>
@@ -55,7 +56,7 @@ The default Constructor of the class
 
 *
 **************************************************************************/
-Camera::Camera(glm::vec3 direction)
+Camera::Camera(glm::vec3 direction) : mFrameBuffer(), mRenderPlane(Model::Shape::Plane)
 {
 	mView = glm::normalize(direction);
 
@@ -102,6 +103,9 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	GLenum error = glGetError();
 	//getting the shader which will be used
 	
+	mFrameBuffer.UseRenderBuffer();
+	mFrameBuffer.ClearRenderBuffer();
+
 	//for each object
 	for (unsigned i = 0; i < objects.size(); i++)
 	{
@@ -171,9 +175,44 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	if (mMode >= Lighting)
 		DrawLights();
 
+	Display();
+	
 	//unbinding the VAOs
 	glBindVertexArray(0);
 	glUseProgram(0);
+
+}
+
+void Camera::Display()
+{
+	// Bind screen buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Clear screen framebuffer
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Select shader program, set uniforms and draw (use the plane in parameters)
+	ShaderProgram secondPass = GetDisplayShader();
+
+	secondPass.Use();
+
+	glm::mat4 transform = glm::scale(glm::vec3(2.0F));
+
+	secondPass.SetMatUniform("M", glm::value_ptr(transform));
+
+	GLenum error = glGetError();
+
+	//binding the objects VAO
+	glBindVertexArray(mRenderPlane.GetVAO());
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mFrameBuffer.GetRenderTexture());
+	secondPass.SetIntUniform("textureData", 0);
+
+	// Draw
+	glDrawArrays(GL_TRIANGLES, 0, mRenderPlane.GetDrawElements());
+
 }
 
 /**************************************************************************
@@ -435,7 +474,8 @@ void Camera::AddAllShaders()
 	AddShader("./src/Shader/programs/Lighting.vs"          , "./src/Shader/programs/Lighting.fs"          );
 	AddShader("./src/Shader/programs/Texture.vs"           , "./src/Shader/programs/Texture.fs"           );
 	AddShader("./src/Shader/programs/VectorColoring.vs"    , "./src/Shader/programs/VectorColoring.fs"    );
-	AddShader("./src/Shader/programs/Normals.vs"           , "./src/Shader/programs/Normals.fs"        , "./src/Shader/programs/Normals.gs");
+	AddShader("./src/Shader/programs/Normals.vs"           , "./src/Shader/programs/Normals.fs"           , "./src/Shader/programs/Normals.gs");
+	AddShader("./src/Shader/programs/Quad.vs"              , "./src/Shader/programs/Quad.fs"              );
 
 }
 
@@ -704,6 +744,11 @@ returns the shader program
 ShaderProgram Camera::GetNormalShader()
 {
 	return mShaders[4];//normals shader
+}
+
+ShaderProgram Camera::GetDisplayShader()
+{
+	return mShaders[5];
 }
 
 const Light Camera::GetLight() const

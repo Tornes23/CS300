@@ -46,6 +46,7 @@ The functions included are:
 #include "../Window/Window.h"
 #include "../Shader/Shader.h"
 #include "../Light/Light.h"
+#include "../FrameBuffer/FrameBuffer.h"
 
 struct GameObject;
 
@@ -65,6 +66,7 @@ public:
 
 	Camera(glm::vec3 direction = glm::vec3(0,0,-1));
 	void Render(std::vector<GameObject*>& objects);
+	void Display();
 	void ComputePos();
 	void Update();
 
@@ -88,6 +90,7 @@ public:
 	void AddShader(const std::string& vertex, const std::string& fragment, const std::string& geometry = "");
 	ShaderProgram GetShader();
 	ShaderProgram GetNormalShader();
+	ShaderProgram GetDisplayShader();
 
 	const Light GetLight() const;
 
@@ -119,8 +122,12 @@ private:
 
 	Light::LightType mLightMode;
 
+	FrameBuffer mFrameBuffer;
+
 	std::vector<ShaderProgram> mShaders;
 	std::vector<Light> mLights;
+
+	Model mRenderPlane;
 
 	int mPCFSamples;
 };
