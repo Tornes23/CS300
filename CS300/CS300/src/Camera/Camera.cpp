@@ -70,8 +70,6 @@ Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport
 
 	mViewport = viewport;
 
-	mPCFSamples = 0;
-
 	mWireframe = false;
 	mRenderNormals = false;
 	mAveragedNormals = true;
@@ -83,6 +81,8 @@ Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport
 
 	AddAllShaders();
 	AddLight();
+
+	mLights[0].SetShadowMap(mFrameBuffer.GetShadowMap());
 }
 
 /**************************************************************************
@@ -154,10 +154,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		//setting the texture of the object as active
 		objects[i]->mMaterial.SetUniforms(&currentShader);
 
-		glActiveTexture(GL_TEXTURE0 + 1);
-		glBindTexture(GL_TEXTURE_2D, mFrameBuffer.GetShadowMap());
-		currentShader.SetIntUniform("shadowMap", 1);
-	
 		if (mMode == Shadows)
 			ApplyLight(currentShader, mCameraMatrix);
 	
@@ -352,12 +348,12 @@ void Camera::Update()
 
 	if (KeyTriggered(Z))
 	{
-		if (mPCFSamples - 1 >= 0)
-			mPCFSamples--;
+		if (mLights[0].GetPCFSamples() - 1 > 0)
+			mLights[0].SetPCFSamples(-1);
 	}
 
 	if (KeyTriggered(X))
-		mPCFSamples++;
+		mLights[0].SetPCFSamples(1);
 
 	Light::LightType lastMode = mLightMode;
 

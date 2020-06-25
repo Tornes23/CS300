@@ -133,6 +133,4 @@ private:
 	std::vector<Light> mLights;
 
 	Model mRenderPlane;
-
-	int mPCFSamples;
 };

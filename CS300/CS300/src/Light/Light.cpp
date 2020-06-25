@@ -120,6 +120,9 @@ Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color amb
 	mCosOuter = outer;
 	mFallOff = falloff;
 
+	mPCFSamples = 10;
+	mBias = 3;
+
 	//setting the animation variable
 	mbAnimation = true;
 }
@@ -199,6 +202,14 @@ void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::m
 	shader->SetFloatUniform(shaderString + ".CosInner", cosf(glm::radians(mCosInner)));
 	shader->SetFloatUniform(shaderString + ".CosOuter", cosf(glm::radians(mCosOuter)));
 	shader->SetFloatUniform(shaderString + ".FallOff", mFallOff);
+
+	shader->SetIntUniform(shaderString + ".PCFSamples", mPCFSamples);
+
+	shader->SetIntUniform(shaderString + ".Bias", mBias);
+
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, mShadowMap);
+	shader->SetIntUniform(shaderString + ".ShadowMap", 1);
 	
 
 }
@@ -517,6 +528,9 @@ void Light::Edit(int id)
 		ImGui::DragFloat("Fall Off", &mFallOff);
 		ImGui::DragFloat("Radius", &mRadius);
 
+		ImGui::DragInt("PCF Samples", &mPCFSamples);
+		ImGui::DragInt("Bias", &mBias);
+
 		//setting the colors
 		mAmbientColor.SetColor(ambient);
 		mDiffuseColor.SetColor(diffuse);
@@ -528,5 +542,20 @@ void Light::Edit(int id)
 	//popping the id
 	ImGui::PopID();
 
+}
+
+void Light::SetShadowMap(GLuint shadow)
+{
+	mShadowMap = shadow;
+}
+
+int Light::GetPCFSamples() const
+{
+	return mPCFSamples;
+}
+
+void Light::SetPCFSamples(int modify)
+{
+	mPCFSamples += modify;
 }
 

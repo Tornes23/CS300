@@ -18,6 +18,11 @@ struct Light{
     float CosOuter;
     float FallOff;
     
+    int PCFSamples;
+    
+    int Bias;
+    
+    sampler2D ShadowMap;
 };
 
 //Material structure
@@ -53,27 +58,38 @@ in vec4 FragLightSpc;
 
 //uniform variable to get the data of the texture
 uniform sampler2D textureData;
-uniform sampler2D shadowMap;
 
-//float ComputePCFShadow()
-//{
-//    
-//}
+float ComputePCFShadow(vec2 uv, float posDepth)
+{
+    vec2 offset = 1.0 / textureSize(lightSources[0].ShadowMap, 0);
+    int samples = lightSources[0].PCFSamples;
+    float visibility = 0.0;
+    int count = 0;
+
+    for(int x = -samples; x <= samples; x++)
+    {
+        for(int y = -samples; y <= samples; y++)
+        {
+            float shadowDepth = texture(lightSources[0].ShadowMap, uv + offset * vec2(x, y)).r;
+            visibility += ((shadowDepth - posDepth) > 0.0) ? 1.0 : 0.0;
+            count++;
+        }
+    }
+
+    return visibility / count;
+}
 
 float ComputeShadow()
 {
     // perform perspective divide
-    vec3 projCoords = FragLightSpc.xyz / FragLightSpc.w;
+    vec3 projCoords = (FragLightSpc.xyz) / FragLightSpc.w;
     // transform to [0,1] range
-    projCoords = projCoords * 0.5 + 0.5;
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(shadowMap, projCoords.xy).r; 
-    // get depth of current fragment from light's perspective
-    float currentDepth = projCoords.z;
-    // check whether current frag pos is in shadow
-    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+    vec2 shadowUV = projCoords.st * 0.5 + 0.5;
+    
+    float positionDepth = (FragLightSpc.z + lightSources[0].Bias ) / FragLightSpc.w;
+    
 
-    return shadow;
+    return ComputePCFShadow(shadowUV, positionDepth);
 }
 
 

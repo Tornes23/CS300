@@ -80,6 +80,10 @@ public:
 
 	void Edit(int id);
 
+	void SetShadowMap(GLuint shadow);
+	int GetPCFSamples() const;
+	void SetPCFSamples(int modify);
+
 private:
 
 	Model mModel;
@@ -103,6 +107,11 @@ private:
 	float mCosOuter;
 	float mFallOff;
 	float mRadius;
+
+	int mPCFSamples;
+	int mBias;
+
+	GLuint mShadowMap;
 
 	bool mbAnimation;
 };
