@@ -202,17 +202,13 @@ void Camera::RenderDepth(std::vector<GameObject*>& objects)
 
 	ShaderProgram depthShader = GetDepthShader();
 
-	glm::mat4x4 lightSpace = mLights[0].GetLightSpaceMat(mNear, mFar, mViewport);
+	glm::mat4x4 mLightView = mLights[0].GetView();
+	glm::mat4x4 mLightProj = mLights[0].GetPerspective(mNear, mFar, mViewport);
 
 	depthShader.Use();
 
-	depthShader.SetMatUniform("lightSpace", glm::value_ptr(lightSpace));
-
-	depthShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
-	depthShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
-
-	depthShader.SetFloatUniform("near_plane", mNear);
-	depthShader.SetFloatUniform("far_plane", mFar);
+	depthShader.SetMatUniform("view", glm::value_ptr(mLightView));
+	depthShader.SetMatUniform("projection", glm::value_ptr(mLightProj));
 
 	mFrameBuffer.UseDepthBuffer();
 

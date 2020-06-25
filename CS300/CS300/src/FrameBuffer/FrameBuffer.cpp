@@ -110,6 +110,8 @@ void FrameBuffer::UseRenderBuffer()
 //~
 void FrameBuffer::UseDepthBuffer()
 {
+	glViewport(0, 0, mShadowMapWidth, mShadowMapHeight);
+
 	// Bind created FBO
 	glBindFramebuffer(GL_FRAMEBUFFER, mDepthBuffer);
 	

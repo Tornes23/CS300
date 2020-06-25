@@ -299,17 +299,22 @@ glm::mat4x4 Light::GetM2W()
 	return mModel2World;
 }
 
-glm::mat4x4 Light::GetLightSpaceMat(float near, float far, glm::ivec2 viewport)
+glm::mat4x4 Light::GetPerspective(float near, float far, glm::ivec2 viewport)
 {
-	glm::mat4x4 lighProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(viewport.x) / static_cast<float>(viewport.y), near, far);
+	mProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(viewport.x) / static_cast<float>(viewport.y), near, far);
 
-	glm::vec3 upVec = glm::normalize(glm::cross(glm::cross(mDirection, glm::vec3(0, 1, 0)),  mDirection));
+	return mProjection;
+}
 
-	glm::mat4x4 lighDirection = glm::lookAt(mPosition, mDirection, upVec);
+glm::mat4x4 Light::GetView()
+{
+	glm::vec3 upVec = glm::normalize(glm::cross(glm::cross(mDirection, glm::vec3(0, 1, 0)), mDirection));
 
-	mLightSpaceMat = lighProjection * lighDirection;
+	mView = glm::lookAt(mPosition, mDirection, upVec);
 
-	return mLightSpaceMat;
+	//mView = glm::lookAt(mPosition, glm::vec3(0.0F), glm::vec3(0, 1, 0));
+
+	return mView;
 }
 
 /**************************************************************************
