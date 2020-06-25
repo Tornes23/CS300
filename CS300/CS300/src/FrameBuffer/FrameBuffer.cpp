@@ -105,6 +105,10 @@ void FrameBuffer::UseRenderBuffer()
 
 	// Bind created FBO
 	glBindFramebuffer(GL_FRAMEBUFFER, mRenderBuffer);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glCullFace(GL_BACK);
 }
 
 //~
@@ -116,6 +120,8 @@ void FrameBuffer::UseDepthBuffer()
 	glBindFramebuffer(GL_FRAMEBUFFER, mDepthBuffer);
 	
 	glClear(GL_DEPTH_BUFFER_BIT);
+	
+	glCullFace(GL_FRONT);
 }
 
 //~

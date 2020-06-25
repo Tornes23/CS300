@@ -301,7 +301,7 @@ glm::mat4x4 Light::GetM2W()
 
 glm::mat4x4 Light::GetPerspective(float near, float far, glm::ivec2 viewport)
 {
-	mProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(viewport.x) / static_cast<float>(viewport.y), near, far);
+	mProjection = glm::perspective(glm::radians(45.0F), static_cast<float>(viewport.x) / static_cast<float>(viewport.y), near, far);
 
 	return mProjection;
 }

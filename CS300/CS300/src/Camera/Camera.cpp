@@ -271,8 +271,8 @@ void Camera::Display()
 	glBindVertexArray(mRenderPlane.GetVAO());
 
 	glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, mFrameBuffer.GetRenderTexture());
-	glBindTexture(GL_TEXTURE_2D, mLights[0].GetShadowMap());
+	glBindTexture(GL_TEXTURE_2D, mFrameBuffer.GetRenderTexture());
+	//glBindTexture(GL_TEXTURE_2D, mLights[0].GetShadowMap());
 	secondPass.SetIntUniform("textureData", 0);
 
 	// Draw
