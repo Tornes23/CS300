@@ -1,7 +1,7 @@
 #version 400 core
 
 in vec2 UV;
-layout(location = 0) out vec3 FragColor;
+layout(location = 0) out vec4 FragColor;
 
 uniform sampler2D textureData;
 uniform float near_plane;
@@ -21,5 +21,5 @@ void main()
     //
     //FragColor = vec4(vec3(LinearizeDepth(depthValue) / far_plane), 1.0); // perspective
      
-    FragColor =  texture(textureData, UV).rgb;
+    FragColor =  texture(textureData, UV).rgba;
 }
