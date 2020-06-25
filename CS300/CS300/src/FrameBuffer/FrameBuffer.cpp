@@ -9,6 +9,8 @@ FrameBuffer::FrameBuffer(int width, int height)
 	mShadowMapWidth = 1024;
 	mShadowMapHeight = 1024;
 
+	mContrast = 1.0F;
+
 	GenRenderBuffer();
 	GenDepthBuffer();
 
@@ -88,6 +90,16 @@ const GLuint FrameBuffer::GetRenderTexture() const
 const GLuint FrameBuffer::GetShadowMap() const
 {
 	return mShadowMap;
+}
+
+const float FrameBuffer::GetContrast() const
+{
+	return mContrast;
+}
+
+void FrameBuffer::SetContrast(float val)
+{
+	mContrast = val;
 }
 
 

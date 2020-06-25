@@ -68,6 +68,7 @@ public:
 	void Render(std::vector<GameObject*>& objects);
 	void RenderDepth(std::vector<GameObject*>& objects);
 	void Display();
+	void DisplayShadowMap();
 	void ComputePos();
 	void Update();
 
@@ -95,6 +96,7 @@ public:
 	ShaderProgram GetNormalShader();
 	ShaderProgram GetDisplayShader();
 	ShaderProgram GetDepthShader();
+	ShaderProgram GetShadowMapShader();
 
 	const Light GetLight() const;
 
@@ -133,4 +135,5 @@ private:
 	std::vector<Light> mLights;
 
 	Model mRenderPlane;
+	Model mShadowPlane;
 };

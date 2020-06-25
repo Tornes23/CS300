@@ -13,6 +13,9 @@ public:
 	const GLuint GetRenderTexture() const;
 	const GLuint GetDepthBuffer() const;
 	const GLuint GetShadowMap() const;
+	const float  GetContrast() const;
+	
+	void  SetContrast(float val);
 
 	void UseRenderBuffer();
 	void UseDepthBuffer();
@@ -27,6 +30,8 @@ private:
 
 	int mShadowMapWidth;
 	int mShadowMapHeight;
+
+	float mContrast;
 
 	GLuint mShadowMap;
 

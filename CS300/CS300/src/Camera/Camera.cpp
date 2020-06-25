@@ -56,7 +56,7 @@ The default Constructor of the class
 
 *
 **************************************************************************/
-Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport.x, viewport.y), mRenderPlane(Model::Shape::Plane)
+Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport.x, viewport.y), mRenderPlane(Model::Shape::Plane), mShadowPlane(Model::Shape::Plane)
 {
 	mView = glm::normalize(direction);
 
@@ -252,32 +252,64 @@ void Camera::Display()
 {
 	// Bind screen buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+	
 	// Clear screen framebuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
 	// Select shader program, set uniforms and draw (use the plane in parameters)
 	ShaderProgram secondPass = GetDisplayShader();
-
+	
 	secondPass.Use();
+	
+	glm::mat4 transform = glm::scale(glm::vec3(2.0F));
+	
+	secondPass.SetMatUniform("M", glm::value_ptr(transform));
+	
+	GLenum error = glGetError();
+	
+	//binding the objects VAO
+	glBindVertexArray(mRenderPlane.GetVAO());
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mFrameBuffer.GetRenderTexture());
+	secondPass.SetIntUniform("textureData", 0);
+	
+	// Draw
+	glDrawArrays(GL_TRIANGLES, 0, mRenderPlane.GetDrawElements());
+
+	DisplayShadowMap();
+
+}
+
+void Camera::DisplayShadowMap()
+{
+
+	glViewport(0, 0, 256, 256);
+
+	// Clear screen framebuffer
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	// Select shader program, set uniforms and draw (use the plane in parameters)
+	ShaderProgram shadowMap = GetShadowMapShader();
+
+	shadowMap.Use();
 
 	glm::mat4 transform = glm::scale(glm::vec3(2.0F));
 
-	secondPass.SetMatUniform("M", glm::value_ptr(transform));
+	shadowMap.SetMatUniform("M", glm::value_ptr(transform));
+	shadowMap.SetFloatUniform("Contrast", mFrameBuffer.GetContrast());
 
 	GLenum error = glGetError();
 
 	//binding the objects VAO
-	glBindVertexArray(mRenderPlane.GetVAO());
+	glBindVertexArray(mShadowPlane.GetVAO());
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mFrameBuffer.GetRenderTexture());
-	//glBindTexture(GL_TEXTURE_2D, mLights[0].GetShadowMap());
-	secondPass.SetIntUniform("textureData", 0);
+	glBindTexture(GL_TEXTURE_2D, mLights[0].GetShadowMap());
+	shadowMap.SetIntUniform("textureData", 0);
 
 	// Draw
-	glDrawArrays(GL_TRIANGLES, 0, mRenderPlane.GetDrawElements());
-
+	glDrawArrays(GL_TRIANGLES, 0, mShadowPlane.GetDrawElements());
 }
 
 /**************************************************************************
@@ -539,7 +571,8 @@ void Camera::AddAllShaders()
 	AddShader("./src/Shader/programs/Normals.vs"           , "./src/Shader/programs/Normals.fs"           , "./src/Shader/programs/Normals.gs");
 	AddShader("./src/Shader/programs/Quad.vs"              , "./src/Shader/programs/Quad.fs"              );
 	AddShader("./src/Shader/programs/Shadows.vs"           , "./src/Shader/programs/Shadows.fs"           );
-	AddShader("./src/Shader/programs/Depth.vs"             , "./src/Shader/programs/Depth.fs"           );
+	AddShader("./src/Shader/programs/Depth.vs"             , "./src/Shader/programs/Depth.fs"             );
+	AddShader("./src/Shader/programs/ShadowMap.vs"         , "./src/Shader/programs/ShadowMap.fs"         );
 
 }
 
@@ -653,6 +686,12 @@ void Camera::Edit()
 		ImGui::End();
 		return;
 	}
+
+	float con = mFrameBuffer.GetContrast();
+
+	ImGui::DragFloat("Contrast", &con, 0.005F, 0.0F, 1.0F);
+
+	mFrameBuffer.SetContrast(con);
 
 	//for each light
 	for (unsigned i = 0; i < mLights.size(); i++)
@@ -825,6 +864,11 @@ ShaderProgram Camera::GetDisplayShader()
 ShaderProgram Camera::GetDepthShader()
 {
 	return mShaders[7];
+}
+
+ShaderProgram Camera::GetShadowMapShader()
+{
+	return mShaders[8];
 }
 
 const Light Camera::GetLight() const
