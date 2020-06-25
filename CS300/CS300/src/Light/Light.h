@@ -66,6 +66,7 @@ public:
 	void Update();
 	void Render();
 	glm::mat4x4 GetM2W();
+	glm::mat4x4 GetLightSpaceMat(float near, float far, glm::ivec2 viewport);
 	void ComputePos();
 
 	const glm::vec3 GetAmbient();
@@ -90,6 +91,7 @@ private:
 	ShaderProgram mShader;
 	glm::vec3 mScale;
 	glm::mat4x4 mModel2World;
+	glm::mat4x4 mLightSpaceMat;
 
 	LightType mType;
 

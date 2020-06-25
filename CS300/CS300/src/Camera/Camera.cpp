@@ -202,9 +202,7 @@ void Camera::RenderDepth(std::vector<GameObject*>& objects)
 
 	ShaderProgram depthShader = GetDepthShader();
 
-	glm::mat4x4 lighProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(mViewport.x) / static_cast<float>(mViewport.y), mNear, mFar);
-	glm::mat4x4 lighDirection = glm::lookAt(mLights[0].GetPosition(), glm::vec3(0.0F), glm::vec3(0.0F, 1.0F, 0.0F));
-	glm::mat4x4 lightSpace = lighProjection * lighDirection;
+	glm::mat4x4 lightSpace = mLights[0].GetLightSpaceMat(mNear, mFar, mViewport);
 
 	depthShader.Use();
 

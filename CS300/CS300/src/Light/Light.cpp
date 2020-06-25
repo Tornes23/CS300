@@ -35,7 +35,8 @@ The functions included are:
 
 ***************************************************************************/
 
-
+#include <GLM/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform2.hpp>
 #include <GLM/gtc/type_ptr.hpp>
 #include <IMGUI/imgui.h>
 #include "Light.h"
@@ -296,6 +297,17 @@ glm::mat4x4 Light::GetM2W()
 
 	//returning the matrix
 	return mModel2World;
+}
+
+glm::mat4x4 Light::GetLightSpaceMat(float near, float far, glm::ivec2 viewport)
+{
+	glm::mat4x4 lighProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(viewport.x) / static_cast<float>(viewport.y), near, far);
+
+	glm::mat4x4 lighDirection = glm::lookAt(mPosition, glm::vec3(0.0F), glm::vec3(0.0F, 1.0F, 0.0F));
+
+	mLightSpaceMat = lighProjection * lighDirection;
+
+	return mLightSpaceMat;
 }
 
 /**************************************************************************
