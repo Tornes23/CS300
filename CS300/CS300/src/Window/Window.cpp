@@ -98,7 +98,7 @@ Returns a vec2 containing the viewport size
 
 *
 **************************************************************************/
-glm::vec2 Window::GetViewport() const
+glm::ivec2 Window::GetViewport() const
 {
 	//rerturning the viewpor size
 	return mSize;

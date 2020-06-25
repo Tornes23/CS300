@@ -40,7 +40,7 @@ public:
 	Window(int width = 1280, int height = 720, const char* title = "CS300");
 
 	//getter function
-	glm::vec2 GetViewport() const;
+	glm::ivec2 GetViewport() const;
 
 	//utility functions
 	void Update();

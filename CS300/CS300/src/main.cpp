@@ -34,7 +34,7 @@ int main()
 	GameObjectManager myManager;
 
 	Utils::InitGL(&myWindow);
-	Camera myCamera(glm::vec3(0, 0, 10));
+	Camera myCamera(glm::vec3(0, 0, 10), myWindow.GetViewport());
 
 	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(100, 100, 100), "Floor", Model::Shape::Plane, true, glm::vec3(0, 0, -1), glm::vec3(0, 1, 0)));
 	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(-20, 0, 0), glm::vec3(5, 5, 5), "SideKickLeft", Model::Shape::Plane, true));

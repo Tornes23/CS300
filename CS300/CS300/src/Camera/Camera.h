@@ -64,7 +64,7 @@ public:
 
 	} RenderMode;
 
-	Camera(glm::vec3 direction = glm::vec3(0,0,-1));
+	Camera(glm::vec3 direction = glm::vec3(0,0,-1), glm::ivec2 viewport = glm::ivec2(1280, 720));
 	void Render(std::vector<GameObject*>& objects);
 	void RenderDepth(std::vector<GameObject*>& objects);
 	void Display();
@@ -119,6 +119,7 @@ private:
 	float mNear;
 	float mFar;
 	float mRadius;
+	glm::ivec2 mViewport;
 
 	glm::vec3 mRotations;
 

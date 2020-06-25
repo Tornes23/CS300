@@ -56,7 +56,7 @@ The default Constructor of the class
 
 *
 **************************************************************************/
-Camera::Camera(glm::vec3 direction) : mFrameBuffer(), mRenderPlane(Model::Shape::Plane)
+Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport.x, viewport.y), mRenderPlane(Model::Shape::Plane)
 {
 	mView = glm::normalize(direction);
 
@@ -67,6 +67,8 @@ Camera::Camera(glm::vec3 direction) : mFrameBuffer(), mRenderPlane(Model::Shape:
 	mNear = 10.0F;
 	mFar = 500.0F;
 	mRadius = 50.0F;
+
+	mViewport = viewport;
 
 	mPCFSamples = 0;
 
@@ -247,7 +249,8 @@ void Camera::Display()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Clear screen framebuffer
-	glViewport(0, 0, 1280, 720);
+	glViewport(0, 0, mViewport.x, mViewport.y);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Select shader program, set uniforms and draw (use the plane in parameters)
@@ -701,7 +704,7 @@ returns the matrix
 glm::mat4x4 Camera::CreatePerspective()
 {
 	//creating the matrix
-	mPerspective = glm::perspective(glm::radians(60.0F), 1280.0F/720.0F, mNear, mFar);
+	mPerspective = glm::perspective(glm::radians(60.0F), static_cast<float>(mViewport.x) / static_cast<float>(mViewport.y), mNear, mFar);
 
 	//returning the matrix
 	return mPerspective;
