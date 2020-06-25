@@ -34,7 +34,7 @@ void main()
     //setting the out variables
     UV = vTextCoords;
     
-    PosInCamSpc = vec3(MV * vec4(vPos, 1.0));
+    PosInCamSpc = (MV * vec4(vPos, 1.0)).xyz;
     
     FragLightSpc = lightSpace * vec4(PosInCamSpc, 1.0F);
     

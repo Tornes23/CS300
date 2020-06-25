@@ -143,7 +143,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 		
 		currentShader.SetVec3Uniform("camPositon", mPosition);
-	
+
 		bool useTex = mMode < NormalColoring ? mMode % 2 == 0 ? true : false : false;
 	
 		currentShader.SetIntUniform("UseTexture", useTex ? 1 : 0);
@@ -153,6 +153,10 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	
 		//setting the texture of the object as active
 		objects[i]->mMaterial.SetUniforms(&currentShader);
+
+		glActiveTexture(GL_TEXTURE0 + 1);
+		glBindTexture(GL_TEXTURE_2D, mFrameBuffer.GetShadowMap());
+		currentShader.SetIntUniform("shadowMap", 1);
 	
 		if (mMode == Shadows)
 			ApplyLight(currentShader, mCameraMatrix);
@@ -493,9 +497,6 @@ the world to camera matrix
 **************************************************************************/
 void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam)
 {
-	//setting if the averaged normals are used or not
-	shader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
-
 	//setting the number of light sources
 	shader.SetIntUniform("lightCount", (int)mLights.size());
 
