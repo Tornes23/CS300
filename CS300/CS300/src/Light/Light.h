@@ -114,7 +114,7 @@ private:
 	float mRadius;
 
 	int mPCFSamples;
-	int mBias;
+	float mBias;
 
 	GLuint mShadowMap;
 

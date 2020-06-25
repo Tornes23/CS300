@@ -20,7 +20,7 @@ struct Light{
     
     int PCFSamples;
     
-    int Bias;
+    float Bias;
     
     sampler2D ShadowMap;
 };

@@ -122,7 +122,7 @@ Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color amb
 	mFallOff = falloff;
 
 	mPCFSamples = 10;
-	mBias = 3;
+	mBias = 7.5F;
 
 	//setting the animation variable
 	mbAnimation = true;
@@ -206,7 +206,7 @@ void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::m
 
 	shader->SetIntUniform(shaderString + ".PCFSamples", mPCFSamples);
 
-	shader->SetIntUniform(shaderString + ".Bias", mBias);
+	shader->SetFloatUniform(shaderString + ".Bias", mBias);
 
 	glActiveTexture(GL_TEXTURE0 + 1);
 	glBindTexture(GL_TEXTURE_2D, mShadowMap);
@@ -553,7 +553,7 @@ void Light::Edit(int id)
 		ImGui::DragFloat("Radius", &mRadius);
 
 		ImGui::DragInt("PCF Samples", &mPCFSamples);
-		ImGui::DragInt("Bias", &mBias);
+		ImGui::DragFloat("Bias", &mBias);
 
 		//setting the colors
 		mAmbientColor.SetColor(ambient);
