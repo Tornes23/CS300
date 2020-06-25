@@ -49,11 +49,35 @@ out vec4 FragColor;
 in vec3 PosInCamSpc; 
 in vec2 UV;
 in vec3 Normal;
+in vec4 FragLightSpc;
 
 //uniform variable to get the data of the texture
 uniform sampler2D textureData;
+uniform sampler2D shadowMap;
 
-vec3 PointLight(vec3 initialCol, int i)
+//float ComputePCFShadow()
+//{
+//    
+//}
+
+float ComputeShadow()
+{
+    // perform perspective divide
+    vec3 projCoords = FragLightSpc.xyz / FragLightSpc.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // check whether current frag pos is in shadow
+    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+
+    return shadow;
+}
+
+
+vec3 SpotLight(vec3 initialCol, int i, float shadowVal)
 {
     //computing the distance
     float distance = length(lightSources[i].PosInCamSpc - PosInCamSpc);
@@ -65,9 +89,6 @@ vec3 PointLight(vec3 initialCol, int i)
     float diffuseVal = max(dot(Normal, lightDir), 0.0);
     vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSources[i].DiffuseColor;
     
-    //adding it to the color
-    initialCol += diffuseCol;
-    
     //computing specular color
     vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
 
@@ -79,76 +100,7 @@ vec3 PointLight(vec3 initialCol, int i)
     vec3 specular = (material.SpecularColor * spec) * lightSources[i].SpecularColor;  
     
     //adding it to the color
-    initialCol += specular;
-    
-    //computing the attenuation
-    float attenuation = min((1.0 / 
-                        (lightSources[i].Attenuation.x + (lightSources[i].Attenuation.y * distance) 
-                        + lightSources[i].Attenuation.z * (distance * distance))), 1.0);
-                        
-    //applying the attenuation to the color     
-    initialCol *= attenuation;
-    
-    //return the color after the lighting
-    return initialCol;
-}
-
-vec3 DirectionalLight(vec3 initialCol, int i)
-{   
-    //computing the light direction
-    vec3 lightDir = normalize(-lightSources[i].Direction);
-    
-    //computing diffuse value and color
-    float diffuseVal = max(dot(Normal, lightDir), 0.0);
-    vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSources[i].DiffuseColor;
-    
-    //adding it to the color
-    initialCol += diffuseCol;
-    
-    //computing specular color
-    vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
-    
-    //computing the reflection direction
-    vec3 reflectDir = reflect(-lightDir, Normal);  
-    
-    //computing the speculat factor and color
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
-    vec3 specular = (material.SpecularColor * spec) * lightSources[i].SpecularColor;  
-    
-    //adding it to the color
-    initialCol += specular;
-    
-    //return the color after the lighting
-    return initialCol; 
-}
-
-vec3 SpotLight(vec3 initialCol, int i)
-{
-    //computing the distance
-    float distance = length(lightSources[i].PosInCamSpc - PosInCamSpc);
-    
-    //computing the light direction
-    vec3 lightDir = normalize(lightSources[i].PosInCamSpc - PosInCamSpc);
-    
-    //computing diffuse value and color
-    float diffuseVal = max(dot(Normal, lightDir), 0.0);
-    vec3 diffuseCol = (diffuseVal * material.DiffuseColor) * lightSources[i].DiffuseColor;
-    
-    //adding it to the color
-    initialCol += diffuseCol;
-    
-    //computing specular color
-    vec3 viewDir = normalize(-PosInCamSpc);//since im cam space cam pos = origin
-
-    //computing the reflection direction
-    vec3 reflectDir = reflect(-lightDir, Normal);  
-    
-    //computing the speculat factor and color
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
-    vec3 specular = (material.SpecularColor * spec) * lightSources[i].SpecularColor;  
-    
-    //adding it to the color
-    initialCol += specular;
+    initialCol += (shadowVal * (diffuseCol + specular));
     
     //computing the attenuation
     float attenuation = min((1.0 / 
@@ -190,18 +142,11 @@ vec3 ApplyPhongLight()
         
         //variable to store the color after the lighting process
         vec3 color;
- 
-        //if the light type is point light
-        if(lightSources[i].Type == 0)
-            color = PointLight(ambientCol, i);
         
-        //if the light type is directional light
-        if(lightSources[i].Type == 1)
-            color = DirectionalLight(ambientCol, i);
-        
-        //if the light type is SpotLight
-        if(lightSources[i].Type == 2)
-            color = SpotLight(ambientCol, i);
+        //variable to store the shadow value
+        float shadow = ComputeShadow();
+            
+        color = SpotLight(ambientCol, i, shadow);
         
         //computing the final color
         finalCol += color * textureCol;

@@ -112,6 +112,10 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	mFrameBuffer.UseRenderBuffer();
 	mFrameBuffer.ClearRenderBuffer();
 	
+	glm::mat4x4 lighProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(mViewport.x) / static_cast<float>(mViewport.y), mNear, mFar);
+	glm::mat4x4 lighDirection = glm::lookAt(mLights[0].GetPosition(), glm::vec3(0.0F), glm::vec3(0.0F, 1.0F, 0.0F));
+	glm::mat4x4 lightSpace = lighProjection * lighDirection;
+
 	//for each object
 	for (unsigned i = 0; i < objects.size(); i++)
 	{
@@ -123,6 +127,8 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	
 		currentShader.Use();
 	
+		currentShader.SetMatUniform("lightSpace", glm::value_ptr(lightSpace));
+
 		currentShader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
 		//Setting the matrix uniforms
 		currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
@@ -688,6 +694,13 @@ void Camera::SetAnimation()
 	{
 		mLights[i].SetAnimation(mLightAnimation);
 	}
+}
+
+void Camera::SetShadowmap()
+{
+	//setting the texture as active
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, mFrameBuffer.GetShadowMap());
 }
 
 /**************************************************************************

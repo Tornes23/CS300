@@ -10,6 +10,7 @@ layout(location = 3) in vec3 vAverage;
 out vec2 UV;
 out vec3 Normal;
 out vec3 PosInCamSpc;
+out vec4 FragLightSpc;
 
 //uniform variables for the transformation
 uniform int Average;
@@ -17,6 +18,7 @@ uniform mat4 m2w;
 uniform mat4 m2w_normal;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 lightSpace;
 
 void main()
 {
@@ -33,6 +35,8 @@ void main()
     UV = vTextCoords;
     
     PosInCamSpc = vec3(MV * vec4(vPos, 1.0));
+    
+    FragLightSpc = lightSpace * vec4(PosInCamSpc, 1.0F);
     
     //if average normals are used or not tranform one or the other and set it to the out variable
     if(Average == 1)
