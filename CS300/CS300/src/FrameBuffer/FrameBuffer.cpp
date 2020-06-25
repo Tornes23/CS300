@@ -120,7 +120,7 @@ void FrameBuffer::UseRenderBuffer()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glCullFace(GL_BACK);
+	//glCullFace(GL_BACK);
 }
 
 //~
@@ -133,7 +133,7 @@ void FrameBuffer::UseDepthBuffer()
 	
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
-	glCullFace(GL_FRONT);
+	//glCullFace(GL_FRONT);
 }
 
 //~

@@ -301,7 +301,7 @@ glm::mat4x4 Light::GetM2W()
 
 glm::mat4x4 Light::GetPerspective(float near, float far, glm::ivec2 viewport)
 {
-	mProjection = glm::perspective(glm::radians(45.0F), static_cast<float>(viewport.x) / static_cast<float>(viewport.y), near, far);
+	mProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(viewport.x) / static_cast<float>(viewport.y), near, far);
 
 	return mProjection;
 }
@@ -311,8 +311,6 @@ glm::mat4x4 Light::GetView()
 	glm::vec3 upVec = glm::normalize(glm::cross(glm::cross(mDirection, glm::vec3(0, 1, 0)), mDirection));
 
 	mView = glm::lookAt(mPosition, mDirection, upVec);
-
-	//mView = glm::lookAt(mPosition, glm::vec3(0.0F), glm::vec3(0, 1, 0));
 
 	return mView;
 }
