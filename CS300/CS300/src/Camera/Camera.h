@@ -56,7 +56,7 @@ public:
 
 	typedef enum RenderMode
 	{
-		Lighting,
+		Shadows,
 		NormalColoring,
 		TangentColoring,
 		BitangentColoring,
@@ -66,6 +66,7 @@ public:
 
 	Camera(glm::vec3 direction = glm::vec3(0,0,-1));
 	void Render(std::vector<GameObject*>& objects);
+	void RenderDepth(std::vector<GameObject*>& objects);
 	void Display();
 	void ComputePos();
 	void Update();
@@ -91,6 +92,7 @@ public:
 	ShaderProgram GetShader();
 	ShaderProgram GetNormalShader();
 	ShaderProgram GetDisplayShader();
+	ShaderProgram GetDepthShader();
 
 	const Light GetLight() const;
 

@@ -1,6 +1,22 @@
 #include "FrameBuffer.h"
 
 //~
+FrameBuffer::FrameBuffer(int width, int height)
+{
+	mWidth = width;
+	mHeight = height;
+
+	mShadowMapWidth = 1024;
+	mShadowMapHeight = 1024;
+
+	GenRenderBuffer();
+	GenDepthBuffer();
+
+	// Revert to the default framebuffer for now
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+//~
 void FrameBuffer::GenRenderBuffer()
 {
 	// Create to render texture (use window resolution)
@@ -30,27 +46,30 @@ void FrameBuffer::GenRenderBuffer()
 }
 
 //~
-FrameBuffer::FrameBuffer(int width, int height)
-{
-	mWidth = width;
-	mHeight = height;
-
-	GenRenderBuffer();
-	GenDepthBuffer();
-
-	// Revert to the default framebuffer for now
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-//~
 void FrameBuffer::GenDepthBuffer()
 {
-	glGenRenderbuffers(1, &mDepthBuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, mDepthBuffer);
-	//setting it will store depth
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, mWidth, mHeight);
-	//attaching
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepthBuffer);
+	// Create to render texture (use window resolution)
+	glGenTextures(1, &mShadowMap);
+	glBindTexture(GL_TEXTURE_2D, mShadowMap);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, mShadowMapWidth, mShadowMapHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+	// Filtering 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	// Expansion
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// Create and set up the FBO
+	glGenFramebuffers(1, &mDepthBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, mDepthBuffer);
+
+	// Set output color texture at attachment 0
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mShadowMap, 0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 //~
@@ -66,6 +85,13 @@ const GLuint FrameBuffer::GetRenderTexture() const
 }
 
 //~
+const GLuint FrameBuffer::GetShadowMap() const
+{
+	return mShadowMap;
+}
+
+
+//~
 const GLuint FrameBuffer::GetDepthBuffer() const
 {
 	return mDepthBuffer;
@@ -73,8 +99,23 @@ const GLuint FrameBuffer::GetDepthBuffer() const
 //~
 void FrameBuffer::UseRenderBuffer()
 {
+	glViewport(0, 0, mWidth, mHeight);
+
+	ClearRenderBuffer();
+
 	// Bind created FBO
 	glBindFramebuffer(GL_FRAMEBUFFER, mRenderBuffer);
+}
+
+//~
+void FrameBuffer::UseDepthBuffer()
+{
+	glViewport(0, 0, mShadowMapWidth, mShadowMapHeight);
+
+	// Bind created FBO
+	glBindFramebuffer(GL_FRAMEBUFFER, mDepthBuffer);
+	
+	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 //~

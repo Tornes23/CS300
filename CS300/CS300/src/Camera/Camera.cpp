@@ -64,8 +64,8 @@ Camera::Camera(glm::vec3 direction) : mFrameBuffer(), mRenderPlane(Model::Shape:
 
 	//initializing all the vues to 0
 	ComputePos();
-	mNear = 0.1F;
-	mFar = 100.0F;
+	mNear = 10.0F;
+	mFar = 500.0F;
 	mRadius = 50.0F;
 
 	mPCFSamples = 0;
@@ -75,7 +75,7 @@ Camera::Camera(glm::vec3 direction) : mFrameBuffer(), mRenderPlane(Model::Shape:
 	mAveragedNormals = false;
 	mLightAnimation = true;
 
-	mMode = Lighting;
+	mMode = Shadows;
 
 	mLightMode = Light::LightType::Spotlight;
 
@@ -100,79 +100,83 @@ The game objects to render
 **************************************************************************/
 void Camera::Render(std::vector<GameObject*>& objects)
 {
+
+	//rendering the shadow map
+	RenderDepth(objects);
+
 	GLenum error = glGetError();
 	//getting the shader which will be used
 	
 	mFrameBuffer.UseRenderBuffer();
 	mFrameBuffer.ClearRenderBuffer();
-
+	
 	//for each object
 	for (unsigned i = 0; i < objects.size(); i++)
 	{
 		//if is not active skip it
 		if (!(objects[i]->mActive))
 			continue;
-
+	
 		ShaderProgram currentShader = GetShader();
-
+	
 		currentShader.Use();
-
+	
 		currentShader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
 		//Setting the matrix uniforms
 		currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
 		currentShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
-
+	
 		//generate the model to world of the object
 		glm::mat4x4 m2w_object = objects[i]->GenerateM2W();
 		glm::mat4x4 m2w_normal = glm::transpose(glm::inverse(mCameraMatrix * m2w_object));
-
+	
 		//setting the uniform matrix
 		currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
 		currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 		
 		currentShader.SetVec3Uniform("camPositon", mPosition);
-
+	
 		bool useTex = mMode < NormalColoring ? mMode % 2 == 0 ? true : false : false;
-
+	
 		currentShader.SetIntUniform("UseTexture", useTex ? 1 : 0);
-
+	
 		if(mMode >= NormalColoring)
 			currentShader.SetIntUniform("Selection", mMode - NormalColoring);
-
+	
 		//setting the texture of the object as active
 		objects[i]->mMaterial.SetUniforms(&currentShader);
-
-		if (mMode == Lighting)
+	
+		if (mMode == Shadows)
 			ApplyLight(currentShader, mCameraMatrix);
-
-
+	
+	
 		//if wireframe is on change the render mode
 		if (!mWireframe)//if wireframe is not togled on
 			glPolygonMode(GL_FRONT, GL_FILL);
 		else
 			glPolygonMode(GL_FRONT, GL_LINE);
-
+	
 		//rendering the trianlges
 		DrawTriangle(objects[i]);
-
+	
 		//if the normals have to be rendered
 		if (mRenderNormals)
 		{
 			currentShader = GetNormalShader();
-
+	
 			currentShader.Use();
-
+	
 			currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
 			currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 			currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
 			currentShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
 			currentShader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
-
+	
 			DrawNormals(objects[i]);
 		}
 	}
-
-	if (mMode >= Lighting)
+	
+	if (mMode == Shadows)
 		DrawLights();
 
 	Display();
@@ -183,13 +187,67 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 }
 
+void Camera::RenderDepth(std::vector<GameObject*>& objects)
+{
+
+	GLenum error = glGetError();
+
+	ShaderProgram depthShader = GetDepthShader();
+
+	glm::mat4x4 lighProjection = glm::ortho(-50.0F, 50.0F, -50.0F, 50.0F, mNear, mFar);
+	glm::mat4x4 lighDirection = glm::lookAt(mLights[0].GetPosition(), mLights[0].GetDirection(), glm::vec3(0.0F, 1.0F, 0.0F));
+	glm::mat4x4 lightSpace = lighProjection * lighDirection;
+
+	depthShader.Use();
+
+	depthShader.SetMatUniform("lightSpace", glm::value_ptr(lightSpace));
+
+	depthShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
+	depthShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
+
+	mFrameBuffer.UseDepthBuffer();
+
+	//for each object
+	for (unsigned i = 0; i < objects.size(); i++)
+	{
+		//if is not active skip it
+		if (!(objects[i]->mActive))
+			continue;
+
+		//generate the model to world of the object
+		glm::mat4x4 m2w_object = objects[i]->GenerateM2W();
+		
+		//setting the uniform matrix
+		depthShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, objects[i]->mMaterial.GetTexture().GetHandle());
+
+		//setting the texture of the object as active
+		objects[i]->mMaterial.SetUniforms(&depthShader);
+
+		//if wireframe is on change the render mode
+		if (!mWireframe)//if wireframe is not togled on
+			glPolygonMode(GL_FRONT, GL_FILL);
+		else
+			glPolygonMode(GL_FRONT, GL_LINE);
+
+		//rendering the trianlges
+		DrawTriangle(objects[i]);
+	}
+
+	// Bind screen buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+}
+
 void Camera::Display()
 {
 	// Bind screen buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Clear screen framebuffer
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glViewport(0, 0, 1280, 720);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Select shader program, set uniforms and draw (use the plane in parameters)
@@ -476,6 +534,8 @@ void Camera::AddAllShaders()
 	AddShader("./src/Shader/programs/VectorColoring.vs"    , "./src/Shader/programs/VectorColoring.fs"    );
 	AddShader("./src/Shader/programs/Normals.vs"           , "./src/Shader/programs/Normals.fs"           , "./src/Shader/programs/Normals.gs");
 	AddShader("./src/Shader/programs/Quad.vs"              , "./src/Shader/programs/Quad.fs"              );
+	AddShader("./src/Shader/programs/Shadows.vs"           , "./src/Shader/programs/Shadows.fs"           );
+	AddShader("./src/Shader/programs/Depth.vs"             , "./src/Shader/programs/Depth.fs"           );
 
 }
 
@@ -707,8 +767,8 @@ ShaderProgram Camera::GetShader()
 
 	switch (mMode)
 	{
-	case Lighting:
-		return mShaders[1];
+	case Shadows:
+		return mShaders[6];
 		break;
 	case NormalColoring:
 		return mShaders[3];
@@ -749,6 +809,11 @@ ShaderProgram Camera::GetNormalShader()
 ShaderProgram Camera::GetDisplayShader()
 {
 	return mShaders[5];
+}
+
+ShaderProgram Camera::GetDepthShader()
+{
+	return mShaders[7];
 }
 
 const Light Camera::GetLight() const
