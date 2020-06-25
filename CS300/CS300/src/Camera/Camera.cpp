@@ -74,7 +74,7 @@ Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport
 
 	mWireframe = false;
 	mRenderNormals = false;
-	mAveragedNormals = false;
+	mAveragedNormals = true;
 	mLightAnimation = true;
 
 	mMode = Shadows;
@@ -196,8 +196,8 @@ void Camera::RenderDepth(std::vector<GameObject*>& objects)
 
 	ShaderProgram depthShader = GetDepthShader();
 
-	glm::mat4x4 lighProjection = glm::ortho(-50.0F, 50.0F, -50.0F, 50.0F, mNear, mFar);
-	glm::mat4x4 lighDirection = glm::lookAt(mLights[0].GetPosition(), mLights[0].GetDirection(), glm::vec3(0.0F, 1.0F, 0.0F));
+	glm::mat4x4 lighProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(mViewport.x) / static_cast<float>(mViewport.y), mNear, mFar);
+	glm::mat4x4 lighDirection = glm::lookAt(mLights[0].GetPosition(), glm::vec3(0.0F), glm::vec3(0.0F, 1.0F, 0.0F));
 	glm::mat4x4 lightSpace = lighProjection * lighDirection;
 
 	depthShader.Use();
@@ -206,6 +206,9 @@ void Camera::RenderDepth(std::vector<GameObject*>& objects)
 
 	depthShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
 	depthShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
+
+	depthShader.SetFloatUniform("near_plane", mNear);
+	depthShader.SetFloatUniform("far_plane", mFar);
 
 	mFrameBuffer.UseDepthBuffer();
 
@@ -249,8 +252,6 @@ void Camera::Display()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Clear screen framebuffer
-	glViewport(0, 0, mViewport.x, mViewport.y);
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Select shader program, set uniforms and draw (use the plane in parameters)
