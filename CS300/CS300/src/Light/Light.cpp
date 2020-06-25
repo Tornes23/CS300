@@ -92,7 +92,7 @@ Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color amb
 	//setting the rotations
 	mRotations = rotations;
 	mScale = glm::vec3(0.5, 0.5, 0.5);
-	mRadius = 45.0F;
+	mRadius = 35.0F;
 
 	//computing the position
 	float posX = (mRadius * cosf(glm::radians(mRotations.y))) * sinf(glm::radians(mRotations.x));
@@ -303,9 +303,9 @@ glm::mat4x4 Light::GetLightSpaceMat(float near, float far, glm::ivec2 viewport)
 {
 	glm::mat4x4 lighProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(viewport.x) / static_cast<float>(viewport.y), near, far);
 
-	glm::vec3 upVec = glm::cross(glm::cross(mDirection, glm::vec3(0, 1, 0)),  mDirection);
+	glm::vec3 upVec = glm::normalize(glm::cross(glm::cross(mDirection, glm::vec3(0, 1, 0)),  mDirection));
 
-	glm::mat4x4 lighDirection = glm::lookAt(mPosition, glm::vec3(0.0F), upVec);
+	glm::mat4x4 lighDirection = glm::lookAt(mPosition, mDirection, upVec);
 
 	mLightSpaceMat = lighProjection * lighDirection;
 
@@ -474,6 +474,11 @@ ShaderProgram Light::GetShader() const
 {
 	//returning the shader
 	return mShader;
+}
+
+GLuint Light::GetShadowMap() const
+{
+	return mShadowMap;
 }
 
 /**************************************************************************

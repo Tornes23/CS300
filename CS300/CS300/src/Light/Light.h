@@ -78,6 +78,7 @@ public:
 	LightType GetType() const;
 	void  SetType(LightType mode);
 	ShaderProgram GetShader() const;
+	GLuint GetShadowMap() const;
 
 	void Edit(int id);
 
