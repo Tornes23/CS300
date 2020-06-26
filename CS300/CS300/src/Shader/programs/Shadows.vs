@@ -35,8 +35,9 @@ void main()
     UV = vTextCoords;
     
     PosInCamSpc = (MV * vec4(vPos, 1.0)).xyz;
+    vec3 PosInWorld= (m2w * vec4(vPos, 1.0)).xyz;
     
-    FragLightSpc = lightSpace * vec4(PosInCamSpc, 1.0F);
+    FragLightSpc = lightSpace * vec4(PosInWorld, 1.0F);
     
     //if average normals are used or not tranform one or the other and set it to the out variable
     if(Average == 1)
