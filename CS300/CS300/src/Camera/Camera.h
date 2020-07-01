@@ -17,6 +17,9 @@ This file contains the definition of the camera class
 The functions included are:
 - Camera::Camera();
 - void Camera::Render(Window& target, std::vector<GameObject*>& objects);
+- void Camera::RenderDepth(Window& target, std::vector<GameObject*>& objects);
+- void Camera::Display();
+- void Camera::DisplayShadowMap();
 - void Camera::Update();
 - void Camera::ComputePos();
 - void Camera::DrawTriangle(GameObject* target);

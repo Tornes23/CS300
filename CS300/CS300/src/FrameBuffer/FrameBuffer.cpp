@@ -1,8 +1,54 @@
+/*!**************************************************************************
+\file    FrameBuffer.cpp
+
+\author  Nestor Uriarte 
+
+\par     DP email:  nestor.uriarte@digipen.edu 
+
+\par     Course:    CS300 
+
+\par     assignemnt 3 
+
+\date    Wed Jul 01 11:02:02 2020
+
+\brief
+This file contains the implementation of the FrameBuffer class
+
+The functions included are:
+- FrameBuffer::FrameBuffer(int width, int height);
+- void FrameBuffer::GenRenderBuffer();
+- void FrameBuffer::GenDepthBuffer();
+- const GLuint FrameBuffer::GetRenderBuffer() const;
+- const GLuint FrameBuffer::GetRenderTexture() const;
+- const GLuint FrameBuffer::GetShadowMap() const;
+- const GLuint FrameBuffer::GetDepthBuffer() const;
+- void FrameBuffer::UseRenderBuffer();
+- void FrameBuffer::UseDepthBuffer();
+- void FrameBuffer::ClearRenderBuffer();
+
+***************************************************************************/
+
+
 #include "FrameBuffer.h"
 
-//~
+/**************************************************************************
+*!
+\fn     FrameBuffer::FrameBuffer
+
+\brief 
+The default constructor of the class
+
+\param  int width
+the width for the frame buffer
+
+\param  int height
+the height for the frame buffer
+
+*
+**************************************************************************/
 FrameBuffer::FrameBuffer(int width, int height)
 {
+	//setting the variables
 	mWidth = width;
 	mHeight = height;
 
@@ -13,12 +59,17 @@ FrameBuffer::FrameBuffer(int width, int height)
 
 	GenRenderBuffer();
 	GenDepthBuffer();
-
-	// Revert to the default framebuffer for now
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-//~
+/**************************************************************************
+*!
+\fn     FrameBuffer::GenRenderBuffer
+
+\brief 
+Generates the Render buffer
+
+*
+**************************************************************************/
 void FrameBuffer::GenRenderBuffer()
 {
 	// Create to render texture (use window resolution)
@@ -61,10 +112,18 @@ void FrameBuffer::GenRenderBuffer()
 
 }
 
-//~
+/**************************************************************************
+*!
+\fn     FrameBuffer::GenDepthBuffer
+
+\brief 
+Generates the Depth buffer
+
+*
+**************************************************************************/
 void FrameBuffer::GenDepthBuffer()
 {
-	// Create to render texture (use window resolution)
+	// Create to render texture (use shadowmap resolution)
 	glGenTextures(1, &mShadowMap);
 	glBindTexture(GL_TEXTURE_2D, mShadowMap);
 
@@ -93,84 +152,174 @@ void FrameBuffer::GenDepthBuffer()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-//~
+/**************************************************************************
+*!
+\fn     FrameBuffer::GetRenderBuffer
+
+\brief 
+Getter function for the Render Buffer
+
+\return const GLuint
+The handle for the buffer
+
+*
+**************************************************************************/
 const GLuint FrameBuffer::GetRenderBuffer() const
 {
 	return mRenderBuffer;
 }
 
-//~
+/**************************************************************************
+*!
+\fn     FrameBuffer::GetRenderTexture
+
+\brief 
+Getter function for the Render texture
+
+\return const GLuint
+The handle for the texture
+
+*
+**************************************************************************/
 const GLuint FrameBuffer::GetRenderTexture() const
 {
 	return mRenderTexture;
 }
 
-//~
+/**************************************************************************
+*!
+\fn     FrameBuffer::GetShadowMap
+
+\brief 
+Getter function for the ShadowMap texture
+
+
+\return const GLuint
+The handle for the texture
+
+*
+**************************************************************************/
 const GLuint FrameBuffer::GetShadowMap() const
 {
 	return mShadowMap;
 }
 
+/**************************************************************************
+*!
+\fn     FrameBuffer::GetContrast
+
+\brief
+Getter function for the contrast value
+
+
+\return const float
+The value
+
+*
+**************************************************************************/
 const float FrameBuffer::GetContrast() const
 {
 	return mContrast;
 }
 
+/**************************************************************************
+*!
+\fn     FrameBuffer::SetContrast
+
+\brief
+Setter function for the copnstrast value
+
+
+\param float val
+value to set
+
+*
+**************************************************************************/
 void FrameBuffer::SetContrast(float val)
 {
 	mContrast = val;
 }
 
 
-//~
+/**************************************************************************
+*!
+\fn     FrameBuffer::GetDepthBuffer
+
+\brief 
+Getter function for the depth texture
+
+
+\return const GLuint
+The handle for the buffer
+
+
+*
+**************************************************************************/
 const GLuint FrameBuffer::GetDepthBuffer() const
 {
 	return mDepthBuffer;
 }
-//~
+/**************************************************************************
+*!
+\fn     FrameBuffer::UseRenderBuffer
+
+\brief 
+Sets everything to render on the render buffer
+
+*
+**************************************************************************/
 void FrameBuffer::UseRenderBuffer()
 {
+	//setting the viewport size
 	glViewport(0, 0, mWidth, mHeight);
-
-	ClearRenderBuffer();
 
 	// Bind created FBO
 	glBindFramebuffer(GL_FRAMEBUFFER, mRenderBuffer);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	//clearing the buffer
+	ClearRenderBuffer();
 
 	//back face removal
-	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
 }
 
-//~
+/**************************************************************************
+*!
+\fn     FrameBuffer::UseDepthBuffer
+
+\brief 
+Sets everything to render on the depth buffer
+
+*
+**************************************************************************/
 void FrameBuffer::UseDepthBuffer()
 {
+	//setting the size of the viewport
 	glViewport(0, 0, mShadowMapWidth, mShadowMapHeight);
 
 	// Bind created FBO
 	glBindFramebuffer(GL_FRAMEBUFFER, mDepthBuffer);
 	
+	//clearing the buffer
 	glClear(GL_DEPTH_BUFFER_BIT);
-	
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
 
 	//back face removal
-	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
-	glFrontFace(GL_CCW);
 }
 
-//~
+/**************************************************************************
+*!
+\fn     FrameBuffer::ClearRenderBuffer
+
+\brief 
+clears the Render Buffer
+
+*
+**************************************************************************/
 void FrameBuffer::ClearRenderBuffer()
 {
 	// Clear framebuffer
 	glClearColor(0.0F, 0.0F, 0.0F, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
+

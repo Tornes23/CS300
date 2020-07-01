@@ -17,6 +17,9 @@ This file contains the implementation of the camera class
 The functions included are:
 - Camera::Camera();
 - void Camera::Render(Window& target, std::vector<GameObject*>& objects);
+- void Camera::RenderDepth(Window& target, std::vector<GameObject*>& objects);
+- void Camera::Display();
+- void Camera::DisplayShadowMap();
 - void Camera::Update();
 - void Camera::ComputePos();
 - void Camera::DrawTriangle(GameObject* target);
@@ -92,9 +95,6 @@ Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport
 \brief 
 The render function
 
-\param  Window& target
-The window in which it will render
-
 \param  std::vector<GameObject*>& objects
 The game objects to render
 
@@ -109,9 +109,10 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	GLenum error = glGetError();
 	//getting the shader which will be used
 	
+	//calling that the render buffer wil be used 
 	mFrameBuffer.UseRenderBuffer();
-	mFrameBuffer.ClearRenderBuffer();
 	
+	//creating the light space matrix
 	glm::mat4x4 lighProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(mViewport.x) / static_cast<float>(mViewport.y), mNear, mFar);
 	glm::mat4x4 lighDirection = glm::lookAt(mLights[0].GetPosition(), glm::vec3(0.0F), glm::vec3(0.0F, 1.0F, 0.0F));
 	glm::mat4x4 lightSpace = lighProjection * lighDirection;
@@ -125,8 +126,10 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	
 		ShaderProgram currentShader = GetShader();
 	
+		//calling to use this render
 		currentShader.Use();
 	
+		//setting the uniforms
 		currentShader.SetMatUniform("lightSpace", glm::value_ptr(lightSpace));
 
 		currentShader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
@@ -187,6 +190,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	if (mMode == Shadows)
 		DrawLights();
 
+	//calling to be rendered on to the scren
 	Display();
 	
 	//unbinding the VAOs
@@ -195,21 +199,38 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 }
 
+
+/**************************************************************************
+*!
+\fn     Camera::RenderDepth
+
+\brief
+The render function
+
+\param  std::vector<GameObject*>& objects
+The game objects to render onto the depth map
+
+*
+**************************************************************************/
 void Camera::RenderDepth(std::vector<GameObject*>& objects)
 {
 
 	GLenum error = glGetError();
 
+	//getting the shader to be used
 	ShaderProgram depthShader = GetDepthShader();
 
+	//getting the light matrices
 	glm::mat4x4 mLightView = mLights[0].GetView();
 	glm::mat4x4 mLightProj = mLights[0].GetPerspective(mNear, mFar, mViewport);
 
 	depthShader.Use();
 
+	//setting the uniforms
 	depthShader.SetMatUniform("view", glm::value_ptr(mLightView));
 	depthShader.SetMatUniform("projection", glm::value_ptr(mLightProj));
 
+	//calling that we will use the the depth buffer
 	mFrameBuffer.UseDepthBuffer();
 
 	//for each object
@@ -241,6 +262,7 @@ void Camera::RenderDepth(std::vector<GameObject*>& objects)
 		DrawTriangle(objects[i]);
 	}
 
+	//setting the resulting shadow map to the existing light
 	mLights[0].SetShadowMap(mFrameBuffer.GetShadowMap());
 
 	// Bind screen buffer
@@ -248,6 +270,15 @@ void Camera::RenderDepth(std::vector<GameObject*>& objects)
 
 }
 
+/**************************************************************************
+*!
+\fn     Camera::Display
+
+\brief
+The render to screen function 
+
+*
+**************************************************************************/
 void Camera::Display()
 {
 	// Bind screen buffer
@@ -256,7 +287,7 @@ void Camera::Display()
 	// Clear screen framebuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	// Select shader program, set uniforms and draw (use the plane in parameters)
+	// Select shader program, set uniforms and draw 
 	ShaderProgram secondPass = GetDisplayShader();
 	
 	secondPass.Use();
@@ -277,19 +308,29 @@ void Camera::Display()
 	// Draw
 	glDrawArrays(GL_TRIANGLES, 0, mRenderPlane.GetDrawElements());
 
+	//calling to render the shadow map on th bottom left corner
 	DisplayShadowMap();
 
 }
 
+/**************************************************************************
+*!
+\fn     Camera::DisplayShadowMap
+
+\brief
+The render to screen function for the shadow map
+
+*
+**************************************************************************/
 void Camera::DisplayShadowMap()
 {
-
+	//setting the viewport
 	glViewport(0, 0, 256, 256);
 
 	// Clear screen framebuffer
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	// Select shader program, set uniforms and draw (use the plane in parameters)
+	// Select shader program, set uniforms and draw
 	ShaderProgram shadowMap = GetShadowMapShader();
 
 	shadowMap.Use();
