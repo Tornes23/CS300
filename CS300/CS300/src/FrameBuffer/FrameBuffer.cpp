@@ -45,6 +45,20 @@ void FrameBuffer::GenRenderBuffer()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mRenderTexture, 0);
 	GLenum attachements[] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, attachements);
+
+	// Add depth render buffer to the frame buffer
+	GLuint depthRenderBuffer;
+	//generating
+	glGenRenderbuffers(1, &depthRenderBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
+	//setting it will store depth
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, mWidth, mHeight);
+	//attaching
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer);
+
+	// Revert to the default framebuffer for now
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }
 
 //~
@@ -71,6 +85,11 @@ void FrameBuffer::GenDepthBuffer()
 	// Set output color texture at attachment 0
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mShadowMap, 0);
 
+	GLenum attachements[] = { GL_NONE };
+
+	glDrawBuffers(1, attachements);
+
+	// Revert to the default framebuffer for now
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -120,7 +139,13 @@ void FrameBuffer::UseRenderBuffer()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//glCullFace(GL_BACK);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	//back face removal
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 }
 
 //~
@@ -133,7 +158,13 @@ void FrameBuffer::UseDepthBuffer()
 	
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
-	//glCullFace(GL_FRONT);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	//back face removal
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+	glFrontFace(GL_CCW);
 }
 
 //~
