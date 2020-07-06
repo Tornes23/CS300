@@ -78,7 +78,7 @@ Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport
 	mAveragedNormals = true;
 	mLightAnimation = true;
 
-	mMode = Shadows;
+	mMode = Regular;
 
 	mLightMode = Light::LightType::Spotlight;
 
@@ -157,8 +157,8 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		//setting the texture of the object as active
 		objects[i]->mMaterial.SetUniforms(&currentShader);
 
-		if (mMode == Shadows)
-			ApplyLight(currentShader, mCameraMatrix);
+		//if (mMode == Shadows)
+		//	ApplyLight(currentShader, mCameraMatrix);
 	
 	
 		//if wireframe is on change the render mode
@@ -187,8 +187,8 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		}
 	}
 	
-	if (mMode == Shadows)
-		DrawLights();
+	//if (mMode == Shadows)
+	//	DrawLights();
 
 	//calling to be rendered on to the scren
 	Display();
@@ -309,7 +309,7 @@ void Camera::Display()
 	glDrawArrays(GL_TRIANGLES, 0, mRenderPlane.GetDrawElements());
 
 	//calling to render the shadow map on th bottom left corner
-	DisplayShadowMap();
+	//DisplayShadowMap();
 
 }
 
@@ -858,8 +858,8 @@ ShaderProgram Camera::GetShader()
 
 	switch (mMode)
 	{
-	case Shadows:
-		return mShaders[6];
+	case Regular:
+		return mShaders[2];
 		break;
 	case NormalColoring:
 		return mShaders[3];

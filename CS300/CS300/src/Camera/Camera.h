@@ -59,7 +59,9 @@ public:
 
 	typedef enum RenderMode
 	{
-		Shadows,
+		Regular,
+		Reflection,
+		Refraction,
 		NormalColoring,
 		TangentColoring,
 		BitangentColoring,
