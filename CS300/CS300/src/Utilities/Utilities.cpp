@@ -24,12 +24,10 @@ The functions included are:
 
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include <GL/glew.h>
 #include "Utilities.h"
-#include "../Camera/Camera.h"
 #include "../Window/Window.h"
-#include "../GOManager/GOManager.h"
-#include "../Input/Input.h"
 
 /**************************************************************************
 *!
@@ -120,5 +118,20 @@ void Utils::ParseShader(std::string & filename, std::string & code)
 	}
 	//closing the file
 	inFile.close();
+}
+
+void Utils::GetFileNames(std::string& path, std::vector<std::string>& container)
+{
+	namespace fileSystem = std::experimental::filesystem;
+
+	std::string filename;
+
+	for (auto it : fileSystem::directory_iterator(path))
+	{
+		if (it.path().string().rfind("\\") != std::string::npos)
+			filename = it.path().string().substr(it.path().string().rfind("\\") + 1);
+
+		container.push_back(path + "/" + filename);
+	}
 }
 

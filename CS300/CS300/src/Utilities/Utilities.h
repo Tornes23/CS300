@@ -21,6 +21,7 @@ The functions included are:
 
 ***************************************************************************/
 #pragma once
+#include <vector>
 
 class Window;
 
@@ -31,4 +32,6 @@ namespace Utils
 	void InitGL(Window* window);
 
 	void ParseShader(std::string& filename, std::string& code);
+
+	void GetFileNames(std::string& path, std::vector<std::string>& container);
 }

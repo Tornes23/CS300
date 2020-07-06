@@ -93,6 +93,7 @@
     <ClCompile Include="src\Material\Material.cpp" />
     <ClCompile Include="src\Model\Model.cpp" />
     <ClCompile Include="src\Shader\Shader.cpp" />
+    <ClCompile Include="src\SkyBox\SkyBox.cpp" />
     <ClCompile Include="src\Texture\Texture.cpp" />
     <ClCompile Include="src\Utilities\Utilities.cpp" />
     <ClCompile Include="src\Window\Window.cpp" />
@@ -111,6 +112,7 @@
     <ClInclude Include="src\Material\Material.h" />
     <ClInclude Include="src\Model\Model.h" />
     <ClInclude Include="src\Shader\Shader.h" />
+    <ClInclude Include="src\SkyBox\SkyBox.h" />
     <ClInclude Include="src\Texture\Texture.h" />
     <ClInclude Include="src\Utilities\Utilities.h" />
     <ClInclude Include="src\Window\Window.h" />

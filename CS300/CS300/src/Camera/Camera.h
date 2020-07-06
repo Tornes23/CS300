@@ -50,6 +50,7 @@ The functions included are:
 #include "../Shader/Shader.h"
 #include "../Light/Light.h"
 #include "../FrameBuffer/FrameBuffer.h"
+#include "../SkyBox/SkyBox.h"
 
 struct GameObject;
 
@@ -72,13 +73,14 @@ public:
 	Camera(glm::vec3 direction = glm::vec3(0,0,-1), glm::ivec2 viewport = glm::ivec2(1280, 720));
 	void Render(std::vector<GameObject*>& objects);
 	void RenderDepth(std::vector<GameObject*>& objects);
+	void RenderSkyBox();
 	void Display();
 	void DisplayShadowMap();
 	void ComputePos();
 	void Update();
 
-	void DrawTriangle(GameObject* target);
-	void DrawNormals(GameObject* target);
+	void DrawTriangle(Model* target);
+	void DrawNormals(Model* target);
 	void DrawLights();
 
 	void AddAllShaders();
@@ -141,4 +143,6 @@ private:
 
 	Model mRenderPlane;
 	Model mShadowPlane;
+
+	SkyBox mSkyBox;
 };

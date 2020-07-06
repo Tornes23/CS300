@@ -85,6 +85,9 @@
     <Filter Include="Source Files\FrameBuffer">
       <UniqueIdentifier>{74964de9-bffb-442c-af7f-115c2ace4401}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\SkyBox">
+      <UniqueIdentifier>{a0d6ef1b-e452-4fc9-8d8c-34f06f3de859}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -153,6 +156,9 @@
     <ClCompile Include="src\FrameBuffer\FrameBuffer.cpp">
       <Filter>Source Files\FrameBuffer</Filter>
     </ClCompile>
+    <ClCompile Include="src\SkyBox\SkyBox.cpp">
+      <Filter>Source Files\SkyBox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera\Camera.h">
@@ -202,6 +208,9 @@
     </ClInclude>
     <ClInclude Include="src\FrameBuffer\FrameBuffer.h">
       <Filter>Source Files\FrameBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SkyBox\SkyBox.h">
+      <Filter>Source Files\SkyBox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

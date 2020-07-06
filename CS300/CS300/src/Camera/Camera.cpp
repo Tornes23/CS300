@@ -59,7 +59,7 @@ The default Constructor of the class
 
 *
 **************************************************************************/
-Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport.x, viewport.y), mRenderPlane(Model::Shape::Plane), mShadowPlane(Model::Shape::Plane)
+Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport.x, viewport.y), mRenderPlane(Model::Shape::Plane), mShadowPlane(Model::Shape::Plane), mSkyBox()
 {
 	mView = glm::normalize(direction);
 
@@ -102,15 +102,11 @@ The game objects to render
 **************************************************************************/
 void Camera::Render(std::vector<GameObject*>& objects)
 {
-
-	//rendering the shadow map
-	RenderDepth(objects);
+	//calling that the render buffer wil be used 
+	mFrameBuffer.UseRenderBuffer();
 
 	GLenum error = glGetError();
 	//getting the shader which will be used
-	
-	//calling that the render buffer wil be used 
-	mFrameBuffer.UseRenderBuffer();
 	
 	//creating the light space matrix
 	glm::mat4x4 lighProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(mViewport.x) / static_cast<float>(mViewport.y), mNear, mFar);
@@ -168,7 +164,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 			glPolygonMode(GL_FRONT, GL_LINE);
 	
 		//rendering the trianlges
-		DrawTriangle(objects[i]);
+		DrawTriangle(&(objects[i]->mModel));
 	
 		//if the normals have to be rendered
 		if (mRenderNormals)
@@ -183,12 +179,12 @@ void Camera::Render(std::vector<GameObject*>& objects)
 			currentShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
 			currentShader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
 	
-			DrawNormals(objects[i]);
+			DrawNormals(&(objects[i]->mModel));
 		}
 	}
 	
-	//if (mMode == Shadows)
-	//	DrawLights();
+	//rendering the SkyBox
+	RenderSkyBox();
 
 	//calling to be rendered on to the scren
 	Display();
@@ -214,7 +210,6 @@ The game objects to render onto the depth map
 **************************************************************************/
 void Camera::RenderDepth(std::vector<GameObject*>& objects)
 {
-
 	GLenum error = glGetError();
 
 	//getting the shader to be used
@@ -259,7 +254,7 @@ void Camera::RenderDepth(std::vector<GameObject*>& objects)
 			glPolygonMode(GL_FRONT, GL_LINE);
 
 		//rendering the trianlges
-		DrawTriangle(objects[i]);
+		DrawTriangle(&(objects[i]->mModel));
 	}
 
 	//setting the resulting shadow map to the existing light
@@ -268,6 +263,38 @@ void Camera::RenderDepth(std::vector<GameObject*>& objects)
 	// Bind screen buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+}
+
+/**************************************************************************
+*!
+\fn     Camera::RenderDepth
+
+\brief
+The render function for the skybox
+
+*
+**************************************************************************/
+void Camera::RenderSkyBox()
+{
+	glCullFace(GL_FRONT);
+	glDepthFunc(GL_LEQUAL);
+
+	ShaderProgram skybox = mSkyBox.GetShader();
+
+	skybox.Use();
+
+	glm::mat4 camera = glm::mat4(glm::mat3(mCameraMatrix));
+
+	skybox.SetMatUniform("view", glm::value_ptr(camera));
+	skybox.SetMatUniform("projection", glm::value_ptr(mPerspective));
+	skybox.SetIntUniform("cubeMap", mSkyBox.GetTexture().GetHandle());
+
+	mSkyBox.GetTexture().SetCubeMapTexture();
+
+	DrawTriangle(&(mSkyBox.GetModel()));
+	glCullFace(GL_BACK);
+
+	glDepthFunc(GL_LESS);
 }
 
 /**************************************************************************
@@ -469,19 +496,19 @@ the object to be rendered
 
 *
 **************************************************************************/
-void Camera::DrawTriangle(GameObject* target)
+void Camera::DrawTriangle(Model* target)
 {
 	GLenum error = glGetError();
 
 	//binding the objects VAO
-	glBindVertexArray(target->mModel.GetVAO());
+	glBindVertexArray(target->GetVAO());
 	error = glGetError();
 
 	// Drawing
-	if (target->mModel.GetIndexed())
-		glDrawElements(GL_TRIANGLES, target->mModel.GetDrawElements(), GL_UNSIGNED_SHORT, 0);
+	if (target->GetIndexed())
+		glDrawElements(GL_TRIANGLES, target->GetDrawElements(), GL_UNSIGNED_SHORT, 0);
 	else
-		glDrawArrays(GL_TRIANGLES, 0, target->mModel.GetDrawElements());
+		glDrawArrays(GL_TRIANGLES, 0, target->GetDrawElements());
 
 	error = glGetError();
 }
@@ -498,19 +525,19 @@ the object to be rendered
 
 *
 **************************************************************************/
-void Camera::DrawNormals(GameObject * target)
+void Camera::DrawNormals(Model * target)
 {
 	GLenum error = glGetError();
 
 	//binding the objects VAO
-	glBindVertexArray(target->mModel.GetNormalVAO());
+	glBindVertexArray(target->GetNormalVAO());
 	error = glGetError();
 
 	// Drawing
-	if (target->mModel.GetIndexed())
-		glDrawElements(GL_TRIANGLES, target->mModel.GetDrawElements(), GL_UNSIGNED_SHORT, 0);
+	if (target->GetIndexed())
+		glDrawElements(GL_TRIANGLES, target->GetDrawElements(), GL_UNSIGNED_SHORT, 0);
 	else
-		glDrawArrays(GL_TRIANGLES, 0, target->mModel.GetDrawElements());
+		glDrawArrays(GL_TRIANGLES, 0, target->GetDrawElements());
 
 	error = glGetError();
 }

@@ -18,8 +18,6 @@ The functions included are:
 - int main()
 
 ***************************************************************************/
-
-
 #include "CS300.h"
 
 #undef main
@@ -36,10 +34,9 @@ int main()
 	Utils::InitGL(&myWindow);
 	Camera myCamera(glm::vec3(0, 0, 10), myWindow.GetViewport());
 
-	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(0, -15, 0), glm::vec3(100, 100, 100), "Floor", Model::Shape::Plane, true, glm::vec3(0, 0, -1), glm::vec3(0, 1, 0)));
 	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(-20, 0, 0), glm::vec3(5, 5, 5), "SideKickLeft", Model::Shape::Sphere, true));
 	myManager.AddLevelObject(myManager.CreateObject(glm::vec3(20, 0, 0), glm::vec3(5, 5, 5), "SideKickRight", Model::Shape::Sphere, true));
-
+	
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(20, 20, 20),  "Plane",    Model::Shape::Plane,    false));
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(20, 20, 20),  "Cube",     Model::Shape::Cube,     false));
 	myManager.AddObject(myManager.CreateObject(glm::vec3(0,  0,  0),  glm::vec3(20, 20, 20),  "Cone",     Model::Shape::Cone,     false));
