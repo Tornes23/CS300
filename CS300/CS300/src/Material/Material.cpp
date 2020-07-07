@@ -192,14 +192,14 @@ void Material::SetUniforms(ShaderProgram * shader)
 {
 	//setting the  texture as the active one
 	mTexture.SetActiveTexture();
-	mEnviromentMap.SetCubeMapActive();
-
-	//por alguna razon si setteo este uniform no funciona
 	shader->SetIntUniform("textureData", mTexture.GetTexIndex());
+
+
+	mEnviromentMap.SetCubeMapActive();
+	shader->SetIntUniform("EnviromentMap", mEnviromentMap.GetIndex(false));
 
 	shader->SetFloatUniform("RefractionVal", mRefraction);
 
-	shader->SetIntUniform("EnviromentMap", mEnviromentMap.GetIndex(false));
 
 }
 

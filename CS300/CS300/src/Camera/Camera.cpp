@@ -366,7 +366,7 @@ void Camera::GenerateEnviroment(std::vector<GameObject*>& reflectiveObjects, std
 
 void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& objects)
 {
-	CubeMap targetMap = target->mMaterial.mEnviromentMap;
+	CubeMap& targetMap = target->mMaterial.mEnviromentMap;
 
 	std::vector<glm::vec3> viewVecs {glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1)};
 	std::vector<glm::vec3> upVecs { glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), glm::vec3(0, 0, -1), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0) };
@@ -705,13 +705,6 @@ void Camera::SetAnimation()
 	{
 		mLights[i].SetAnimation(mLightAnimation);
 	}
-}
-
-void Camera::SetShadowmap()
-{
-	//setting the texture as active
-	glActiveTexture(GL_TEXTURE0 + 2);
-	glBindTexture(GL_TEXTURE_2D, mFrameBuffer.GetShadowMap());
 }
 
 /**************************************************************************
