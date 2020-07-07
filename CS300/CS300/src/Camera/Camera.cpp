@@ -107,6 +107,8 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	//getting the shader which will be used
 	GLenum error = glGetError();
 
+	RenderSkyBox(mCameraMatrix, mPerspective);
+
 	//for each object
 	for (unsigned i = 0; i < objects.size(); i++)
 	{
@@ -173,8 +175,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		}
 	}
 
-	RenderSkyBox();
-
 	//calling to be rendered on to the scren
 	Display();
 	
@@ -193,7 +193,7 @@ The render function for the skybox
 
 *
 **************************************************************************/
-void Camera::RenderSkyBox()
+void Camera::RenderSkyBox(glm::mat4& view, glm::mat4& proj)
 {
 	glCullFace(GL_FRONT);
 	glDepthFunc(GL_LEQUAL);
@@ -202,11 +202,11 @@ void Camera::RenderSkyBox()
 
 	skybox.Use();
 
-	glm::mat4 camera = glm::mat4(glm::mat3(mCameraMatrix));
+	glm::mat4 camera = glm::mat4(glm::mat3(view));
 
 	skybox.SetMatUniform("view", glm::value_ptr(camera));
-	skybox.SetMatUniform("projection", glm::value_ptr(mPerspective));
-	skybox.SetIntUniform("cubeMap", mSkyBox.GetCubeMap().GetHandle());
+	skybox.SetMatUniform("projection", glm::value_ptr(proj));
+	skybox.SetIntUniform("cubeMap", mSkyBox.GetCubeMap().GetIndex());
 
 	mSkyBox.GetCubeMap().SetCubeMapActive();
 
@@ -338,12 +338,6 @@ void Camera::Update()
 	if (KeyDown(num9))
 		mLightMode = Light::LightType::Directional;
 
-	//if (KeyTriggered(R))
-	//	AddLight();
-	//
-	//if (KeyTriggered(Y))
-	//	RemoveLight();
-
 #pragma endregion
 
 	if (lastMode != mLightMode)
@@ -359,14 +353,14 @@ void Camera::Update()
 	UpdateLights();
 }
 
-void Camera::GenerateEnviroment(std::vector<GameObject*>& objects)
+void Camera::GenerateEnviroment(std::vector<GameObject*>& reflectiveObjects, std::vector<GameObject*>& allObjects)
 {
-	for (unsigned i = 0; i < objects.size(); i++)
+	for (unsigned i = 0; i < reflectiveObjects.size(); i++)
 	{
-		if (!(objects[i]->mActive))
+		if (!(reflectiveObjects[i]->mActive))
 			continue;
 
-		RenderEnviroment(objects[i], objects);
+		RenderEnviroment(reflectiveObjects[i], allObjects);
 	}
 }
 
@@ -375,7 +369,7 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 	CubeMap targetMap = target->mMaterial.mEnviromentMap;
 
 	std::vector<glm::vec3> viewVecs {glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1)};
-	std::vector<glm::vec3> upVecs { glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0) };
+	std::vector<glm::vec3> upVecs { glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), glm::vec3(0, 0, -1), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0) };
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -388,13 +382,15 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 		//create view/ projection matrix and render onto the texture
 		glm::mat4x4 view = glm::lookAt(target->mPosition, viewVecs[i], upVecs[i]);
 
-		glm::mat4x4 proj = glm::perspective(glm::radians(90.0F), 1.0F, mNear, mFar);
+		glm::mat4x4 proj = glm::perspective(glm::radians(90.0F), 1.0F, 0.1F, mFar);
+
+		RenderSkyBox(view, proj);
 
 		//for each object
-		for (unsigned i = 0; i < objects.size(); i++)
+		for (unsigned j = 0; j < objects.size(); j++)
 		{
 			//if is not active skip it
-			if (!(objects[i]->mActive))
+			if (!(objects[j]->mActive))
 				continue;
 
 			ShaderProgram currentShader = GetShader();
@@ -403,7 +399,7 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 			currentShader.Use();
 
 			//setting the uniforms
-			if (objects[i]->mName.find("Side") != objects[i]->mName.npos)
+			if (objects[j]->mName.find("Side") != objects[j]->mName.npos)
 				currentShader.SetIntUniform("Mode", 0);
 			else
 				currentShader.SetIntUniform("Mode", mMode);
@@ -415,7 +411,7 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 			currentShader.SetMatUniform("projection", glm::value_ptr(proj));
 
 			//generate the model to world of the object
-			glm::mat4x4 m2w_object = objects[i]->GenerateM2W();
+			glm::mat4x4 m2w_object = objects[j]->GenerateM2W();
 			glm::mat4x4 m2w_normal = glm::transpose(glm::inverse(m2w_object));
 
 			//setting the uniform matrix
@@ -425,7 +421,7 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 			currentShader.SetVec3Uniform("CamPos", mPosition);
 
 			//setting the texture of the object as active
-			objects[i]->mMaterial.SetUniforms(&currentShader);
+			objects[j]->mMaterial.SetUniforms(&currentShader);
 
 			//if wireframe is on change the render mode
 			if (!mWireframe)//if wireframe is not togled on
@@ -434,10 +430,8 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 				glPolygonMode(GL_FRONT, GL_LINE);
 
 			//rendering the trianlges
-			DrawTriangle(&(objects[i]->mModel));
+			DrawTriangle(&(objects[j]->mModel));
 		}
-
-		RenderSkyBox();
 
 		//unbinding the VAOs
 		glBindVertexArray(0);

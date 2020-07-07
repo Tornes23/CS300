@@ -72,7 +72,7 @@ int main()
 
 		myWindow.Clear();
 		
-		myCamera.GenerateEnviroment(myManager.mObjects);
+		myCamera.GenerateEnviroment(myManager.mObjects, myManager.mAllObjects);
 		myCamera.Render(myManager.mAllObjects);
 		myEditor.Render();
 		myWindow.SwapBuffers();

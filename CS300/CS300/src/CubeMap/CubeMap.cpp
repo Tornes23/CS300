@@ -13,6 +13,10 @@ CubeMap::CubeMap(std::string cubePath)
 	LoadCubeImage();
 
 	SetParameters();
+
+	mCubeIndex = 1;
+
+	mGenCubeIndex = 2;
 }
 
 /**************************************************************************
@@ -105,13 +109,13 @@ void CubeMap::SetCubeMapActive(bool loaded)
 	if (loaded)
 	{
 		//setting the texture as active
-		glActiveTexture(GL_TEXTURE0 + 3);
+		glActiveTexture(GL_TEXTURE0 + 1);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mHandle);
 	}
 	else
 	{
 		//setting the texture as active
-		glActiveTexture(GL_TEXTURE0 + 3);
+		glActiveTexture(GL_TEXTURE0 + 2);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mFBOCubeHandle);
 	}
 }
@@ -153,6 +157,14 @@ void CubeMap::GenFBOCube()
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+int CubeMap::GetIndex(bool loaded)
+{
+	if (!loaded)
+		return mGenCubeIndex;
+
+	return mCubeIndex;
 }
 
 /**************************************************************************

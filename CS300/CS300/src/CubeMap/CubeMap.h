@@ -27,11 +27,16 @@ public:
 
 	void GenFBOCube();
 
+	int GetIndex(bool loaded = true);
+
 	std::string mCubeMapPath;
 
 	GLuint mHandle;
 	GLuint mFBOCubeHandle;
 	GLuint mFormat;
+
+	int mCubeIndex;
+	int mGenCubeIndex;
 
 	GLuint mFrameCube[6];
 

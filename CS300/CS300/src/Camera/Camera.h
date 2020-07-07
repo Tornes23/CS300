@@ -69,12 +69,12 @@ public:
 
 	Camera(glm::vec3 direction = glm::vec3(0,0,-1), glm::ivec2 viewport = glm::ivec2(1280, 720));
 	void Render(std::vector<GameObject*>& objects);
-	void RenderSkyBox();
+	void RenderSkyBox(glm::mat4& view, glm::mat4& proj);
 	void Display();
 	void ComputePos();
 	void Update();
 
-	void GenerateEnviroment(std::vector<GameObject*>& objects);
+	void GenerateEnviroment(std::vector<GameObject*>& reflectiveObjects, std::vector<GameObject*>& allObjects);
 	void RenderEnviroment(GameObject* target, std::vector<GameObject*>& objects);
 
 	void DrawTriangle(Model* target);

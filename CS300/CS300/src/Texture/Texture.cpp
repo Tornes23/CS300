@@ -278,11 +278,6 @@ void Texture::FreeSurface(SDL_Surface* surface)
 
 int Texture::GetTexIndex() const
 {
-	if (mFilename == "./src/Texture/resources/default.png")
-		return 0;
-	else
-		return 1;
-
 	return 0;
 }
 
