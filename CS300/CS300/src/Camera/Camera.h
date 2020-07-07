@@ -74,6 +74,9 @@ public:
 	void ComputePos();
 	void Update();
 
+	void GenerateEnviroment(std::vector<GameObject*>& objects);
+	void RenderEnviroment(GameObject* target, std::vector<GameObject*>& objects);
+
 	void DrawTriangle(Model* target);
 	void DrawNormals(Model* target);
 	void DrawLights();

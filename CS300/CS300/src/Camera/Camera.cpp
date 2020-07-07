@@ -359,6 +359,95 @@ void Camera::Update()
 	UpdateLights();
 }
 
+void Camera::GenerateEnviroment(std::vector<GameObject*>& objects)
+{
+	for (unsigned i = 0; i < objects.size(); i++)
+	{
+		if (!(objects[i]->mActive))
+			continue;
+
+		RenderEnviroment(objects[i], objects);
+	}
+}
+
+void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& objects)
+{
+	CubeMap targetMap = target->mMaterial.mEnviromentMap;
+
+	std::vector<glm::vec3> viewVecs {glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1)};
+	std::vector<glm::vec3> upVecs { glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0) };
+
+	for (int i = 0; i < 6; i++)
+	{
+		// Bind created FBO
+		glBindFramebuffer(GL_FRAMEBUFFER, targetMap.mFrameCube[i]);
+
+		glClearColor(0.0F, 0.0F, 0.0F, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//create view/ projection matrix and render onto the texture
+		glm::mat4x4 view = glm::lookAt(target->mPosition, viewVecs[i], upVecs[i]);
+
+		glm::mat4x4 proj = glm::perspective(glm::radians(90.0F), 1.0F, mNear, mFar);
+
+		//for each object
+		for (unsigned i = 0; i < objects.size(); i++)
+		{
+			//if is not active skip it
+			if (!(objects[i]->mActive))
+				continue;
+
+			ShaderProgram currentShader = GetShader();
+
+			//calling to use this render
+			currentShader.Use();
+
+			//setting the uniforms
+			if (objects[i]->mName.find("Side") != objects[i]->mName.npos)
+				currentShader.SetIntUniform("Mode", 0);
+			else
+				currentShader.SetIntUniform("Mode", mMode);
+
+			currentShader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
+
+			//Setting the matrix uniforms
+			currentShader.SetMatUniform("view", glm::value_ptr(view));
+			currentShader.SetMatUniform("projection", glm::value_ptr(proj));
+
+			//generate the model to world of the object
+			glm::mat4x4 m2w_object = objects[i]->GenerateM2W();
+			glm::mat4x4 m2w_normal = glm::transpose(glm::inverse(m2w_object));
+
+			//setting the uniform matrix
+			currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
+			currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
+
+			currentShader.SetVec3Uniform("CamPos", mPosition);
+
+			//setting the texture of the object as active
+			objects[i]->mMaterial.SetUniforms(&currentShader);
+
+			//if wireframe is on change the render mode
+			if (!mWireframe)//if wireframe is not togled on
+				glPolygonMode(GL_FRONT, GL_FILL);
+			else
+				glPolygonMode(GL_FRONT, GL_LINE);
+
+			//rendering the trianlges
+			DrawTriangle(&(objects[i]->mModel));
+		}
+
+		RenderSkyBox();
+
+		//unbinding the VAOs
+		glBindVertexArray(0);
+		glUseProgram(0);
+
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 /**************************************************************************
 *!
 \fn     Camera::DrawTriangle

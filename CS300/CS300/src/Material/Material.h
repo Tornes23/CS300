@@ -27,6 +27,7 @@ The functions included are:
 
 #pragma once
 #include "../Texture/Texture.h"
+#include "../CubeMap/CubeMap.h"
 
 class ShaderProgram;
 
@@ -47,9 +48,11 @@ public:
 
 	void SetUniforms(ShaderProgram* shader);
 
+	void SetenviromentMap(CubeMap& enviroment);
+
 	Texture mTexture;
 	Texture mNormalMap;
-	//Texture mEnvirmentMap;
+	CubeMap mEnviromentMap;
 
 	Color mAmbientColor;
 	Color mDiffuseColor;

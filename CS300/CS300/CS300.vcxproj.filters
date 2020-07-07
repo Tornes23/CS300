@@ -88,7 +88,7 @@
     <Filter Include="Source Files\SkyBox">
       <UniqueIdentifier>{a0d6ef1b-e452-4fc9-8d8c-34f06f3de859}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Texture\CubeMaps">
+    <Filter Include="Source Files\Texture\CubeMap">
       <UniqueIdentifier>{9b742793-5df2-4341-ad21-f2b955443e6e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -163,7 +163,7 @@
       <Filter>Source Files\SkyBox</Filter>
     </ClCompile>
     <ClCompile Include="src\CubeMap\CubeMap.cpp">
-      <Filter>Source Files\Texture\CubeMaps</Filter>
+      <Filter>Source Files\Texture\CubeMap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -219,7 +219,7 @@
       <Filter>Source Files\SkyBox</Filter>
     </ClInclude>
     <ClInclude Include="src\CubeMap\CubeMap.h">
-      <Filter>Source Files\Texture\CubeMaps</Filter>
+      <Filter>Source Files\Texture\CubeMap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

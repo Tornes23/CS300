@@ -52,8 +52,11 @@ void CubeMap::SetParameters(GLint param1, GLint param2)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
-const GLuint CubeMap::GetHandle() const
+const GLuint CubeMap::GetHandle(bool loaded) const
 {
+	if(!loaded)
+		return mFBOCubeHandle;
+	
 	return mHandle;
 }
 
@@ -97,17 +100,59 @@ void CubeMap::FreeSurface(SDL_Surface* surface)
 		SDL_FreeSurface(surface);
 }
 
-void CubeMap::SetCubeMapActive()
+void CubeMap::SetCubeMapActive(bool loaded)
 {
-	//setting the texture as active
-	glActiveTexture(GL_TEXTURE0 + 3);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mHandle);
+	if (loaded)
+	{
+		//setting the texture as active
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, mHandle);
+	}
+	else
+	{
+		//setting the texture as active
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, mFBOCubeHandle);
+	}
 }
 
 void CubeMap::GenMipMap()
 {
 	//generating mipmap
 	glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void CubeMap::GenFBOCube()
+{
+	glGenTextures(1, &mFBOCubeHandle);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, mFBOCubeHandle);
+
+	const unsigned EnvMapSize = 512;
+
+	for (GLuint i = 0; i < 6; i++)
+	{
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, EnvMapSize, EnvMapSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+
+	// Create and set up the FBO
+	glGenFramebuffers(6, mFrameCube);
+	for (GLuint i = 0; i < 6; i++)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, mFrameCube[i]);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mFBOCubeHandle, 0);
+		GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+		glDrawBuffers(1, drawBuffers);
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 /**************************************************************************

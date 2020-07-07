@@ -9,7 +9,7 @@ out vec4 FragColor;
 
 uniform sampler2D textureData;
 
-uniform samplerCube CubeMap;
+uniform samplerCube EnviromentMap;
 
 uniform int Mode;
 
@@ -27,8 +27,8 @@ void main()
         FragColor = texture(textureData, UV).rgba;
     
     if(Mode == 1)
-        FragColor = texture(CubeMap, normalize(reflectedVec)).rgba;
+        FragColor = texture(EnviromentMap, normalize(reflectedVec)).rgba;
     
     if(Mode == 2)
-        FragColor = texture(CubeMap, normalize(refractedVec)).rgba;
+        FragColor = texture(EnviromentMap, normalize(refractedVec)).rgba;
 }

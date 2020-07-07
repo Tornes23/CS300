@@ -1,6 +1,8 @@
 #pragma once
+#include <string>
+#include "../FrameBuffer/FrameBuffer.h"
 
-#include "../Texture/Texture.h"
+struct SDL_Surface;
 
 class CubeMap
 {
@@ -11,7 +13,7 @@ public:
 
 	void SetParameters(GLint param1 = GL_LINEAR, GLint param2 = GL_LINEAR);
 
-	const GLuint GetHandle() const;
+	const GLuint GetHandle(bool loaded = true) const;
 
 	void LoadCubeImage();
 
@@ -19,16 +21,19 @@ public:
 
 	void FreeSurface(SDL_Surface* surface);
 
-	void SetCubeMapActive();
+	void SetCubeMapActive(bool loaded = true);
 
 	void GenMipMap();
 
-private:
+	void GenFBOCube();
 
 	std::string mCubeMapPath;
 
 	GLuint mHandle;
+	GLuint mFBOCubeHandle;
 	GLuint mFormat;
+
+	GLuint mFrameCube[6];
 
 	SDL_Surface* mTexture;
 
