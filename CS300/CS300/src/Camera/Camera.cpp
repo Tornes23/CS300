@@ -404,7 +404,7 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 			else
 				currentShader.SetIntUniform("Mode", mMode);
 
-			currentShader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
+			currentShader.SetIntUniform("Averaged", mAveragedNormals ? 1 : 0);
 
 			//Setting the matrix uniforms
 			currentShader.SetMatUniform("view", glm::value_ptr(view));

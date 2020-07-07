@@ -26,12 +26,12 @@ void main()
     mat4 MVP = projection * view * m2w;
     
     FragInWorld = vec3(m2w * vec4(vPos, 1.0));
-    CamInWorld  = vec3(m2w * vec4(CamPos, 1.0));
+    CamInWorld  = CamPos;
     
     if(Averaged == 0)
-        NormalInWorld = vec3(normalize(m2w_normal * vec4(vNormal, 1.0)));
+        NormalInWorld = normalize(mat3(m2w_normal) * vNormal);
     else
-        NormalInWorld = vec3(normalize(m2w_normal * vec4(vAverage, 1.0)));
+        NormalInWorld = normalize(mat3(m2w_normal) * vAverage);
     
     //applying the transformation to the vertex pos
     gl_Position = MVP * vec4(vPos, 1.0);
