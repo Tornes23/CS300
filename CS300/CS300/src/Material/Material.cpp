@@ -195,11 +195,10 @@ void Material::SetUniforms(ShaderProgram * shader)
 	shader->SetIntUniform("textureData", mTexture.GetTexIndex());
 
 
-	mEnviromentMap.SetCubeMapActive();
+	mEnviromentMap.SetCubeMapActive(false);
 	shader->SetIntUniform("EnviromentMap", mEnviromentMap.GetIndex(false));
 
 	shader->SetFloatUniform("RefractionVal", mRefraction);
-
 
 }
 
