@@ -1,11 +1,11 @@
 #include "SkyBox.h"
 
-SkyBox::SkyBox(std::string cubePath) : mShader("./src/Shader/programs/SkyBox.vs", "./src/Shader/programs/SkyBox.fs"), mCubeMap(cubePath, true), mModel()
+SkyBox::SkyBox(std::string cubePath) : mShader("./src/Shader/programs/SkyBox.vs", "./src/Shader/programs/SkyBox.fs"), mCubeMap(cubePath), mModel()
 {
-	mCubeMapPath = cubePath;
+
 }
 
-Texture SkyBox::GetTexture() const
+CubeMap SkyBox::GetCubeMap() const
 {
 	return mCubeMap;
 }

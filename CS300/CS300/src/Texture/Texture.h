@@ -39,20 +39,15 @@ class Texture
 {
 public:
 
-	Texture(std::string filename = "./src/Texture/resources/default.png", bool cubeMap = false);
+	Texture(std::string filename = "./src/Texture/resources/default.png");
 	void SetActiveTexture();
-	void SetCubeMapTexture();
-	void SetNormalMap();
 	void UploadTexture(void* data);
 	void GenBuffers();
-	void GenCubeBuffer();
 	void GetFormat(SDL_Surface* texture = nullptr);
 	void GenMipMap();
 	void SetParameter(GLint param1 = GL_LINEAR_MIPMAP_LINEAR, GLint param2 = GL_LINEAR);
-	void SetCubeParameters(GLint param1 = GL_LINEAR, GLint param2 = GL_LINEAR);
 	const GLuint GetHandle() const;
 	void LoadImage(const std::string& image);
-	void LoadCubeImage(std::string& image);
 	void FreeSurface(SDL_Surface* surface);
 	int GetTexIndex() const;
 

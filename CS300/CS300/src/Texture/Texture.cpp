@@ -47,68 +47,57 @@ the name of the image to loadf
 
 *
 **************************************************************************/
-Texture::Texture(std::string filename, bool cubeMap)
+Texture::Texture(std::string filename)
 {
 	//setting the member variables
 	mTexture = nullptr;
 	mFilename = filename;
 
-	if (!cubeMap)
+	//creating a default 6x6 texture in case is needed
+	Color defaultTexture[] =
 	{
-		//creating a default 6x6 texture in case is needed
-		Color defaultTexture[] =
-		{
-			Color::Blue,   Color::Cyan,   Color::Green,  Color::Yellow, Color::Red,    Color::Pink,
-			Color::Cyan,   Color::Green,  Color::Yellow, Color::Red,    Color::Pink,   Color::Blue,
-			Color::Green,  Color::Yellow, Color::Red,    Color::Pink,   Color::Blue,   Color::Cyan,
-			Color::Yellow, Color::Red,    Color::Pink,   Color::Blue,   Color::Cyan,   Color::Green,
-			Color::Red,    Color::Pink,   Color::Blue,   Color::Cyan,   Color::Green,  Color::Yellow,
-			Color::Pink,   Color::Blue,   Color::Cyan,   Color::Green,  Color::Yellow, Color::Red
-		};
+		Color::Blue,   Color::Cyan,   Color::Green,  Color::Yellow, Color::Red,    Color::Pink,
+		Color::Cyan,   Color::Green,  Color::Yellow, Color::Red,    Color::Pink,   Color::Blue,
+		Color::Green,  Color::Yellow, Color::Red,    Color::Pink,   Color::Blue,   Color::Cyan,
+		Color::Yellow, Color::Red,    Color::Pink,   Color::Blue,   Color::Cyan,   Color::Green,
+		Color::Red,    Color::Pink,   Color::Blue,   Color::Cyan,   Color::Green,  Color::Yellow,
+		Color::Pink,   Color::Blue,   Color::Cyan,   Color::Green,  Color::Yellow, Color::Red
+	};
 
-		//if the filename is other than the default one
-		if (filename != "./src/Texture/resources/default.png")
-			LoadImage(filename);//load it
-		else
-		{
-			//setting the widht and height to 6 
-			mWidth = 6;
-			mHeight = 6;
-		}
-
-		//generating the buffers
-		GenBuffers();
-
-		//getting the format of the texture
-		GetFormat(mTexture);
-
-		//setting the sampling parameter
-		if (filename != "./src/Texture/resources/default.png")
-			SetParameter();
-		else
-			SetParameter(GL_NEAREST, GL_NEAREST);
-
-		//depending if an image was actually loaded or not upload the default texture or te loaded image
-		if (mTexture == nullptr)
-			UploadTexture((unsigned char*)defaultTexture);
-		else
-			UploadTexture(mTexture->pixels);
-
-		//generating a mipmap
-		GenMipMap();
-
-		//freeing the loaded image
-		FreeSurface(mTexture);
-	}
+	//if the filename is other than the default one
+	if (filename != "./src/Texture/resources/default.png")
+		LoadImage(filename);//load it
 	else
 	{
-		GenCubeBuffer();
-	
-		LoadCubeImage(mFilename);
-
-		SetCubeParameters();
-		
+		//setting the widht and height to 6 
+		mWidth = 6;
+		mHeight = 6;
 	}
+
+	//generating the buffers
+	GenBuffers();
+
+	//getting the format of the texture
+	GetFormat(mTexture);
+
+	//setting the sampling parameter
+	if (filename != "./src/Texture/resources/default.png")
+		SetParameter();
+	else
+		SetParameter(GL_NEAREST, GL_NEAREST);
+
+	//depending if an image was actually loaded or not upload the default texture or te loaded image
+	if (mTexture == nullptr)
+		UploadTexture((unsigned char*)defaultTexture);
+	else
+		UploadTexture(mTexture->pixels);
+
+	//generating a mipmap
+	GenMipMap();
+
+	//freeing the loaded image
+	FreeSurface(mTexture);
+	
 }
 
 /**************************************************************************
@@ -124,20 +113,6 @@ void Texture::SetActiveTexture()
 {
 	//setting the texture as active
 	glActiveTexture(GL_TEXTURE0 + 0);
-	glBindTexture(GL_TEXTURE_2D, mHandle);
-}
-
-void Texture::SetCubeMapTexture()
-{
-	//setting the texture as active
-	glActiveTexture(GL_TEXTURE0 + 3);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mHandle);
-}
-
-void Texture::SetNormalMap()
-{
-	//setting the texture as active
-	glActiveTexture(GL_TEXTURE0 + 1);
 	glBindTexture(GL_TEXTURE_2D, mHandle);
 }
 
@@ -173,21 +148,6 @@ void Texture::GenBuffers()
 	//generating the buffer for the texture
 	glGenTextures(1, &mHandle);
 	glBindTexture(GL_TEXTURE_2D, mHandle);
-}
-
-/**************************************************************************
-*!
-\fn     Texture::GenCubeBuffer
-
-\brief
-Generates the cube map buffer
-
-*
-**************************************************************************/
-void Texture::GenCubeBuffer()
-{
-	glGenTextures(1, &mHandle);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mHandle);
 }
 
 /**************************************************************************
@@ -250,16 +210,6 @@ void Texture::SetParameter(GLint param1, GLint param2)
 
 }
 
-void Texture::SetCubeParameters(GLint param1, GLint param2)
-{
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, param1);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, param2);
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-}
-
 /**************************************************************************
 *!
 \fn     Texture::GetHandle
@@ -305,47 +255,6 @@ void Texture::LoadImage(const std::string & image)
 	//setting the width and height
 	mWidth = mTexture->w;
 	mHeight = mTexture->h;
-}
-
-/**************************************************************************
-*!
-\fn     Texture::LoadCubeImage
-
-\brief
-Loads the .pngs of the specified path
-
-\param  const std::string & folder
-tha path to the source folder
-
-*
-**************************************************************************/
-void Texture::LoadCubeImage(std::string & folder)
-{
-	std::vector<std::string> images;
-
-	Utils::GetFileNames(folder, images);
-
-	for (unsigned i = 0; i < images.size(); i++)
-	{
-		//calling to the SDL_Image load function
-		mTexture = IMG_Load(images[i].c_str());
-
-		//if it was loaded succesfully
-		if (mTexture == nullptr)
-		{
-			std::cout << "Error while trying to load " << images[i] << " texture" << std::endl;
-			exit(-1);
-		}
-
-		GetFormat(mTexture);
-
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mFormat, mTexture->w, mTexture->h, 0, mFormat, GL_UNSIGNED_BYTE, mTexture->pixels);
-
-		GenMipMap();
-
-		FreeSurface(mTexture);
-
-	}
 }
 
 /**************************************************************************

@@ -82,6 +82,7 @@
     <ClCompile Include="..\include\IMGUI\imgui_widgets.cpp" />
     <ClCompile Include="src\Camera\Camera.cpp" />
     <ClCompile Include="src\Color\Color.cpp" />
+    <ClCompile Include="src\CubeMap\CubeMap.cpp" />
     <ClCompile Include="src\Editor\Editor.cpp" />
     <ClCompile Include="src\FrameBuffer\FrameBuffer.cpp" />
     <ClCompile Include="src\GameObject\GameObject.cpp" />
@@ -102,6 +103,7 @@
     <ClInclude Include="src\Camera\Camera.h" />
     <ClInclude Include="src\Color\Color.h" />
     <ClInclude Include="src\CS300.h" />
+    <ClInclude Include="src\CubeMap\CubeMap.h" />
     <ClInclude Include="src\Editor\Editor.h" />
     <ClInclude Include="src\FrameBuffer\FrameBuffer.h" />
     <ClInclude Include="src\GameObject\GameObject.h" />

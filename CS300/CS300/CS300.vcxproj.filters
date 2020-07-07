@@ -88,6 +88,9 @@
     <Filter Include="Source Files\SkyBox">
       <UniqueIdentifier>{a0d6ef1b-e452-4fc9-8d8c-34f06f3de859}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Texture\CubeMaps">
+      <UniqueIdentifier>{9b742793-5df2-4341-ad21-f2b955443e6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -159,6 +162,9 @@
     <ClCompile Include="src\SkyBox\SkyBox.cpp">
       <Filter>Source Files\SkyBox</Filter>
     </ClCompile>
+    <ClCompile Include="src\CubeMap\CubeMap.cpp">
+      <Filter>Source Files\Texture\CubeMaps</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera\Camera.h">
@@ -211,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="src\SkyBox\SkyBox.h">
       <Filter>Source Files\SkyBox</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CubeMap\CubeMap.h">
+      <Filter>Source Files\Texture\CubeMaps</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -139,8 +139,8 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
 		currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 		
-		mSkyBox.GetTexture().SetCubeMapTexture();
-		currentShader.SetIntUniform("CubeMap", mSkyBox.GetTexture().GetHandle());
+		mSkyBox.GetCubeMap().SetCubeMapActive();
+		currentShader.SetIntUniform("CubeMap", mSkyBox.GetCubeMap().GetHandle());
 
 		currentShader.SetVec3Uniform("CamPos", mPosition);
 
@@ -173,7 +173,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		}
 	}
 
-	//rendering the SkyBox
 	RenderSkyBox();
 
 	//calling to be rendered on to the scren
@@ -207,9 +206,9 @@ void Camera::RenderSkyBox()
 
 	skybox.SetMatUniform("view", glm::value_ptr(camera));
 	skybox.SetMatUniform("projection", glm::value_ptr(mPerspective));
-	skybox.SetIntUniform("cubeMap", mSkyBox.GetTexture().GetHandle());
+	skybox.SetIntUniform("cubeMap", mSkyBox.GetCubeMap().GetHandle());
 
-	mSkyBox.GetTexture().SetCubeMapTexture();
+	mSkyBox.GetCubeMap().SetCubeMapActive();
 
 	DrawTriangle(&(mSkyBox.GetModel()));
 	glCullFace(GL_BACK);

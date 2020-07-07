@@ -1,5 +1,5 @@
 #pragma once
-#include "../Texture/Texture.h"
+#include "../CubeMap/CubeMap.h"
 #include "../Shader/Shader.h"
 #include "../Model/Model.h"
 
@@ -9,17 +9,15 @@ public:
 
 	SkyBox(std::string cubePath = "./src/Texture/resources/CubeMap");
 
-	Texture GetTexture() const;
+	CubeMap GetCubeMap() const;
 	Model GetModel() const;
 	ShaderProgram GetShader() const;
 
 private:
 
-	std::string mCubeMapPath;
-	
 	ShaderProgram mShader;
 	
-	Texture mCubeMap;
+	CubeMap mCubeMap;
 	
 	Model mModel;
 };
