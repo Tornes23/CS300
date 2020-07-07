@@ -16,7 +16,6 @@ out vec3 NormalInWorld;
 uniform mat4 m2w;
 uniform mat4 view;
 uniform mat4 projection;
-uniform mat4 m2w_normal;
 uniform vec3 CamPos;
 uniform int Averaged;
 
@@ -28,10 +27,12 @@ void main()
     FragInWorld = vec3(m2w * vec4(vPos, 1.0));
     CamInWorld  = CamPos;
     
+    mat3 m2w_normal = inverse(transpose(mat3(m2w)));
+    
     if(Averaged == 0)
-        NormalInWorld = normalize(mat3(m2w_normal) * vNormal);
+        NormalInWorld = normalize(m2w_normal * vNormal);
     else
-        NormalInWorld = normalize(mat3(m2w_normal) * vAverage);
+        NormalInWorld = normalize(m2w_normal * vAverage);
     
     //applying the transformation to the vertex pos
     gl_Position = MVP * vec4(vPos, 1.0);

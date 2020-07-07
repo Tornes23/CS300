@@ -382,7 +382,7 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 		//create view/ projection matrix and render onto the texture
 		glm::mat4x4 view = glm::lookAt(target->mPosition, viewVecs[i], upVecs[i]);
 
-		glm::mat4x4 proj = glm::perspective(glm::radians(90.0F), 1.0F, 0.1F, mFar);
+		glm::mat4x4 proj = glm::perspective(glm::radians(90.0F), 1.0F, mNear, mFar);
 
 		RenderSkyBox(view, proj);
 
@@ -412,11 +412,9 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 
 			//generate the model to world of the object
 			glm::mat4x4 m2w_object = objects[j]->GenerateM2W();
-			glm::mat4x4 m2w_normal = glm::transpose(glm::inverse(m2w_object));
 
 			//setting the uniform matrix
 			currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
-			currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 
 			currentShader.SetVec3Uniform("CamPos", mPosition);
 

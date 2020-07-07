@@ -17,11 +17,11 @@ uniform float RefractionVal;
 
 void main()
 {
-    vec3 viewVector = normalize(CamInWorld - FragInWorld);
+    vec3 viewVector = normalize(FragInWorld - CamInWorld);
     
-    vec3 reflectedVec = reflect(-viewVector, NormalInWorld);
+    vec3 reflectedVec = reflect(viewVector, NormalInWorld);
     
-    vec3 refractedVec = refract(-viewVector, NormalInWorld, RefractionVal);
+    vec3 refractedVec = refract(viewVector, NormalInWorld, RefractionVal);
     
     if(Mode == 0)
         FragColor = texture(textureData, UV).rgba;
