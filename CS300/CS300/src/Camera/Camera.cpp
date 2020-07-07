@@ -71,6 +71,8 @@ Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport
 	mFar = 500.0F;
 	mRadius = 50.0F;
 
+	mFOV = 60.0F;
+
 	mViewport = viewport;
 
 	mWireframe = false;
@@ -83,9 +85,6 @@ Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport
 	mLightMode = Light::LightType::Spotlight;
 
 	AddAllShaders();
-	AddLight();
-
-	mLights[0].SetShadowMap(mFrameBuffer.GetShadowMap());
 }
 
 /**************************************************************************
@@ -105,13 +104,8 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	//calling that the render buffer wil be used 
 	mFrameBuffer.UseRenderBuffer();
 
-	GLenum error = glGetError();
 	//getting the shader which will be used
-	
-	//creating the light space matrix
-	glm::mat4x4 lighProjection = glm::perspective(glm::radians(60.0F), static_cast<float>(mViewport.x) / static_cast<float>(mViewport.y), mNear, mFar);
-	glm::mat4x4 lighDirection = glm::lookAt(mLights[0].GetPosition(), glm::vec3(0.0F), glm::vec3(0.0F, 1.0F, 0.0F));
-	glm::mat4x4 lightSpace = lighProjection * lighDirection;
+	GLenum error = glGetError();
 
 	//for each object
 	for (unsigned i = 0; i < objects.size(); i++)
@@ -126,36 +120,32 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		currentShader.Use();
 	
 		//setting the uniforms
-		currentShader.SetMatUniform("lightSpace", glm::value_ptr(lightSpace));
+		if(objects[i]->mName.find("Side") != objects[i]->mName.npos)
+			currentShader.SetIntUniform("Mode", 0);
+		else
+			currentShader.SetIntUniform("Mode", mMode);
 
 		currentShader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
+
 		//Setting the matrix uniforms
 		currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
 		currentShader.SetMatUniform("projection", glm::value_ptr(mPerspective));
 	
 		//generate the model to world of the object
 		glm::mat4x4 m2w_object = objects[i]->GenerateM2W();
-		glm::mat4x4 m2w_normal = glm::transpose(glm::inverse(mCameraMatrix * m2w_object));
+		glm::mat4x4 m2w_normal = glm::transpose(glm::inverse(m2w_object));
 	
 		//setting the uniform matrix
 		currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
 		currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
 		
-		currentShader.SetVec3Uniform("camPositon", mPosition);
+		mSkyBox.GetTexture().SetCubeMapTexture();
+		currentShader.SetIntUniform("CubeMap", mSkyBox.GetTexture().GetHandle());
 
-		bool useTex = mMode < NormalColoring ? mMode % 2 == 0 ? true : false : false;
-	
-		currentShader.SetIntUniform("UseTexture", useTex ? 1 : 0);
-	
-		if(mMode >= NormalColoring)
-			currentShader.SetIntUniform("Selection", mMode - NormalColoring);
-	
+		currentShader.SetVec3Uniform("CamPos", mPosition);
+
 		//setting the texture of the object as active
 		objects[i]->mMaterial.SetUniforms(&currentShader);
-
-		//if (mMode == Shadows)
-		//	ApplyLight(currentShader, mCameraMatrix);
-	
 	
 		//if wireframe is on change the render mode
 		if (!mWireframe)//if wireframe is not togled on
@@ -182,7 +172,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 			DrawNormals(&(objects[i]->mModel));
 		}
 	}
-	
+
 	//rendering the SkyBox
 	RenderSkyBox();
 
@@ -192,76 +182,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	//unbinding the VAOs
 	glBindVertexArray(0);
 	glUseProgram(0);
-
-}
-
-
-/**************************************************************************
-*!
-\fn     Camera::RenderDepth
-
-\brief
-The render function
-
-\param  std::vector<GameObject*>& objects
-The game objects to render onto the depth map
-
-*
-**************************************************************************/
-void Camera::RenderDepth(std::vector<GameObject*>& objects)
-{
-	GLenum error = glGetError();
-
-	//getting the shader to be used
-	ShaderProgram depthShader = GetDepthShader();
-
-	//getting the light matrices
-	glm::mat4x4 mLightView = mLights[0].GetView();
-	glm::mat4x4 mLightProj = mLights[0].GetPerspective(mNear, mFar, mViewport);
-
-	depthShader.Use();
-
-	//setting the uniforms
-	depthShader.SetMatUniform("view", glm::value_ptr(mLightView));
-	depthShader.SetMatUniform("projection", glm::value_ptr(mLightProj));
-
-	//calling that we will use the the depth buffer
-	mFrameBuffer.UseDepthBuffer();
-
-	//for each object
-	for (unsigned i = 0; i < objects.size(); i++)
-	{
-		//if is not active skip it
-		if (!(objects[i]->mActive))
-			continue;
-
-		//generate the model to world of the object
-		glm::mat4x4 m2w_object = objects[i]->GenerateM2W();
-		
-		//setting the uniform matrix
-		depthShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, objects[i]->mMaterial.GetTexture().GetHandle());
-
-		//setting the texture of the object as active
-		objects[i]->mMaterial.SetUniforms(&depthShader);
-
-		//if wireframe is on change the render mode
-		if (!mWireframe)//if wireframe is not togled on
-			glPolygonMode(GL_FRONT, GL_FILL);
-		else
-			glPolygonMode(GL_FRONT, GL_LINE);
-
-		//rendering the trianlges
-		DrawTriangle(&(objects[i]->mModel));
-	}
-
-	//setting the resulting shadow map to the existing light
-	mLights[0].SetShadowMap(mFrameBuffer.GetShadowMap());
-
-	// Bind screen buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 }
 
@@ -335,49 +255,7 @@ void Camera::Display()
 	// Draw
 	glDrawArrays(GL_TRIANGLES, 0, mRenderPlane.GetDrawElements());
 
-	//calling to render the shadow map on th bottom left corner
-	//DisplayShadowMap();
 
-}
-
-/**************************************************************************
-*!
-\fn     Camera::DisplayShadowMap
-
-\brief
-The render to screen function for the shadow map
-
-*
-**************************************************************************/
-void Camera::DisplayShadowMap()
-{
-	//setting the viewport
-	glViewport(0, 0, 256, 256);
-
-	// Clear screen framebuffer
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	// Select shader program, set uniforms and draw
-	ShaderProgram shadowMap = GetShadowMapShader();
-
-	shadowMap.Use();
-
-	glm::mat4 transform = glm::scale(glm::vec3(2.0F));
-
-	shadowMap.SetMatUniform("M", glm::value_ptr(transform));
-	shadowMap.SetFloatUniform("Contrast", mFrameBuffer.GetContrast());
-
-	GLenum error = glGetError();
-
-	//binding the objects VAO
-	glBindVertexArray(mShadowPlane.GetVAO());
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mLights[0].GetShadowMap());
-	shadowMap.SetIntUniform("textureData", 0);
-
-	// Draw
-	glDrawArrays(GL_TRIANGLES, 0, mShadowPlane.GetDrawElements());
 }
 
 /**************************************************************************
@@ -391,8 +269,6 @@ The update function for the class
 **************************************************************************/
 void Camera::Update()
 {	
-	Edit();
-
 #pragma region CAMERA MOVEMENT
 
 	if (KeyDown(W))
@@ -632,15 +508,9 @@ Adds all the necessary shader for the camera to work
 void Camera::AddAllShaders()
 {
 	//adding the shaders
-	AddShader("./src/Shader/programs/NormalMap.vs"         , "./src/Shader/programs/NormalMap.fs"         );
-	AddShader("./src/Shader/programs/Lighting.vs"          , "./src/Shader/programs/Lighting.fs"          );
-	AddShader("./src/Shader/programs/Texture.vs"           , "./src/Shader/programs/Texture.fs"           );
-	AddShader("./src/Shader/programs/VectorColoring.vs"    , "./src/Shader/programs/VectorColoring.fs"    );
-	AddShader("./src/Shader/programs/Normals.vs"           , "./src/Shader/programs/Normals.fs"           , "./src/Shader/programs/Normals.gs");
-	AddShader("./src/Shader/programs/Quad.vs"              , "./src/Shader/programs/Quad.fs"              );
-	AddShader("./src/Shader/programs/Shadows.vs"           , "./src/Shader/programs/Shadows.fs"           );
-	AddShader("./src/Shader/programs/Depth.vs"             , "./src/Shader/programs/Depth.fs"             );
-	AddShader("./src/Shader/programs/ShadowMap.vs"         , "./src/Shader/programs/ShadowMap.fs"         );
+	AddShader("./src/Shader/programs/Reflection.vs" , "./src/Shader/programs/Reflection.fs" );
+	AddShader("./src/Shader/programs/Normals.vs"    , "./src/Shader/programs/Normals.fs"    , "./src/Shader/programs/Normals.gs");
+	AddShader("./src/Shader/programs/Quad.vs"       , "./src/Shader/programs/Quad.fs"       );
 
 }
 
@@ -739,48 +609,6 @@ void Camera::UpdateLights()
 
 /**************************************************************************
 *!
-\fn     Camera::Edit
-
-\brief
-Wrapping function for imgui
-*
-**************************************************************************/
-void Camera::Edit()
-{
-	//creating a window
-	if (!ImGui::Begin("Lights"))
-	{
-		// Early out if the window is collapsed, as an optimization.
-		ImGui::End();
-		return;
-	}
-
-	float con = mFrameBuffer.GetContrast();
-
-	ImGui::DragFloat("Contrast", &con, 0.005F, 0.0F, 1.0F);
-
-	mFrameBuffer.SetContrast(con);
-
-	//for each light
-	for (unsigned i = 0; i < mLights.size(); i++)
-	{
-		//setting the tab title
-		std::string title = "Light";
-
-		title += std::to_string(i);
-
-		//calling to the edit of the light
-		if (ImGui::CollapsingHeader(title.c_str()))
-		{
-			mLights[i].Edit(i);
-		}
-	}
-
-	ImGui::End();
-}
-
-/**************************************************************************
-*!
 \fn     Camera::SetAnimation
 
 \brief
@@ -819,7 +647,7 @@ returns the matrix
 glm::mat4x4 Camera::CreatePerspective()
 {
 	//creating the matrix
-	mPerspective = glm::perspective(glm::radians(60.0F), static_cast<float>(mViewport.x) / static_cast<float>(mViewport.y), mNear, mFar);
+	mPerspective = glm::perspective(glm::radians(mFOV), static_cast<float>(mViewport.x) / static_cast<float>(mViewport.y), mNear, mFar);
 
 	//returning the matrix
 	return mPerspective;
@@ -882,27 +710,7 @@ returns the shader program
 **************************************************************************/
 ShaderProgram Camera::GetShader()
 {
-
-	switch (mMode)
-	{
-	case Regular:
-		return mShaders[2];
-		break;
-	case NormalColoring:
-		return mShaders[3];
-		break;
-	case TangentColoring:
-		return mShaders[3];
-		break;
-	case BitangentColoring:
-		return mShaders[3];
-		break;
-	default:
-		return mShaders[0];
-		break;
-	}
-
-	
+	return mShaders[0];
 }
 
 /**************************************************************************
@@ -921,27 +729,12 @@ returns the shader program
 **************************************************************************/
 ShaderProgram Camera::GetNormalShader()
 {
-	return mShaders[4];//normals shader
+	return mShaders[1];//normals shader
 }
 
 ShaderProgram Camera::GetDisplayShader()
 {
-	return mShaders[5];
+	return mShaders[2];
 }
 
-ShaderProgram Camera::GetDepthShader()
-{
-	return mShaders[7];
-}
-
-ShaderProgram Camera::GetShadowMapShader()
-{
-	return mShaders[8];
-}
-
-const Light Camera::GetLight() const
-{
-	//returning the light
-	return mLights[0];
-}
 

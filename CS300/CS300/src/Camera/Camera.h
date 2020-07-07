@@ -63,19 +63,14 @@ public:
 		Regular,
 		Reflection,
 		Refraction,
-		NormalColoring,
-		TangentColoring,
-		BitangentColoring,
 		Count
 
 	} RenderMode;
 
 	Camera(glm::vec3 direction = glm::vec3(0,0,-1), glm::ivec2 viewport = glm::ivec2(1280, 720));
 	void Render(std::vector<GameObject*>& objects);
-	void RenderDepth(std::vector<GameObject*>& objects);
 	void RenderSkyBox();
 	void Display();
-	void DisplayShadowMap();
 	void ComputePos();
 	void Update();
 
@@ -90,7 +85,6 @@ public:
 	void RemoveLight();
 	void ChangeLights();
 	void UpdateLights();
-	void Edit();
 	void SetAnimation();
 
 	void SetShadowmap();
@@ -102,10 +96,6 @@ public:
 	ShaderProgram GetShader();
 	ShaderProgram GetNormalShader();
 	ShaderProgram GetDisplayShader();
-	ShaderProgram GetDepthShader();
-	ShaderProgram GetShadowMapShader();
-
-	const Light GetLight() const;
 
 private:
 
@@ -130,6 +120,8 @@ private:
 	float mNear;
 	float mFar;
 	float mRadius;
+	float mFOV;
+
 	glm::ivec2 mViewport;
 
 	glm::vec3 mRotations;

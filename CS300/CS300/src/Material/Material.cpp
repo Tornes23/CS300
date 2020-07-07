@@ -57,7 +57,7 @@ the shininess of the material
 
 *
 **************************************************************************/
-Material::Material(std::string texture, std::string normalMap, Color ambient, Color diffuse, Color specular, float shininess) : mTexture(texture), mNormalMap(normalMap)
+Material::Material(std::string texture, std::string normalMap, Color ambient, Color diffuse, Color specular, float shininess, float refraction) : mTexture(texture), mNormalMap(normalMap)
 {
 	//setting the variables
 	mAmbientColor = ambient;
@@ -65,6 +65,7 @@ Material::Material(std::string texture, std::string normalMap, Color ambient, Co
 	mSpecularColor = specular;
 
 	mShininess = shininess;
+	mRefraction = refraction;
 }
 
 /**************************************************************************
@@ -195,13 +196,16 @@ void Material::SetUniforms(ShaderProgram * shader)
 	
 	//por alguna razon si setteo este uniform no funciona
 	shader->SetIntUniform("textureData", mTexture.GetTexIndex());
-	shader->SetIntUniform("normalMap", mNormalMap.GetTexIndex());
 
-	//setting tne uniform variables
-	shader->SetVec3Uniform("material.AmbientColor",  mAmbientColor.GetColor());
-	shader->SetVec3Uniform("material.DiffuseColor",  mDiffuseColor.GetColor());
-	shader->SetVec3Uniform("material.SpecularColor", mSpecularColor.GetColor());
+	//shader->SetFloatUniform("RefractionVal", mRefraction);
 
-	shader->SetFloatUniform("material.Shininess", mShininess);
+	//shader->SetIntUniform("normalMap", mNormalMap.GetTexIndex());
+	//
+	////setting tne uniform variables
+	//shader->SetVec3Uniform("material.AmbientColor",  mAmbientColor.GetColor());
+	//shader->SetVec3Uniform("material.DiffuseColor",  mDiffuseColor.GetColor());
+	//shader->SetVec3Uniform("material.SpecularColor", mSpecularColor.GetColor());
+	//
+	//shader->SetFloatUniform("material.Shininess", mShininess);
 }
 

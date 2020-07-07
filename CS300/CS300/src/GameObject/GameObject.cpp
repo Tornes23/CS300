@@ -363,20 +363,7 @@ void GameObject::Edit(int id)
 	if (ImGui::TreeNode("Material"))
 	{
 		ImGui::DragFloat("Shininess", &mMaterial.mShininess);
-
-		//getting the colors and storing them in temporals
-		glm::vec3 diffuse = mMaterial.mDiffuseColor.GetColor();
-		glm::vec3 specular = mMaterial.mSpecularColor.GetColor();
-		glm::vec3 ambient = mMaterial.mAmbientColor.GetColor();
-
-		//imgui interface to edit the color
-		ImGui::ColorEdit3("Ambient Color", glm::value_ptr(ambient));
-		ImGui::ColorEdit3("Diffuse Color", glm::value_ptr(diffuse));
-		ImGui::ColorEdit3("Specular Color", glm::value_ptr(specular));
-
-		mMaterial.mAmbientColor.SetColor(ambient);
-		mMaterial.mDiffuseColor.SetColor(diffuse);
-		mMaterial.mSpecularColor.SetColor(specular);
+		ImGui::DragFloat("Refraction Value", &mMaterial.mRefraction, 0.05F, 1.0F, 10.0F);
 
 		ImGui::TreePop();
 	}
