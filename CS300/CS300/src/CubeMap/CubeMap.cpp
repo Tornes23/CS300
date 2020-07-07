@@ -14,6 +14,8 @@ CubeMap::CubeMap(std::string cubePath)
 
 	SetParameters();
 
+	GenFBOCube();
+
 	mCubeIndex = 1;
 
 	mGenCubeIndex = 2;
@@ -134,9 +136,7 @@ void CubeMap::GenFBOCube()
 	const unsigned EnvMapSize = 512;
 
 	for (GLuint i = 0; i < 6; i++)
-	{
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, EnvMapSize, EnvMapSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	}
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, EnvMapSize, EnvMapSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
