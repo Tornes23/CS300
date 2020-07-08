@@ -262,16 +262,21 @@ void GameObjectManager::UpdateSideKicks(GameObject * side1, GameObject * side2)
 	if (side1 != nullptr)
 	{
 		//computing the position and setting it
-		float posX = -20.0F * cosf(glm::radians(mSidePos/5.0F));
-		float posY = (-20.0F / 2.0F) * sinf(glm::radians(mSidePos) * 2);
-		float posZ = -20.0F * sinf(glm::radians(mSidePos/5.0F));
+		float posX = -20.0F * cosf(glm::radians(mSidePos));
+		float posY = (-20.0F / 2.0F) * sinf(glm::radians(mSidePos) * 5);
+		float posZ = -20.0F * sinf(glm::radians(mSidePos));
 
 		side1->mPosition = glm::vec3(posX, posY, posZ);
 	}
 
 	if (side2 != nullptr)
 	{
-		side2->mPosition = glm::vec3(20, 5 * glm::sin(glm::radians(mSidePos) * 2), 0);
+		//computing the position and setting it
+		float posX = 20.0F * cosf(glm::radians(mSidePos));
+		float posY = (20.0F / 2.0F) * sinf(glm::radians(mSidePos) * 5);
+		float posZ = 20.0F * sinf(glm::radians(mSidePos));
+
+		side2->mPosition = glm::vec3(posX, posY, posZ);
 	}
 }
 
