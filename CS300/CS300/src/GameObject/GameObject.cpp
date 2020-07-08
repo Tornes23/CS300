@@ -363,7 +363,7 @@ void GameObject::Edit(int id)
 	if (ImGui::TreeNode("Material"))
 	{
 		ImGui::DragFloat("Shininess", &mMaterial.mShininess);
-		ImGui::DragFloat("Refraction Value", &mMaterial.mRefraction, 0.05F, 1.0F, 10.0F);
+		ImGui::DragFloat("Refraction Value", &mMaterial.mRefraction, 0.05F, 0.0F, 1.0F);
 
 		ImGui::TreePop();
 	}

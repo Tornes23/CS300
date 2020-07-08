@@ -90,8 +90,6 @@ public:
 	void UpdateLights();
 	void SetAnimation();
 
-	void SetShadowmap();
-
 	glm::mat4x4 CreatePerspective();
 	glm::mat4x4 CreateCameraMat();
 

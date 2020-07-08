@@ -127,7 +127,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 		else
 			currentShader.SetIntUniform("Mode", mMode);
 
-		currentShader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
+		currentShader.SetIntUniform("Averaged", mAveragedNormals ? 1 : 0);
 
 		//Setting the matrix uniforms
 		currentShader.SetMatUniform("view", glm::value_ptr(mCameraMatrix));
@@ -139,10 +139,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	
 		//setting the uniform matrix
 		currentShader.SetMatUniform("m2w", glm::value_ptr(m2w_object));
-		currentShader.SetMatUniform("m2w_normal", glm::value_ptr(m2w_normal));
-		
-		mSkyBox.GetCubeMap().SetCubeMapActive();
-		currentShader.SetIntUniform("CubeMap", mSkyBox.GetCubeMap().GetHandle());
 
 		currentShader.SetVec3Uniform("CamPos", mPosition);
 
@@ -371,7 +367,7 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 	CubeMap& targetMap = target->mMaterial.mEnviromentMap;
 
 	std::vector<glm::vec3> viewVecs {glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1)};
-	std::vector<glm::vec3> upVecs { glm::vec3(0, -1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1), glm::vec3(0, -1, 0), glm::vec3(0, -1, 0) };
+	std::vector<glm::vec3> upVecs { glm::vec3(0, -1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0), glm::vec3(0, -1, 0) };
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -384,7 +380,7 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 		//create view/ projection matrix and render onto the texture
 		glm::mat4x4 view = glm::lookAt(target->mPosition, viewVecs[i], upVecs[i]);
 
-		glm::mat4x4 proj = glm::perspective(glm::radians(90.0F), 1.0F, mNear, mFar);
+		glm::mat4x4 proj = glm::perspective(glm::radians(90.0F), 1.0F, 0.1F, mFar);
 
 		RenderSkyBox(view, proj);
 

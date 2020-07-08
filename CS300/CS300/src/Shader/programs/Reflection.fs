@@ -27,8 +27,8 @@ void main()
         FragColor = texture(textureData, UV).rgba;
     
     if(Mode == 1)
-        FragColor = texture(EnviromentMap, normalize(reflectedVec)).rgba;
+        FragColor = vec4(texture(EnviromentMap, normalize(reflectedVec)).rgb, 1.0F);
     
     if(Mode == 2)
-        FragColor = texture(EnviromentMap, normalize(refractedVec)).rgba;
+        FragColor = vec4(texture(EnviromentMap, normalize(refractedVec)).rgb, 1.0F);
 }

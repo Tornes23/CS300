@@ -27,7 +27,7 @@ void main()
     FragInWorld = vec3(m2w * vec4(vPos, 1.0));
     CamInWorld  = CamPos;
     
-    mat3 m2w_normal = inverse(transpose(mat3(m2w)));
+    mat3 m2w_normal = mat3(inverse(transpose(m2w)));
     
     if(Averaged == 0)
         NormalInWorld = normalize(m2w_normal * vNormal);

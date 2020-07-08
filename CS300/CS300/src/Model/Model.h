@@ -57,7 +57,7 @@ public:
 		Sphere
 	} Shape;
 
-	Model(Shape form = Cube, int precision = 9);
+	Model(Shape form = Cube, int precision = 25);
 
 	void UpdateModel(int modification);
 	void CreateSphere(int slices = 20, float radius = 1.0F);
