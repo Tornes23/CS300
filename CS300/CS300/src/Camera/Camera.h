@@ -110,6 +110,7 @@ private:
 	bool mRenderNormals;
 	bool mAveragedNormals;
 	bool mLightAnimation;
+	bool mFancyShit;
 
 	RenderMode mMode;
 
@@ -138,4 +139,5 @@ private:
 	Model mShadowPlane;
 
 	SkyBox mSkyBox;
+	SkyBox mCotton;
 };

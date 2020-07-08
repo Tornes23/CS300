@@ -59,7 +59,7 @@ The default Constructor of the class
 
 *
 **************************************************************************/
-Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport.x, viewport.y), mRenderPlane(Model::Shape::Plane), mShadowPlane(Model::Shape::Plane), mSkyBox()
+Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport.x, viewport.y), mRenderPlane(Model::Shape::Plane), mShadowPlane(Model::Shape::Plane), mSkyBox(), mCotton("./src/Texture/resources/CottonCandy")
 {
 	mView = glm::normalize(direction);
 
@@ -79,6 +79,7 @@ Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport
 	mRenderNormals = false;
 	mAveragedNormals = true;
 	mLightAnimation = true;
+	mFancyShit = false;
 
 	mMode = Regular;
 
@@ -204,9 +205,18 @@ void Camera::RenderSkyBox(glm::mat4& view, glm::mat4& proj)
 	skybox.SetMatUniform("projection", glm::value_ptr(proj));
 	skybox.SetIntUniform("cubeMap", mSkyBox.GetCubeMap().GetIndex());
 
-	mSkyBox.GetCubeMap().SetCubeMapActive();
+	if (!mFancyShit)
+	{
+		mSkyBox.GetCubeMap().SetCubeMapActive();
 
-	DrawTriangle(&(mSkyBox.GetModel()));
+		DrawTriangle(&(mSkyBox.GetModel()));
+	}
+	else
+	{
+		mCotton.GetCubeMap().SetCubeMapActive();
+
+		DrawTriangle(&(mCotton.GetModel()));
+	}
 	glCullFace(GL_BACK);
 
 	glDepthFunc(GL_LESS);
@@ -312,7 +322,7 @@ void Camera::Update()
 		mMode = static_cast<RenderMode>((mMode + 1) % Count);
 
 	if (KeyTriggered(P))
-		mLightAnimation = !mLightAnimation;
+		mFancyShit = !mFancyShit;
 
 	if (KeyTriggered(Z))
 	{
