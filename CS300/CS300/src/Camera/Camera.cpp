@@ -366,10 +366,12 @@ void Camera::GenerateEnviroment(std::vector<GameObject*>& reflectiveObjects, std
 
 void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& objects)
 {
+	glViewport(0, 0, 512, 512);
+
 	CubeMap& targetMap = target->mMaterial.mEnviromentMap;
 
 	std::vector<glm::vec3> viewVecs {glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1)};
-	std::vector<glm::vec3> upVecs { glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), glm::vec3(0, 0, -1), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0) };
+	std::vector<glm::vec3> upVecs { glm::vec3(0, -1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1), glm::vec3(0, -1, 0), glm::vec3(0, -1, 0) };
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -436,6 +438,9 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 		glUseProgram(0);
 
 	}
+
+	glViewport(0, 0, mViewport.x, mViewport.y);
+
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
