@@ -2,10 +2,10 @@
 Copyright (C) 2020 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the prior written consent of DigiPen 
 Institute of Technology is prohibited.
-Project:    cs300_nestor.uriarte_3
+Project:    cs300_nestor.uriarte_4
 
 Author:     Nestor Uriarte    nestor.uriarte        540000817
-Creation date: 01/7/2020
+Creation date: 10/7/2020
 ----------------------------------------------------------------------------------------------------------*/
 • How to run your program: 
    The program can run in release and debug in x64 setting.
@@ -28,16 +28,15 @@ Creation date: 01/7/2020
     ▪ 5: Sphere
 
    Render modifications:
-    ▪ P: Toggle to pause/start the light animation.
+    ▪ P: Toggle to swap the skybox
     ▪ O: Toggle to pause/start the side object animation.
     ▪ N: Toggle normal rendering
     ▪ F: Toggle face/averaged normal
     ▪ M: Toggle wireframe mode on/off
     ▪ T: Change between rendering modes:
-        ▪ Normal Mapping: Scene with lighting and shadow mapping
-        ▪ Normals: Geometry normal in camera space as color
-        ▪ Tangent: Geometry tangent in camera space as color
-        ▪ Bitangent: Geometry bitangent in camera space as color
+        ▪ Regular
+        ▪ Reflection
+        ▪ Refraction
         
     ▪ Arrows Up/Down: Rotate the shape along X-axis
     ▪ Arrows Right/Left: Rotate the shape along Y-axis
