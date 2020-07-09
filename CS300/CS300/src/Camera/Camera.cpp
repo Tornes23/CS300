@@ -79,7 +79,7 @@ Camera::Camera(glm::vec3 direction, glm::ivec2 viewport) : mFrameBuffer(viewport
 	mRenderNormals = false;
 	mAveragedNormals = true;
 	mLightAnimation = true;
-	mFancyShit = false;
+	mFancy = false;
 
 	mMode = Regular;
 
@@ -183,7 +183,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 /**************************************************************************
 *!
-\fn     Camera::RenderDepth
+\fn     Camera::RenderSkyBox
 
 \brief
 The render function for the skybox
@@ -192,9 +192,11 @@ The render function for the skybox
 **************************************************************************/
 void Camera::RenderSkyBox(glm::mat4& view, glm::mat4& proj)
 {
+	//diabling the back face culling setting it to cull front faces
 	glCullFace(GL_FRONT);
 	glDepthFunc(GL_LEQUAL);
 
+	//getting the shader
 	ShaderProgram skybox = mSkyBox.GetShader();
 
 	skybox.Use();
@@ -205,18 +207,23 @@ void Camera::RenderSkyBox(glm::mat4& view, glm::mat4& proj)
 	skybox.SetMatUniform("projection", glm::value_ptr(proj));
 	skybox.SetIntUniform("cubeMap", mSkyBox.GetCubeMap().GetIndex());
 
-	if (!mFancyShit)
+	//if we want the debug texture 
+	if (!mFancy)
 	{
+		//using the debug skybox
 		mSkyBox.GetCubeMap().SetCubeMapActive();
 
 		DrawTriangle(&(mSkyBox.GetModel()));
 	}
 	else
 	{
+		//using the fancy skybox
 		mCotton.GetCubeMap().SetCubeMapActive();
 
 		DrawTriangle(&(mCotton.GetModel()));
 	}
+
+	//enabling again back face removal
 	glCullFace(GL_BACK);
 
 	glDepthFunc(GL_LESS);
@@ -322,7 +329,7 @@ void Camera::Update()
 		mMode = static_cast<RenderMode>((mMode + 1) % Count);
 
 	if (KeyTriggered(P))
-		mFancyShit = !mFancyShit;
+		mFancy = !mFancy;
 
 	if (KeyTriggered(Z))
 	{
@@ -361,29 +368,37 @@ void Camera::Update()
 
 void Camera::GenerateEnviroment(std::vector<GameObject*>& reflectiveObjects, std::vector<GameObject*>& allObjects)
 {
+	//for each reflective/refractive object generate a enviroment map
 	for (unsigned i = 0; i < reflectiveObjects.size(); i++)
 	{
+		//if is active
 		if (!(reflectiveObjects[i]->mActive))
 			continue;
 
+		//generate it
 		RenderEnviroment(reflectiveObjects[i], allObjects);
 	}
 }
 
 void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& objects)
 {
+	//setting th viewport
 	glViewport(0, 0, 512, 512);
 
+	//getting the cube map to modify
 	CubeMap& targetMap = target->mMaterial.mEnviromentMap;
 
+	//containers with the vector for the camera
 	std::vector<glm::vec3> viewVecs {glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1)};
 	std::vector<glm::vec3> upVecs { glm::vec3(0, -1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0), glm::vec3(0, -1, 0) };
 
+	//for each side of the cube
 	for (int i = 0; i < 6; i++)
 	{
 		// Bind created FBO
 		glBindFramebuffer(GL_FRAMEBUFFER, targetMap.mFrameCube[i]);
 
+		//clearing the buffer
 		glClearColor(0.0F, 0.0F, 0.0F, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -392,6 +407,7 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 
 		glm::mat4x4 proj = glm::perspective(glm::radians(90.0F), 1.0F, 0.1F, mFar);
 
+		//rendering the skybox
 		RenderSkyBox(view, proj);
 
 		//for each object
@@ -401,6 +417,7 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 			if (!(objects[j]->mActive))
 				continue;
 
+			//get the shader
 			ShaderProgram currentShader = GetShader();
 
 			//calling to use this render
@@ -445,9 +462,10 @@ void Camera::RenderEnviroment(GameObject * target, std::vector<GameObject*>& obj
 
 	}
 
+	//setting the viewport back to the original
 	glViewport(0, 0, mViewport.x, mViewport.y);
 
-
+	//binfing the frame default frame buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

@@ -110,7 +110,7 @@ private:
 	bool mRenderNormals;
 	bool mAveragedNormals;
 	bool mLightAnimation;
-	bool mFancyShit;
+	bool mFancy;
 
 	RenderMode mMode;
 

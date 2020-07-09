@@ -1,3 +1,28 @@
+/*!**************************************************************************
+\file    CubeMap.cpp
+
+\author  Nestor Uriarte
+
+\par     DP email:  nestor.uriarte@digipen.edu
+
+\par     Course:    CS300
+
+\par     assignemnt 4
+
+\date    Fri Jul 10 00:19:30 2020
+
+\brief	 This file containsm the implementation of the
+CubeMap class
+
+The functions included are:
+- CubeMap::CubeMap(std::string cubePath);
+- const GLuint CubeMap::GetHandle(bool loaded) const;
+- void CubeMap::SetCubeMapActive(bool loaded);
+- void CubeMap::GenMipMap();
+- void CubeMap::GenFBOCube();
+- int CubeMap::GetIndex(bool loaded);
+
+***************************************************************************/
 #pragma once
 #include <string>
 #include "../FrameBuffer/FrameBuffer.h"
