@@ -40,7 +40,9 @@ The functions included are:
 #pragma once
 #include <vector>
 #include <map>
+#ifdef USE_OPENGL
 #include <GL/glew.h>
+#endif
 #include <GLM/vec3.hpp>
 #include <GLM/vec2.hpp>
 #include "../Utilities/Utilities.h"
@@ -71,12 +73,14 @@ public:
 	void BindModelBuffer();
 	void FreeBuffers();
 	void GenBuffers();
-
-	GLsizei GetDrawElements() const;
 	bool GetIndexed();
 
+#ifdef USE_OPENGL
+	GLsizei GetDrawElements() const;
 	const GLuint GetVAO() const;
 	const GLuint GetNormalVAO() const;
+#endif
+
 	Shape GetShape() const;
 	void SetShape(Shape shape);
 
@@ -92,6 +96,8 @@ private:
 	bool mIndexed;
 	int mPrecision;
 	Shape mShape;
+#ifdef USE_OPENGL
 	GLuint mVAO[3];
 	GLuint mVBO[5];
+#endif
 };

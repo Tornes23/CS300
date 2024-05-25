@@ -86,7 +86,10 @@ the cosine of the outer angle for the attenuation
 **************************************************************************/
 Light::Light(LightType type, glm::vec3 rotations, glm::vec3 direction, Color ambient, Color diffuse,
 			 Color specular, float constant, float linear, float quadratic, float inner, float outer, float falloff)
-			: mModel(Model::Shape::Sphere), mShader("./src/Shader/programs/Light.vs", "./src/Shader/programs/Light.fs")
+			: mModel(Model::Shape::Sphere)
+#ifdef USE_OPENGL
+	,mShader("./src/Shader/programs/Light.vs", "./src/Shader/programs/Light.fs")
+#endif
 {
 	//setting the rotations
 	mRotations = rotations;
@@ -183,6 +186,8 @@ the camera position
 **************************************************************************/
 void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::mat4x4& w2Cam, glm::vec3& camPos)
 {
+#ifdef USE_OPENGL
+
 	//setting the uniform variables
 	shader->SetIntUniform(shaderString + ".Type", mType);
 
@@ -199,8 +204,7 @@ void Light::Setuniforms(std::string shaderString, ShaderProgram * shader, glm::m
 	shader->SetFloatUniform(shaderString + ".CosInner", cosf(glm::radians(mCosInner)));
 	shader->SetFloatUniform(shaderString + ".CosOuter", cosf(glm::radians(mCosOuter)));
 	shader->SetFloatUniform(shaderString + ".FallOff", mFallOff);
-	
-
+#endif
 }
 
 /**************************************************************************
@@ -248,6 +252,7 @@ Renders the light
 **************************************************************************/
 void Light::Render()
 {
+#ifdef USE_OPENGL
 	GLenum error = glGetError();
 
 	//binding the objects VAO
@@ -261,6 +266,8 @@ void Light::Render()
 		glDrawArrays(GL_TRIANGLES, 0, mModel.GetDrawElements());
 
 	error = glGetError();
+#endif
+
 }
 
 /**************************************************************************

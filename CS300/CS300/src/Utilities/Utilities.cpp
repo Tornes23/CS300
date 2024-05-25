@@ -24,12 +24,17 @@ The functions included are:
 
 #include <iostream>
 #include <fstream>
+#ifdef USE_OPENGL
 #include <GL/glew.h>
+#endif
+#ifdef USE_VULKAN
+#include <Utilities/VulkanHelpers.h>
+#endif // USE_VULKAN
 #include "Utilities.h"
-#include "../Camera/Camera.h"
-#include "../Window/Window.h"
-#include "../GOManager/GOManager.h"
-#include "../Input/Input.h"
+#include "Camera/Camera.h"
+#include "Window/Window.h"
+#include "GOManager/GOManager.h"
+#include "Input/Input.h"
 
 /**************************************************************************
 *!
@@ -50,6 +55,7 @@ void Utils::InitSDL()
 	}
 }
 
+#ifdef USE_OPENGL
 /**************************************************************************
 *!
 \fn     Utils::InitGL
@@ -83,6 +89,15 @@ void Utils::InitGL(Window* window)
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 }
+#endif
+
+#ifdef USE_VULKAN
+void Utils::InitVulkan(Window* window)
+{
+	Window::VulkanInstanceData context = window->GetMutableContext();
+	VulkanHelpers::CreateInstance(window->GetTitle(), &context.m_instance);
+}
+#endif // USE_VULKAN
 
 /**************************************************************************
 *!

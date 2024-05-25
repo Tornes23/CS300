@@ -30,17 +30,34 @@ The functions included are:
 #pragma once
 #include <GLM/vec2.hpp>
 #include <SDL2/SDL.h>
+#ifdef USE_OPENGL
 #include <GL/glew.h>
+#endif
+#ifdef USE_VULKAN
+#include <vulkan/vulkan.hpp>
+#endif
 #include <string>
 
 class Window
 {
 public:
+
+#ifdef USE_VULKAN
+	struct VulkanInstanceData
+	{
+		VkInstance m_instance;
+		VkPhysicalDevice m_physicalDevice;
+		VkDevice m_device;
+		VkSwapchainKHR m_swapchain;
+	};
+#endif // USE_VULKAN
+
 	//constructor
 	Window(int width = 1280, int height = 720, const char* title = "CS300");
 
 	//getter function
 	glm::vec2 GetViewport() const;
+	std::string GetTitle() const;
 
 	//utility functions
 	void Update();
@@ -49,14 +66,25 @@ public:
 	void DeleteWindow();
 	bool IsClosed() const;
 	SDL_Window* GetSDLWindow() const;
+#ifdef USE_OPENGL
 	SDL_GLContext GetContext() const;
+#endif // USE_OPENGL
+#ifdef USE_VULKAN
+	const Window::VulkanInstanceData& GetContext() const;
+	Window::VulkanInstanceData& GetMutableContext();
+#endif // USE_VULKAN
 	void SetQuit(bool close);
 	void SwapBuffers();
 
 private:
 	//the necessary member variables
 	SDL_Window* mWindow;
+#ifdef USE_OPENGL
 	SDL_GLContext mContext;
+#endif // USE_OPENGL
+#ifdef USE_VULKAN
+	VulkanInstanceData m_context;
+#endif // USE_VULKAN
 	std::string mTitle;
 	glm::ivec2 mSize;
 	bool mQuit;

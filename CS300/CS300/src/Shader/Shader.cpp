@@ -46,9 +46,12 @@ a string containing the address of the fragment shader
 
 *
 **************************************************************************/
-ShaderProgram::ShaderProgram(std::string vertex, std::string fragment, std::string geometry) : mVertex(GL_VERTEX_SHADER, vertex.data()), 
-																							   mFragment(GL_FRAGMENT_SHADER, fragment.data()),
-																							   mGeometry(GL_GEOMETRY_SHADER, geometry.data())
+ShaderProgram::ShaderProgram(std::string vertex, std::string fragment, std::string geometry) 
+#ifdef USE_OPENGL
+	: mVertex(GL_VERTEX_SHADER, vertex.data()), 
+      mFragment(GL_FRAGMENT_SHADER, fragment.data()),
+	  mGeometry(GL_GEOMETRY_SHADER, geometry.data())
+#endif
 {
 	
 	mbGeometry = false;
@@ -56,6 +59,7 @@ ShaderProgram::ShaderProgram(std::string vertex, std::string fragment, std::stri
 	if(geometry != "")
 		mbGeometry = true;
 
+#ifdef USE_OPENGL
 	GLenum error = glGetError();
 	//creating a shader program
 	mHandle = glCreateProgram();
@@ -101,7 +105,7 @@ ShaderProgram::ShaderProgram(std::string vertex, std::string fragment, std::stri
 	//Detaching the vertex shader
 	glDetachShader(mHandle, mVertex.GetHandle());
 	error = glGetError();
-
+#endif
 }
 
 /**************************************************************************
@@ -116,6 +120,7 @@ returns the value of the handle
 
 *
 **************************************************************************/
+#ifdef USE_OPENGL
 const GLuint ShaderProgram::GetHandle() const
 {
 	//returning the handle
@@ -337,6 +342,7 @@ void ShaderProgram::Use()
 	// Bind the shader program and this object's VAO
 	glUseProgram(mHandle);
 }
+#endif
 
 /**************************************************************************
 *!
@@ -353,6 +359,7 @@ The name of the file
 
 *
 **************************************************************************/
+#ifdef USE_OPENGL
 Shader::Shader(GLenum shaderType, const char* filename)
 {
 	//setting the member variables
@@ -424,4 +431,5 @@ const GLuint Shader::GetHandle() const
 	//returning the handle
 	return mHandle;
 }
+#endif
 

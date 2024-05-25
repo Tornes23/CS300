@@ -30,7 +30,9 @@ The functions included are:
 
 #pragma once
 #include <string>
+#ifdef USE_OPENGL
 #include <GL/glew.h>
+#endif
 #include "../Color/Color.h"
 
 struct SDL_Surface;
@@ -45,8 +47,10 @@ public:
 	void GenBuffers();
 	void GetFormat(SDL_Surface* texture = nullptr);
 	void GenMipMap();
+#ifdef USE_OPENGL
 	void SetParameter(GLint param = GL_NEAREST);
 	const GLuint GetHandle() const;
+#endif
 	void LoadImage(const std::string& image);
 	void FreeSurface(SDL_Surface* surface);
 
@@ -54,8 +58,10 @@ private:
 
 	std::string mFilename;
 	SDL_Surface* mTexture;
+#ifdef USE_OPENGL
 	GLuint mHandle;
 	GLuint mFormat;
+#endif
 	int mWidth;
 	int mHeight;
 };

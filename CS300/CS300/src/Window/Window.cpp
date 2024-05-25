@@ -57,10 +57,13 @@ Window::Window(int width, int height, const char * title)
 	mSize.x = width;
 	mSize.y = height;
 	mQuit = false;
-
+#ifdef USE_OPENGL
 	//creating the window
 	mWindow = SDL_CreateWindow("CS300", 100, 100, width, height, SDL_WINDOW_OPENGL);
-
+#endif
+#ifdef USE_VULKAN
+	mWindow = SDL_CreateWindow("CS300", 100, 100, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN);
+#endif
 	//if is invalid
 	if (mWindow == nullptr)
 	{
@@ -69,6 +72,7 @@ Window::Window(int width, int height, const char * title)
 		exit(1);
 	}
 
+#ifdef USE_OPENGL
 	//setting the attributes for the opengl context
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -84,6 +88,7 @@ Window::Window(int width, int height, const char * title)
 		SDL_Quit();
 		exit(1);
 	}
+#endif
 }
 
 /**************************************************************************
@@ -102,6 +107,11 @@ glm::vec2 Window::GetViewport() const
 {
 	//rerturning the viewpor size
 	return mSize;
+}
+
+std::string Window::GetTitle() const
+{
+	return mTitle;
 }
 
 /**************************************************************************
@@ -131,9 +141,11 @@ Clears the window
 **************************************************************************/
 void Window::Clear()
 {
+#ifdef USE_OPENGL
 	//clearing the window to black and the depth buffer
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#endif
 }
 
 /**************************************************************************
@@ -156,8 +168,10 @@ void Window::SetQuit(bool close)
 
 void Window::SwapBuffers()
 {
+#ifdef USE_OPENGL
 	//swapping the front and back buffers
 	SDL_GL_SwapWindow(mWindow);
+#endif
 }
 
 /**************************************************************************
@@ -171,8 +185,10 @@ Deletes the OpenGL context used
 **************************************************************************/
 void Window::DeleteContext()
 {
+#ifdef USE_OPENGL
 	//freeing the openGL context
 	SDL_GL_DeleteContext(mContext);
+#endif
 }
 
 /**************************************************************************
@@ -186,8 +202,10 @@ Deletes the SDL window
 **************************************************************************/
 void Window::DeleteWindow()
 {
+#ifdef USE_OPENGL
 	//freeing the sdl window
 	SDL_DestroyWindow(mWindow);
+#endif
 }
 
 /**************************************************************************
@@ -226,6 +244,7 @@ SDL_Window * Window::GetSDLWindow() const
 	return mWindow;
 }
 
+#ifdef USE_OPENGL
 /**************************************************************************
 *!
 \fn     Window::GetContext
@@ -243,5 +262,19 @@ SDL_GLContext Window::GetContext() const
 	//returning the opengl context
 	return mContext;
 }
+#endif // USE_OPENGL
+
+#ifdef USE_VULKAN
+const Window::VulkanInstanceData& Window::GetContext() const
+{
+	//returning the vulkan context
+	return m_context;
+}
+Window::VulkanInstanceData& Window::GetMutableContext()
+{
+	//returning the vulkan context
+	return m_context;
+}
+#endif // USE_VULKAN
 
 

@@ -168,6 +168,7 @@ Sets the uniform variables
 **************************************************************************/
 void Material::SetUniforms(ShaderProgram * shader)
 {
+#ifdef USE_OPENGL
 	//setting the  texture as the active one
 	mTexture.SetActiveTexture();
 
@@ -177,5 +178,6 @@ void Material::SetUniforms(ShaderProgram * shader)
 	shader->SetVec3Uniform("material.SpecularColor", mSpecularColor.GetColor());
 
 	shader->SetFloatUniform("material.Shininess", mShininess);
+#endif
 }
 

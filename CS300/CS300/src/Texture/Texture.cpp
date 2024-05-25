@@ -77,9 +77,11 @@ Texture::Texture(std::string filename)
 	
 	//getting the format of the texture
 	GetFormat(mTexture);
-	
+#ifdef USE_OPENGL
 	//setting the sampling parameter
 	SetParameter();
+#endif
+
 	
 	//depending if an image was actually loaded or not upload the default texture or te loaded image
 	if (mTexture == nullptr)
@@ -105,9 +107,12 @@ Sets the texture as the active one
 **************************************************************************/
 void Texture::SetActiveTexture()
 {
+#ifdef USE_OPENGL
 	//setting the texture as active
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, mHandle);
+#endif
+
 }
 
 /**************************************************************************
@@ -124,8 +129,11 @@ Uploads the texture data to the GPU
 **************************************************************************/
 void Texture::UploadTexture(void* data)
 {
+#ifdef USE_OPENGL
 	// Give pixel data to opengl
 	glTexImage2D(GL_TEXTURE_2D, 0, mFormat, mWidth, mHeight, 0, mFormat, GL_UNSIGNED_BYTE, data);
+#endif
+
 }
 
 /**************************************************************************
@@ -139,9 +147,11 @@ Generates the buffers
 **************************************************************************/
 void Texture::GenBuffers()
 {
+#ifdef USE_OPENGL
 	//generating the buffer for the texture
 	glGenTextures(1, &mHandle);
 	glBindTexture(GL_TEXTURE_2D, mHandle);
+#endif
 }
 
 /**************************************************************************
@@ -158,11 +168,15 @@ Gets the format of the file loaded
 **************************************************************************/
 void Texture::GetFormat(SDL_Surface * texture)
 {
+#ifdef USE_OPENGL
+
 	//if a loaded image was given check it's format otherwise set to RGBA
 	if (texture == nullptr)
 		mFormat = GL_RGBA;
 	else
 		mFormat = texture->format->BytesPerPixel == 4 ? GL_RGB : GL_RGBA;
+#endif
+
 }
 
 /**************************************************************************
@@ -176,8 +190,11 @@ Generates a MipMap
 **************************************************************************/
 void Texture::GenMipMap()
 {
+#ifdef USE_OPENGL
 	//generating mipmap
 	glGenerateMipmap(GL_TEXTURE_2D);
+#endif
+
 }
 
 /**************************************************************************
@@ -192,6 +209,7 @@ The sampling parameter to set
 
 *
 **************************************************************************/
+#ifdef USE_OPENGL
 void Texture::SetParameter(GLint param)
 {
 	//setting the parameters for the texture to clamp to the maximum
@@ -221,6 +239,7 @@ const GLuint Texture::GetHandle() const
 	//returning the handle
 	return mHandle;
 }
+#endif
 
 /**************************************************************************
 *!

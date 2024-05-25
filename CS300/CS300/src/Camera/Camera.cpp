@@ -97,8 +97,8 @@ The game objects to render
 **************************************************************************/
 void Camera::Render(std::vector<GameObject*>& objects)
 {
+#ifdef USE_OPENGL
 	GLenum error = glGetError();
-	//getting the shader which will be used
 	
 	//for each object
 	for (unsigned i = 0; i < objects.size(); i++)
@@ -129,7 +129,6 @@ void Camera::Render(std::vector<GameObject*>& objects)
 
 		if (mLighting)
 			ApplyLight(currentShader, mCameraMatrix);
-
 
 		//if wireframe is on change the render mode
 		if (!mWireframe)//if wireframe is not togled on
@@ -164,6 +163,7 @@ void Camera::Render(std::vector<GameObject*>& objects)
 	//unbinding the VAOs
 	glBindVertexArray(0);
 	glUseProgram(0);
+#endif
 }
 
 /**************************************************************************
@@ -278,6 +278,7 @@ the object to be rendered
 **************************************************************************/
 void Camera::DrawTriangle(GameObject* target)
 {
+#ifdef USE_OPENGL
 	GLenum error = glGetError();
 
 	//binding the objects VAO
@@ -291,6 +292,7 @@ void Camera::DrawTriangle(GameObject* target)
 		glDrawArrays(GL_TRIANGLES, 0, target->mModel.GetDrawElements());
 
 	error = glGetError();
+#endif
 }
 
 /**************************************************************************
@@ -307,6 +309,7 @@ the object to be rendered
 **************************************************************************/
 void Camera::DrawNormals(GameObject * target)
 {
+#ifdef USE_OPENGL
 	GLenum error = glGetError();
 
 	//binding the objects VAO
@@ -320,6 +323,7 @@ void Camera::DrawNormals(GameObject * target)
 		glDrawArrays(GL_TRIANGLES, 0, target->mModel.GetDrawElements());
 
 	error = glGetError();
+#endif
 }
 
 /**************************************************************************
@@ -333,6 +337,7 @@ Renders the light object
 **************************************************************************/
 void Camera::DrawLights()
 {
+#ifdef USE_OPENGL
 	//for each light we have
 	for (unsigned i = 0; i < mLights.size(); i++)
 	{
@@ -351,6 +356,7 @@ void Camera::DrawLights()
 		//rendering
 		mLights[i].Render();
 	}
+#endif
 }
 
 /**************************************************************************
@@ -370,6 +376,7 @@ the world to camera matrix
 **************************************************************************/
 void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam)
 {
+#ifdef USE_OPENGL
 	//setting if the averaged normals are used or not
 	shader.SetIntUniform("Average", mAveragedNormals ? 1 : 0);
 
@@ -381,6 +388,7 @@ void Camera::ApplyLight(ShaderProgram& shader, glm::mat4x4& w2Cam)
 	{
 		mLights[i].Setuniforms("lightSources[" + std::to_string(i) + "]", &shader, w2Cam, mPosition);
 	}
+#endif
 
 }
 
@@ -414,6 +422,7 @@ Adds all the necessary shader for the camera to work
 **************************************************************************/
 void Camera::AddAllShaders()
 {
+#ifdef USE_OPENGL
 	//adding the shaders
 	AddShader("./src/Shader/programs/Texture.vs"          , "./src/Shader/programs/Texture.fs"        );
 	AddShader("./src/Shader/programs/Mapping.vs"          , "./src/Shader/programs/Mapping.fs"        );
@@ -421,7 +430,9 @@ void Camera::AddAllShaders()
 	AddShader("./src/Shader/programs/LightingColor.vs"    , "./src/Shader/programs/LightingColor.fs"  );
 	AddShader("./src/Shader/programs/Normals.vs"          , "./src/Shader/programs/Normals.fs"        , "./src/Shader/programs/Normals.gs");
 	AddShader("./src/Shader/programs/NormalsAverage.vs"   , "./src/Shader/programs/NormalsAverage.fs" , "./src/Shader/programs/Normals.gs");
+#endif
 }
+
 
 /**************************************************************************
 *!
@@ -630,8 +641,10 @@ a string containing the address of the fragment shader
 **************************************************************************/
 void Camera::AddShader(const std::string & vertex, const std::string & fragment, const std::string& geometry)
 {
+#ifdef USE_OPENGL
 	//adding the shader to the vector
 	mShaders.push_back(ShaderProgram(vertex, fragment, geometry));
+#endif
 }
 
 /**************************************************************************

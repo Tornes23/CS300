@@ -21,14 +21,19 @@ The functions included are:
 
 ***************************************************************************/
 #pragma once
+#include <string>
 
 class Window;
 
 namespace Utils
 {	
 	void InitSDL();
-
+#ifdef USE_OPENGL
 	void InitGL(Window* window);
+#endif
+#ifdef USE_VULKAN
+	void InitVulkan(Window* window);
+#endif
 
 	void ParseShader(std::string& filename, std::string& code);
 }

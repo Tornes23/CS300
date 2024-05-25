@@ -961,6 +961,7 @@ Binds the VBO and VAO buffers of the normals
 **************************************************************************/
 void Model::BindNormalBuffer()
 {
+#ifdef USE_OPENGL
 	//binding the VAO
 	glBindVertexArray(mVAO[1]);
 
@@ -992,6 +993,8 @@ void Model::BindNormalBuffer()
 	// Unbind the VAO
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(mVAO[1]);
+#endif
+
 }
 
 /**************************************************************************
@@ -1005,6 +1008,7 @@ Binds the VBO and VAO buffers of the model
 **************************************************************************/
 void Model::BindModelBuffer()
 {
+#ifdef USE_OPENGL
 	//binding the VAO
 	glBindVertexArray(mVAO[0]);
 
@@ -1042,6 +1046,8 @@ void Model::BindModelBuffer()
 	// Unbind the VAO
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(mVAO[0]);
+#endif
+
 }
 
 /**************************************************************************
@@ -1055,9 +1061,12 @@ Deallocates the VBOs and VAOs
 **************************************************************************/
 void Model::FreeBuffers()
 {
+#ifdef USE_OPENGL
 	//deallocating the 2 VAOs and the 4 VBOs
 	glDeleteBuffers(5, mVBO);
 	glDeleteVertexArrays(3, mVAO);
+#endif
+
 
 	//clearing the vectors
 	mVertices.clear();
@@ -1069,9 +1078,12 @@ void Model::FreeBuffers()
 
 void Model::GenBuffers()
 {
+#ifdef USE_OPENGL
 	//generating the VAO and VBO buffers
 	glGenVertexArrays(3, mVAO);
 	glGenBuffers(5, mVBO);
+#endif
+
 }
 
 /**************************************************************************
@@ -1086,6 +1098,7 @@ the count of indexes to be rendered
 
 *
 **************************************************************************/
+#ifdef USE_OPENGL
 GLsizei Model::GetDrawElements() const
 {
 	//returning the index amount
@@ -1094,6 +1107,7 @@ GLsizei Model::GetDrawElements() const
 	else
 		return static_cast<GLsizei>(mVertices.size());
 }
+#endif
 
 bool Model::GetIndexed()
 {
@@ -1112,11 +1126,14 @@ Returns the handle for the VAO
 
 *
 **************************************************************************/
+#ifdef USE_OPENGL
 const GLuint Model::GetVAO() const
 {
 	//returing the VAO of the model
 	return mVAO[0];
 }
+#endif
+
 
 /**************************************************************************
 *!
@@ -1130,11 +1147,13 @@ Returns the handle for the VAO
 
 *
 **************************************************************************/
+#ifdef USE_OPENGL
 const GLuint Model::GetNormalVAO() const
 {
 	//returing the VAO of the normal
 	return mVAO[1];
 }
+#endif
 
 Model::Shape Model::GetShape() const
 {

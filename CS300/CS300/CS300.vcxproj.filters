@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\GLDebug">
-      <UniqueIdentifier>{ca0ab472-1d3e-438d-aed6-b14871ac378e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{401b9893-9e1b-4e18-a5f5-695aa0a39aef}</UniqueIdentifier>
     </Filter>
@@ -82,13 +79,16 @@
     <Filter Include="Source Files\Shader\Programs\Normals\Average">
       <UniqueIdentifier>{a8f9d983-af4d-416e-bf5f-d8a6e690897c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Utils\VulkanHelpers">
+      <UniqueIdentifier>{dd59bb34-ffc1-445b-8bd7-08a00d5f9a47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Debug">
+      <UniqueIdentifier>{ca0ab472-1d3e-438d-aed6-b14871ac378e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GLDebug\OGLDebug.cpp">
-      <Filter>Source Files\GLDebug</Filter>
     </ClCompile>
     <ClCompile Include="src\Utilities\Utilities.cpp">
       <Filter>Source Files\Utils</Filter>
@@ -132,19 +132,34 @@
     <ClCompile Include="..\include\IMGUI\imgui.cpp">
       <Filter>Source Files\Editor\ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\include\IMGUI\imgui_demo.cpp">
-      <Filter>Source Files\Editor\ImGUI</Filter>
-    </ClCompile>
     <ClCompile Include="..\include\IMGUI\imgui_draw.cpp">
       <Filter>Source Files\Editor\ImGUI</Filter>
     </ClCompile>
     <ClCompile Include="..\include\IMGUI\imgui_impl_opengl3.cpp">
       <Filter>Source Files\Editor\ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\include\IMGUI\imgui_impl_sdl.cpp">
+    <ClCompile Include="..\include\IMGUI\imgui_widgets.cpp">
       <Filter>Source Files\Editor\ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\include\IMGUI\imgui_widgets.cpp">
+    <ClCompile Include="src\CustomDebug\OGLDebug.cpp">
+      <Filter>Source Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\VulkanHelpers.cpp">
+      <Filter>Source Files\Utils\VulkanHelpers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\IMGUI\imgui_impl_vulkan.cpp">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\IMGUI\imgui_impl_dx12.cpp">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\IMGUI\imgui_impl_sdl2.cpp">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\IMGUI\imgui_tables.cpp">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\IMGUI\imgui_demo.cpp">
       <Filter>Source Files\Editor\ImGUI</Filter>
     </ClCompile>
   </ItemGroup>
@@ -163,9 +178,6 @@
     </ClInclude>
     <ClInclude Include="src\Model\Model.h">
       <Filter>Source Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GLDebug\OGLDebug.h">
-      <Filter>Source Files\GLDebug</Filter>
     </ClInclude>
     <ClInclude Include="src\Shader\Shader.h">
       <Filter>Source Files\Shader</Filter>
@@ -193,6 +205,45 @@
     </ClInclude>
     <ClInclude Include="src\Editor\Editor.h">
       <Filter>Source Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanHelpers.h">
+      <Filter>Source Files\Utils\VulkanHelpers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CustomDebug\VulkanDebug.h">
+      <Filter>Source Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CustomDebug\OGLDebug.h">
+      <Filter>Source Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IMGUI\imgui_impl_dx12.h">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IMGUI\imgui_impl_sdl2.h">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IMGUI\imgui_impl_vulkan.h">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IMGUI\imgui_impl_opengl3.h">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IMGUI\imgui.h">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IMGUI\imstb_truetype.h">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IMGUI\imconfig.h">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IMGUI\imstb_rectpack.h">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IMGUI\imstb_textedit.h">
+      <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IMGUI\imgui_internal.h">
+      <Filter>Source Files\Editor\ImGUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

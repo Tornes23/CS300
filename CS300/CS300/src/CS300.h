@@ -17,15 +17,20 @@ necessary includes in the assignment
 
 
 #pragma once
+#ifdef USE_OPENGL
 #include <GL/glew.h>
 #include <GL/GL.h>
+#endif
+#ifdef USE_VULKAN
+
+#endif // USE_VULKAN
 #include <SDL2/SDL.h>
 #include <IMGUI/imgui.h>
 
 #include "Editor/Editor.h"
 #include "Camera/Camera.h"
 #include "GameObject/GameObject.h"
-#include "GLDebug/OGLDebug.h"
+#include "CustomDebug/OGLDebug.h"
 #include "GOManager/GOManager.h"
 #include "Model/Model.h"
 #include "Shader/Shader.h"
