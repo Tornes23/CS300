@@ -96,6 +96,8 @@ void Utils::InitVulkan(Window* window)
 {
 	Window::VulkanInstanceData context = window->GetMutableContext();
 	VulkanHelpers::CreateInstance(window->GetTitle(), &context.m_instance);
+
+
 }
 #endif // USE_VULKAN
 

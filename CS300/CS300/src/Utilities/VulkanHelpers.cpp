@@ -1,8 +1,9 @@
 #ifdef USE_VULKAN
 #include <stdexcept>
 #include <iostream>
-#include "VulkanHelpers.h"
 #include <CustomDebug/VulkanDebug.h>
+#include "VulkanHelpers.h"
+#include "VulkanHelpers.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define VK_KHR_win32_surface 1
@@ -11,78 +12,43 @@
 
 namespace VulkanHelpers
 {
-	unsigned int CheckLayers(uint32_t check_count, char const* const* const check_names, uint32_t layer_count,
-		vk::LayerProperties* layers)
+	bool CheckLayers(ValidationLayersData& layersData)
 	{
-		for (uint32_t i = 0; i < check_count; i++)
-		{
-			unsigned int found = VK_FALSE;
-			for (uint32_t j = 0; j < layer_count; j++)
-			{
-				std::string name = layers[j].layerName.data();
-				std::cout << name << std::endl;
-				if (!strcmp(check_names[i], name.c_str()))
-				{
-					found = VK_TRUE;
+		for (const char* layerName : validationLayers) {
+			bool layerFound = false;
+
+			for (const auto& layerProperties : availableLayers) {
+				if (strcmp(layerName, layerProperties.layerName) == 0) {
+					layerFound = true;
 					break;
 				}
 			}
-			if (!found)
-			{
-				fprintf(stderr, "Cannot find layer: %s\n", check_names[i]);
-				return 0;
+
+			if (!layerFound) {
+				return false;
 			}
 		}
-		return VK_TRUE;
+
+		return true;
 	}
 
-
-	void CreateInstance(const std::string& appName, VkInstance* instance)
+	bool GetValidationLayers(ValidationLayersData& layersData)
 	{
-		uint32_t           instance_extension_count = 0;
-		uint32_t           instance_layer_count = 0;
-		char const* const instance_validation_layers[] = { "VK_LAYER_KHRONOS_validation" };
-		char const* extension_names[64];
-		char const* enabled_layers[64];
-		unsigned int enabled_extension_count = 0;
-		unsigned int enabled_layer_count = 0;
+		vkEnumerateInstanceLayerProperties(&layersData.m_layerCount, nullptr);
+		layersData.m_availableLayers.resize(layersData.m_layerCount);
+		vkEnumerateInstanceLayerProperties(&layersData.m_layerCount, layersData.m_availableLayers.data());
 
-		// Look for validation layers
-		unsigned int validation_found = VK_FALSE;
-		auto result = vk::enumerateInstanceLayerProperties(&instance_layer_count, static_cast<vk::LayerProperties*>(nullptr));
-		if (result == vk::Result::eSuccess)
-		{
+		return CheckLayers(layersData);
+	}
 
-			if (instance_layer_count > 0)
-			{
-				std::unique_ptr<vk::LayerProperties[]> instance_layers(new vk::LayerProperties[instance_layer_count]);
-				result = vk::enumerateInstanceLayerProperties(&instance_layer_count, instance_layers.get());
-				VERIFY(result == vk::Result::eSuccess);
-
-				validation_found = CheckLayers(ARRAY_SIZE(instance_validation_layers), instance_validation_layers,
-					instance_layer_count, instance_layers.get());
-				if (validation_found)
-				{
-					enabled_layer_count = ARRAY_SIZE(instance_validation_layers);
-					enabled_layers[0] = "VK_LAYER_KHRONOS_validation";
-				}
-			}
-
-			if (!validation_found)
-			{
-				ERR_EXIT(
-					"vkEnumerateInstanceLayerProperties failed to find required validation layer.\n\n"
-					"Please look at the Getting Started guide for additional information.\n",
-					"vkCreateInstance Failure");
-			}
-		}
-
+	bool GetExtensionsLayers(ExtensionLayersData& extensionsData)
+	{
 		/* Look for instance extensions */
-		unsigned int surfaceExtFound = VK_FALSE;
-		unsigned int platformSurfaceExtFound = VK_FALSE;
+		vk::Bool32 surfaceExtFound = VK_FALSE;
+		vk::Bool32 platformSurfaceExtFound = VK_FALSE;
 		memset(extension_names, 0, sizeof(extension_names));
 
-		result = vk::enumerateInstanceExtensionProperties(nullptr, &instance_extension_count,
+		auto result = vk::enumerateInstanceExtensionProperties(nullptr, &instance_extension_count,
 			static_cast<vk::ExtensionProperties*>(nullptr));
 		VERIFY(result == vk::Result::eSuccess);
 
@@ -131,6 +97,31 @@ namespace VulkanHelpers
 				"Please look at the Getting Started guide for additional information.\n",
 				"vkCreateInstance Failure");
 		}
+		return false;
+	}
+
+
+	void CreateInstance(const std::string& appName, VkInstance* instance)
+	{
+		ValidationLayersData layersData;
+		layersData.m_layerCount = 0;
+		ExtensionLayersData extensionsData;
+		extensionsData.m_extensionCount = 0;
+
+#ifndef NDEBUG
+		if (GetValidationLayers(layersData))
+		{
+			//throw exception
+			throw std::runtime_error("[VULKAN INSTANCE CREATION] Validation layers requested, but not available!");
+		}
+#endif
+
+		if (GetExtensionsLayers(extensionsData))
+		{
+			//throw exception
+			throw std::runtime_error("[VULKAN INSTANCE CREATION] Extensions requested, but not available!");
+		}
+
 		auto const app = vk::ApplicationInfo()
 			.setPApplicationName(appName.c_str())
 			.setApplicationVersion(0)
@@ -140,14 +131,36 @@ namespace VulkanHelpers
 
 		const VkInstanceCreateInfo inst_info = vk::InstanceCreateInfo()
 			.setPApplicationInfo(&app)
-			.setEnabledLayerCount(enabled_layer_count)
-			.setPpEnabledLayerNames(instance_validation_layers)
+			.setEnabledLayerCount(layersData.m_layerCount)
+#ifndef NDEBUG
+			.setPpEnabledLayerNames(layersData.m_validationLayers)
+#endif
 			.setEnabledExtensionCount(enabled_extension_count)
 			.setPpEnabledExtensionNames(extension_names);
 
-		if (vkCreateInstance(&inst_info, nullptr, instance) != VK_SUCCESS) 
+		auto result = vkCreateInstance(&inst_info, nullptr, instance) != VK_SUCCESS) 
+
+		if (result == vk::Result::eErrorIncompatibleDriver)
 		{
-			throw std::runtime_error("failed to create instance!");
+			ERR_EXIT(
+				"Cannot find a compatible Vulkan installable client driver (ICD).\n\n"
+				"Please look at the Getting Started guide for additional information.\n",
+				"vkCreateInstance Failure");
+		}
+		else if (result == vk::Result::eErrorExtensionNotPresent)
+		{
+			ERR_EXIT(
+				"Cannot find a specified extension library.\n"
+				"Make sure your layers path is set appropriately.\n",
+				"vkCreateInstance Failure");
+		}
+		else if (result != vk::Result::eSuccess)
+		{
+			ERR_EXIT(
+				"vkCreateInstance failed.\n\n"
+				"Do you have a compatible Vulkan installable client driver (ICD) installed?\n"
+				"Please look at the Getting Started guide for additional information.\n",
+				"vkCreateInstance Failure");
 		}
 	}
 }

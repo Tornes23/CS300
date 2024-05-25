@@ -18,4 +18,7 @@
         exit(1);                                            \
     } while (0)
 
+
+//need to make a callback for debugging
+
 #endif // USE_VULKAN

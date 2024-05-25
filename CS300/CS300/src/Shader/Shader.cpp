@@ -46,12 +46,11 @@ a string containing the address of the fragment shader
 
 *
 **************************************************************************/
-ShaderProgram::ShaderProgram(std::string vertex, std::string fragment, std::string geometry) 
 #ifdef USE_OPENGL
+ShaderProgram::ShaderProgram(std::string vertex, std::string fragment, std::string geometry) 
 	: mVertex(GL_VERTEX_SHADER, vertex.data()), 
       mFragment(GL_FRAGMENT_SHADER, fragment.data()),
 	  mGeometry(GL_GEOMETRY_SHADER, geometry.data())
-#endif
 {
 	
 	mbGeometry = false;
@@ -59,7 +58,6 @@ ShaderProgram::ShaderProgram(std::string vertex, std::string fragment, std::stri
 	if(geometry != "")
 		mbGeometry = true;
 
-#ifdef USE_OPENGL
 	GLenum error = glGetError();
 	//creating a shader program
 	mHandle = glCreateProgram();
@@ -105,8 +103,8 @@ ShaderProgram::ShaderProgram(std::string vertex, std::string fragment, std::stri
 	//Detaching the vertex shader
 	glDetachShader(mHandle, mVertex.GetHandle());
 	error = glGetError();
-#endif
 }
+#endif
 
 /**************************************************************************
 *!

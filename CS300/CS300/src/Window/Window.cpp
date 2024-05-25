@@ -189,6 +189,9 @@ void Window::DeleteContext()
 	//freeing the openGL context
 	SDL_GL_DeleteContext(mContext);
 #endif
+#ifdef USE_VULKAN
+	vkDestroyInstance(m_context.m_instance, nullptr);
+#endif
 }
 
 /**************************************************************************
