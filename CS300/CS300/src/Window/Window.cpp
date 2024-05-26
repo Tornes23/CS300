@@ -57,6 +57,7 @@ Window::Window(int width, int height, const char * title)
 	mSize.x = width;
 	mSize.y = height;
 	mQuit = false;
+	mTitle = title;
 #ifdef USE_OPENGL
 	//creating the window
 	mWindow = SDL_CreateWindow("CS300", 100, 100, width, height, SDL_WINDOW_OPENGL);

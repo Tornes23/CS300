@@ -30,7 +30,9 @@ namespace VulkanHelpers
 		VkDebugUtilsMessengerEXT* m_pDebugMessenger;
 		VkDebugUtilsMessengerCreateInfoEXT m_createInfo;
 
+		VkDebugUtilsMessengerCreateInfoEXT GetCreateInfo() const;
 		void PopulateCreateinfo();
+		void Initialize();
 		void Initialize(VkInstance* instance,
 						const VkAllocationCallbacks* pAllocator,
 						VkDebugUtilsMessengerEXT* pDebugMessenger);
