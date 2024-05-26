@@ -162,6 +162,9 @@
     <ClCompile Include="..\include\IMGUI\imgui_demo.cpp">
       <Filter>Source Files\Editor\ImGUI</Filter>
     </ClCompile>
+    <ClCompile Include="src\CustomDebug\VulkanDebug.cpp">
+      <Filter>Source Files\Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera\Camera.h">
@@ -206,9 +209,6 @@
     <ClInclude Include="src\Editor\Editor.h">
       <Filter>Source Files\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanHelpers.h">
-      <Filter>Source Files\Utils\VulkanHelpers</Filter>
-    </ClInclude>
     <ClInclude Include="src\CustomDebug\VulkanDebug.h">
       <Filter>Source Files\Debug</Filter>
     </ClInclude>
@@ -244,6 +244,9 @@
     </ClInclude>
     <ClInclude Include="..\include\IMGUI\imgui_internal.h">
       <Filter>Source Files\Editor\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utilities\VulkanHelpers.h">
+      <Filter>Source Files\Utils\VulkanHelpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

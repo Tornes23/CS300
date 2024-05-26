@@ -49,6 +49,9 @@ public:
 		VkPhysicalDevice m_physicalDevice;
 		VkDevice m_device;
 		VkSwapchainKHR m_swapchain;
+#ifndef NDEBUG
+		VkDebugUtilsMessengerEXT m_debugMessenger;
+#endif
 	};
 #endif // USE_VULKAN
 

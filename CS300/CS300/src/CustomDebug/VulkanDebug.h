@@ -10,6 +10,8 @@
 #endif
 
 #include <windows.h>
+#include <vulkan/vulkan.hpp>
+
 
 #define ERR_EXIT(err_msg, err_class)                        \
     do                                                      \
@@ -18,7 +20,19 @@
         exit(1);                                            \
     } while (0)
 
+namespace VulkanHelpers
+{
 
-//need to make a callback for debugging
+
+	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+		VkDebugUtilsMessageTypeFlagsEXT messageType,
+		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+		void* pUserData);
+
+    void ActualDebugPrint(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                          VkDebugUtilsMessageTypeFlagsEXT messageType,
+                          const VkDebugUtilsMessengerCallbackDataEXT * pCallbackData,
+                          void* pUserData);
+}
 
 #endif // USE_VULKAN

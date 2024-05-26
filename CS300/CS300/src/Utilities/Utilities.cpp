@@ -97,6 +97,15 @@ void Utils::InitVulkan(Window* window)
 	Window::VulkanInstanceData context = window->GetMutableContext();
 	VulkanHelpers::CreateInstance(window->GetTitle(), &context.m_instance);
 
+#ifndef NDEBUG	
+	VulkanHelpers::DebugCallbackData debugCallback;
+	debugCallback.Initialize(&context.m_instance, nullptr, &context.m_debugMessenger);
+
+	if (VulkanHelpers::CreateDebugCallback(debugCallback) != VK_SUCCESS) {
+		throw std::runtime_error("failed to set up debug messenger!");
+	}
+#endif
+
 
 }
 #endif // USE_VULKAN

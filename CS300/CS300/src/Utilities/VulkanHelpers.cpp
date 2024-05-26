@@ -4,6 +4,7 @@
 #include <CustomDebug/VulkanDebug.h>
 #include "VulkanHelpers.h"
 #include "VulkanHelpers.h"
+#include "VulkanHelpers.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define VK_KHR_win32_surface 1
@@ -14,10 +15,10 @@ namespace VulkanHelpers
 {
 	bool CheckLayers(ValidationLayersData& layersData)
 	{
-		for (const char* layerName : validationLayers) {
+		for (const char* layerName : layersData.m_validationLayers) {
 			bool layerFound = false;
 
-			for (const auto& layerProperties : availableLayers) {
+			for (const auto& layerProperties : layersData.m_availableLayers) {
 				if (strcmp(layerName, layerProperties.layerName) == 0) {
 					layerFound = true;
 					break;
@@ -32,51 +33,36 @@ namespace VulkanHelpers
 		return true;
 	}
 
-	bool GetValidationLayers(ValidationLayersData& layersData)
-	{
-		vkEnumerateInstanceLayerProperties(&layersData.m_layerCount, nullptr);
-		layersData.m_availableLayers.resize(layersData.m_layerCount);
-		vkEnumerateInstanceLayerProperties(&layersData.m_layerCount, layersData.m_availableLayers.data());
-
-		return CheckLayers(layersData);
-	}
-
-	bool GetExtensionsLayers(ExtensionLayersData& extensionsData)
+	bool CheckExtensions(ExtensionLayersData& extensionsData)
 	{
 		/* Look for instance extensions */
 		vk::Bool32 surfaceExtFound = VK_FALSE;
 		vk::Bool32 platformSurfaceExtFound = VK_FALSE;
-		memset(extension_names, 0, sizeof(extension_names));
 
-		auto result = vk::enumerateInstanceExtensionProperties(nullptr, &instance_extension_count,
-			static_cast<vk::ExtensionProperties*>(nullptr));
-		VERIFY(result == vk::Result::eSuccess);
+		VkResult result = result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionsData.m_extensionCount, extensionsData.m_availableExtensions.data());
+		VERIFY(result == VkResult::VK_SUCCESS);
 
-		if (instance_extension_count > 0)
+		if (extensionsData.m_extensionCount > 0)
 		{
-			std::unique_ptr<vk::ExtensionProperties[]> instance_extensions(new vk::ExtensionProperties[instance_extension_count]);
-			result = vk::enumerateInstanceExtensionProperties(nullptr, &instance_extension_count, instance_extensions.get());
-			VERIFY(result == vk::Result::eSuccess);
-
-			for (uint32_t i = 0; i < instance_extension_count; i++)
+			for (uint32_t i = 0; i < extensionsData.m_extensionCount; i++)
 			{
-				if (!strcmp(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, instance_extensions[i].extensionName))
+				if (!strcmp(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, extensionsData.m_availableExtensions[i].extensionName))
 				{
-					extension_names[enabled_extension_count++] = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
+					extensionsData.m_extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 				}
-				if (!strcmp(VK_KHR_SURFACE_EXTENSION_NAME, instance_extensions[i].extensionName))
+				if (!strcmp(VK_KHR_SURFACE_EXTENSION_NAME, extensionsData.m_availableExtensions[i].extensionName))
 				{
 					surfaceExtFound = 1;
-					extension_names[enabled_extension_count++] = VK_KHR_SURFACE_EXTENSION_NAME;
+					extensionsData.m_extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
 				}
 
-				if (!strcmp(VK_KHR_WIN32_SURFACE_EXTENSION_NAME, instance_extensions[i].extensionName))
+				if (!strcmp(VK_KHR_WIN32_SURFACE_EXTENSION_NAME, extensionsData.m_availableExtensions[i].extensionName))
 				{
 					platformSurfaceExtFound = 1;
-					extension_names[enabled_extension_count++] = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
+					extensionsData.m_extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 				}
 
-				assert(enabled_extension_count < 64);
+				assert(extensionsData.m_extensionCount < 64);
 			}
 		}
 
@@ -97,7 +83,27 @@ namespace VulkanHelpers
 				"Please look at the Getting Started guide for additional information.\n",
 				"vkCreateInstance Failure");
 		}
-		return false;
+
+#ifndef NDEBUG
+		extensionsData.m_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		extensionsData.m_extensionCount++;
+#endif
+
+		return true;
+	}
+
+	bool GetValidationLayers(ValidationLayersData& layersData)
+	{
+		vkEnumerateInstanceLayerProperties(&layersData.m_layerCount, nullptr);
+		layersData.m_availableLayers.resize(layersData.m_layerCount);
+		vkEnumerateInstanceLayerProperties(&layersData.m_layerCount, layersData.m_availableLayers.data());
+
+		return CheckLayers(layersData);
+	}
+
+	bool GetExtensionsLayers(ExtensionLayersData& extensionsData)
+	{
+		return CheckExtensions(extensionsData);
 	}
 
 
@@ -133,28 +139,28 @@ namespace VulkanHelpers
 			.setPApplicationInfo(&app)
 			.setEnabledLayerCount(layersData.m_layerCount)
 #ifndef NDEBUG
-			.setPpEnabledLayerNames(layersData.m_validationLayers)
+			.setPpEnabledLayerNames(layersData.m_validationLayers.data())
 #endif
-			.setEnabledExtensionCount(enabled_extension_count)
-			.setPpEnabledExtensionNames(extension_names);
+			.setEnabledExtensionCount(extensionsData.m_extensionCount)
+			.setPpEnabledExtensionNames(extensionsData.m_extensions.data());
 
-		auto result = vkCreateInstance(&inst_info, nullptr, instance) != VK_SUCCESS) 
+		VkResult result = vkCreateInstance(&inst_info, nullptr, instance);
 
-		if (result == vk::Result::eErrorIncompatibleDriver)
+		if (result == VkResult::VK_ERROR_INCOMPATIBLE_DRIVER)
 		{
 			ERR_EXIT(
 				"Cannot find a compatible Vulkan installable client driver (ICD).\n\n"
 				"Please look at the Getting Started guide for additional information.\n",
 				"vkCreateInstance Failure");
 		}
-		else if (result == vk::Result::eErrorExtensionNotPresent)
+		else if (result == VkResult::VK_ERROR_EXTENSION_NOT_PRESENT)
 		{
 			ERR_EXIT(
 				"Cannot find a specified extension library.\n"
 				"Make sure your layers path is set appropriately.\n",
 				"vkCreateInstance Failure");
 		}
-		else if (result != vk::Result::eSuccess)
+		else if (result != VkResult::VK_SUCCESS)
 		{
 			ERR_EXIT(
 				"vkCreateInstance failed.\n\n"
@@ -163,5 +169,71 @@ namespace VulkanHelpers
 				"vkCreateInstance Failure");
 		}
 	}
+
+	void DestroyInstance(VkInstance* instance)
+	{
+		vkDestroyInstance(*instance, nullptr);
+	}
+
+#ifndef NDEBUG
+	VkResult CreateDebugCallback(DebugCallbackData& debugData)
+	{
+		
+		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*debugData.m_instance, "vkCreateDebugUtilsMessengerEXT");
+		if (func != nullptr) {
+			return func(*debugData.m_instance, &debugData.m_createInfo, debugData.m_pAllocator, debugData.m_pDebugMessenger);
+		}
+		else {
+			return VK_ERROR_EXTENSION_NOT_PRESENT;
+		}
+		
+	}
+
+	void DestroyDebugCallback(DebugCallbackData& debugData)
+	{
+		auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*debugData.m_instance, "vkDestroyDebugUtilsMessengerEXT");
+		if (func != nullptr) 
+		{
+			func(*debugData.m_instance, *debugData.m_pDebugMessenger, debugData.m_pAllocator);
+		}
+	}
+
+	void DebugCallbackData::Initialize(VkInstance* instance,
+									   const VkAllocationCallbacks* pAllocator,
+									   VkDebugUtilsMessengerEXT* pDebugMessenger)
+	{
+		m_instance = instance;
+		m_pAllocator = pAllocator;
+		m_pDebugMessenger = pDebugMessenger;
+		PopulateCreateinfo();
+	}
+	void DebugCallbackData::PopulateCreateinfo()
+	{
+		m_createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+		m_createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+
+		m_createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+
+		m_createInfo.pfnUserCallback = debugCallback;
+		m_createInfo.pUserData = nullptr; // Optional
+	}
+
+	VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
+												 VkDebugUtilsMessageTypeFlagsEXT messageType, 
+												 const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, 
+												 void* pUserData)
+	{
+	
+		ActualDebugPrint(messageSeverity, messageType, pCallbackData, pUserData);
+	
+		return VK_FALSE;
+	}
+
+#endif
+
 }
 #endif // USE_VULKAN
