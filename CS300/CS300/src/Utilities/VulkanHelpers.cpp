@@ -3,8 +3,7 @@
 #include <iostream>
 #include <CustomDebug/VulkanDebug.h>
 #include "VulkanHelpers.h"
-#include "VulkanHelpers.h"
-#include "VulkanHelpers.h"
+#include <SDL_vulkan.h>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define VK_KHR_win32_surface 1
@@ -33,61 +32,15 @@ namespace VulkanHelpers
 		return true;
 	}
 
-	bool CheckExtensions(ExtensionLayersData& extensionsData)
+	bool CheckExtensions(ExtensionLayersData& extensionsData, SDL_Window* window)
 	{
 		/* Look for instance extensions */
-		vk::Bool32 surfaceExtFound = VK_FALSE;
-		vk::Bool32 platformSurfaceExtFound = VK_FALSE;
-
-		VkResult result = result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionsData.m_extensionCount, nullptr);
-		VERIFY(result == VkResult::VK_SUCCESS);
-		extensionsData.m_availableExtensions.resize(extensionsData.m_extensionCount);
-		result = result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionsData.m_extensionCount, extensionsData.m_availableExtensions.data());
-		VERIFY(result == VkResult::VK_SUCCESS);
-
-		if (extensionsData.m_extensionCount > 0)
+		if (!SDL_Vulkan_GetInstanceExtensions(window, &extensionsData.m_extensionCount, nullptr))
 		{
-			for (uint32_t i = 0; i < extensionsData.m_extensionCount; i++)
-			{
-				extensionsData.m_extensions.push_back(extensionsData.m_availableExtensions[i].extensionName);
-				//if (!strcmp(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, extensionsData.m_availableExtensions[i].extensionName))
-				//{
-				//	extensionsData.m_extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-				//}
-				//if (!strcmp(VK_KHR_SURFACE_EXTENSION_NAME, extensionsData.m_availableExtensions[i].extensionName))
-				//{
-				//	surfaceExtFound = 1;
-				//	extensionsData.m_extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-				//}
-				//
-				//if (!strcmp(VK_KHR_WIN32_SURFACE_EXTENSION_NAME, extensionsData.m_availableExtensions[i].extensionName))
-				//{
-				//	platformSurfaceExtFound = 1;
-				//	extensionsData.m_extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-				//}
-
-				assert(extensionsData.m_extensionCount < 64);
-			}
+			return false;
 		}
-
-		//if (!surfaceExtFound)
-		//{
-		//	ERR_EXIT("vkEnumerateInstanceExtensionProperties failed to find the " VK_KHR_SURFACE_EXTENSION_NAME
-		//		" extension.\n\n"
-		//		"Do you have a compatible Vulkan installable client driver (ICD) installed?\n"
-		//		"Please look at the Getting Started guide for additional information.\n",
-		//		"vkCreateInstance Failure");
-		//}
-		//
-		//if (!platformSurfaceExtFound)
-		//{
-		//	ERR_EXIT("vkEnumerateInstanceExtensionProperties failed to find the " VK_KHR_WIN32_SURFACE_EXTENSION_NAME
-		//		" extension.\n\n"
-		//		"Do you have a compatible Vulkan installable client driver (ICD) installed?\n"
-		//		"Please look at the Getting Started guide for additional information.\n",
-		//		"vkCreateInstance Failure");
-		//}
-
+		extensionsData.m_extensions.resize(extensionsData.m_extensionCount);
+		SDL_Vulkan_GetInstanceExtensions(window, &extensionsData.m_extensionCount, extensionsData.m_extensions.data());
 #ifndef NDEBUG
 		extensionsData.m_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		extensionsData.m_extensionCount++;
@@ -105,13 +58,13 @@ namespace VulkanHelpers
 		return CheckLayers(layersData);
 	}
 
-	bool GetExtensionsLayers(ExtensionLayersData& extensionsData)
+	bool GetExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window)
 	{
-		return CheckExtensions(extensionsData);
+		return CheckExtensions(extensionsData, window);
 	}
 
 
-	void CreateInstance(const std::string& appName, VkInstance* instance)
+	void CreateInstance(const std::string& appName, VkInstance* instance, SDL_Window* window)
 	{
 		ValidationLayersData layersData;
 		layersData.m_layerCount = 0;
@@ -126,7 +79,7 @@ namespace VulkanHelpers
 		}
 #endif
 
-		if (!GetExtensionsLayers(extensionsData))
+		if (!GetExtensionsLayers(extensionsData, window))
 		{
 			//throw exception
 			throw std::runtime_error("[VULKAN INSTANCE CREATION] Extensions requested, but not available!");
@@ -146,7 +99,7 @@ namespace VulkanHelpers
 		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = debugCallbackData.GetCreateInfo();
 #endif
 
-		VkInstanceCreateInfo createinfo;
+		VkInstanceCreateInfo createinfo{};
 		createinfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		createinfo.pApplicationInfo = &appInfo;
 #ifndef NDEBUG
@@ -154,7 +107,7 @@ namespace VulkanHelpers
 		createinfo.ppEnabledLayerNames  = layersData.m_validationLayers.data();
 		createinfo.pNext = &debugCreateInfo;
 #endif
-		//createinfo.enabledExtensionCount = extensionsData.m_extensions.size();
+		createinfo.enabledExtensionCount = (uint32_t)extensionsData.m_extensions.size();
 		createinfo.enabledExtensionCount = extensionsData.m_extensionCount;
 		createinfo.ppEnabledExtensionNames = extensionsData.m_extensions.data();
 		//createinfo.ppEnabledExtensionNames = extensionsData.m_availableExtensions.data();
@@ -254,7 +207,7 @@ namespace VulkanHelpers
 												 void* pUserData)
 	{
 	
-		ActualDebugPrint(messageSeverity, messageType, pCallbackData, pUserData);
+		//ActualDebugPrint(messageSeverity, messageType, pCallbackData, pUserData);
 	
 		return VK_FALSE;
 	}

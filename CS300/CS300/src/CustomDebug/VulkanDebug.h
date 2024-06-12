@@ -10,7 +10,7 @@
 #endif
 
 #include <windows.h>
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan.h>
 
 
 #define ERR_EXIT(err_msg, err_class)                        \

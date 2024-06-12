@@ -1,7 +1,10 @@
 #ifdef USE_VULKAN
 #pragma once
 #include <string>
-#include <vulkan/vulkan.hpp>
+#include <vector>
+#include <vulkan/vulkan.h>
+
+struct SDL_Window;
 
 namespace VulkanHelpers
 {
@@ -39,16 +42,16 @@ namespace VulkanHelpers
 	};
 #endif
 
-	void CreateInstance(const std::string& appName, VkInstance* instance);
+	void CreateInstance(const std::string& appName, VkInstance* instance, SDL_Window* window);
 	void DestroyInstance(VkInstance* instance);
 #ifndef NDEBUG
 	VkResult CreateDebugCallback(DebugCallbackData& debugData);
 	void DestroyDebugCallback(DebugCallbackData& debugData);
 #endif
 	bool CheckLayers(ValidationLayersData& layerData);
-	bool CheckExtensions(ExtensionLayersData& extensionsData);
+	bool CheckExtensions(ExtensionLayersData& extensionsData, SDL_Window* window);
 	bool GetValidationLayers(ValidationLayersData& layerData);
-	bool GetExtensionsLayers(ExtensionLayersData& extensionsData);
+	bool GetExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window);
 
 
 

@@ -95,7 +95,7 @@ void Utils::InitGL(Window* window)
 void Utils::InitVulkan(Window* window)
 {
 	Window::VulkanInstanceData context = window->GetMutableContext();
-	VulkanHelpers::CreateInstance(window->GetTitle(), &context.m_instance);
+	VulkanHelpers::CreateInstance(window->GetTitle(), &context.m_instance, window->GetSDLWindow());
 
 #ifndef NDEBUG	
 	VulkanHelpers::DebugCallbackData debugCallback;

@@ -34,7 +34,7 @@ The functions included are:
 #include <GL/glew.h>
 #endif
 #ifdef USE_VULKAN
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan.h>
 #endif
 #include <string>
 

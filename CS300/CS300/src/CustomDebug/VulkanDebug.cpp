@@ -40,7 +40,7 @@ and you can have as many of them as you want.
 		if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
 			// Message is important enough to show
 		}
-
+		
 		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
 	}
 }
