@@ -85,7 +85,7 @@ namespace VulkanHelpers
 			throw std::runtime_error("[VULKAN INSTANCE CREATION] Extensions requested, but not available!");
 		}
 
-		VkApplicationInfo appInfo;
+		VkApplicationInfo appInfo{};
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 		appInfo.pApplicationName = appName.c_str();
 		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -110,7 +110,6 @@ namespace VulkanHelpers
 		createinfo.enabledExtensionCount = (uint32_t)extensionsData.m_extensions.size();
 		createinfo.enabledExtensionCount = extensionsData.m_extensionCount;
 		createinfo.ppEnabledExtensionNames = extensionsData.m_extensions.data();
-		//createinfo.ppEnabledExtensionNames = extensionsData.m_availableExtensions.data();
 
 		VkResult result = vkCreateInstance(&createinfo, nullptr, instance);
 
@@ -193,7 +192,6 @@ namespace VulkanHelpers
 			VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 
 		m_createInfo.pfnUserCallback = debugCallback;
-		m_createInfo.pUserData = nullptr; // Optional
 	}
 
 	void DebugCallbackData::Initialize()

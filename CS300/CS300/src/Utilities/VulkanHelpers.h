@@ -31,7 +31,7 @@ namespace VulkanHelpers
 		VkInstance* m_instance;
 		const VkAllocationCallbacks* m_pAllocator;
 		VkDebugUtilsMessengerEXT* m_pDebugMessenger;
-		VkDebugUtilsMessengerCreateInfoEXT m_createInfo;
+		VkDebugUtilsMessengerCreateInfoEXT m_createInfo{};
 
 		VkDebugUtilsMessengerCreateInfoEXT GetCreateInfo() const;
 		void PopulateCreateinfo();
