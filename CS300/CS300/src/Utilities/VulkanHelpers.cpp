@@ -142,6 +142,11 @@ namespace VulkanHelpers
 		vkDestroyInstance(*instance, nullptr);
 	}
 
+	bool GetGPUDevice()
+	{
+
+	}
+
 #ifdef DEBUG
 	VkResult CreateDebugCallback(DebugCallbackData& debugData)
 	{
@@ -205,7 +210,7 @@ namespace VulkanHelpers
 												 void* pUserData)
 	{
 	
-		//ActualDebugPrint(messageSeverity, messageType, pCallbackData, pUserData);
+		ActualDebugPrint(messageSeverity, messageType, pCallbackData, pUserData);
 	
 		return VK_FALSE;
 	}

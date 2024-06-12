@@ -52,6 +52,8 @@ namespace VulkanHelpers
 	bool CheckExtensions(ExtensionLayersData& extensionsData, SDL_Window* window);
 	bool GetValidationLayers(ValidationLayersData& layerData);
 	bool GetExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window);
+	
+	bool GetDevice();
 
 
 
