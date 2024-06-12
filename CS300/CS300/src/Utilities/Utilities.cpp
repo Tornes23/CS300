@@ -97,7 +97,7 @@ void Utils::InitVulkan(Window* window)
 	Window::VulkanInstanceData context = window->GetMutableContext();
 	VulkanHelpers::CreateInstance(window->GetTitle(), &context.m_instance, window->GetSDLWindow());
 
-#ifndef NDEBUG	
+#ifdef DEBUG	
 	VulkanHelpers::DebugCallbackData debugCallback;
 	debugCallback.Initialize(&context.m_instance, nullptr, &context.m_debugMessenger);
 

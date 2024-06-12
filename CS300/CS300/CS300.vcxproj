@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\SDL2;$(ProjectDir)src </AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);USE_OPENGL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;DEBUG;%(PreprocessorDefinitions);USE_OPENGL</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\SDL2; $(SolutionDir)lib\GL</AdditionalLibraryDirectories>
@@ -141,7 +141,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\SDL2;$(ProjectDir)src </AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);USE_DIRECTX</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;DEBUG;%(PreprocessorDefinitions);USE_DIRECTX</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\SDL2; $(SolutionDir)lib\GL</AdditionalLibraryDirectories>
@@ -155,7 +155,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)include\SDL2;$(ProjectDir)src </AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);USE_VULKAN</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;DEBUG;%(PreprocessorDefinitions);USE_VULKAN</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\SDL2; $(SolutionDir)lib\VULKAN</AdditionalLibraryDirectories>

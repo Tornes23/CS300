@@ -41,7 +41,7 @@ namespace VulkanHelpers
 		}
 		extensionsData.m_extensions.resize(extensionsData.m_extensionCount);
 		SDL_Vulkan_GetInstanceExtensions(window, &extensionsData.m_extensionCount, extensionsData.m_extensions.data());
-#ifndef NDEBUG
+#ifdef DEBUG
 		extensionsData.m_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		extensionsData.m_extensionCount++;
 #endif
@@ -71,7 +71,7 @@ namespace VulkanHelpers
 		ExtensionLayersData extensionsData;
 		extensionsData.m_extensionCount = 0;
 
-#ifndef NDEBUG
+#ifdef DEBUG
 		if (!GetValidationLayers(layersData))
 		{
 			//throw exception
@@ -93,7 +93,7 @@ namespace VulkanHelpers
 		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.apiVersion = VK_API_VERSION_1_0;
 
-#ifndef NDEBUG
+#ifdef DEBUG
 		VulkanHelpers::DebugCallbackData debugCallbackData;
 		debugCallbackData.Initialize();
 		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = debugCallbackData.GetCreateInfo();
@@ -102,7 +102,7 @@ namespace VulkanHelpers
 		VkInstanceCreateInfo createinfo{};
 		createinfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		createinfo.pApplicationInfo = &appInfo;
-#ifndef NDEBUG
+#ifdef DEBUG
 		createinfo.enabledLayerCount = (uint32_t)layersData.m_validationLayers.size();
 		createinfo.ppEnabledLayerNames  = layersData.m_validationLayers.data();
 		createinfo.pNext = &debugCreateInfo;
@@ -143,7 +143,7 @@ namespace VulkanHelpers
 		vkDestroyInstance(*instance, nullptr);
 	}
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	VkResult CreateDebugCallback(DebugCallbackData& debugData)
 	{
 		

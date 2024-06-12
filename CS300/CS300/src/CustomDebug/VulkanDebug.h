@@ -3,7 +3,7 @@
 #define VULKAN_HPP_NO_EXCEPTIONS
 #define VULKAN_HPP_TYPESAFE_CONVERSION
 
-#ifndef NDEBUG
+#ifdef DEBUG
 #define VERIFY(x) assert(x)
 #else
 #define VERIFY(x) ((void)(x))

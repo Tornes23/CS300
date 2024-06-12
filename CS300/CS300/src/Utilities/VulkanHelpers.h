@@ -25,7 +25,7 @@ namespace VulkanHelpers
 
 	};
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	struct DebugCallbackData
 	{
 		VkInstance* m_instance;
@@ -44,7 +44,7 @@ namespace VulkanHelpers
 
 	void CreateInstance(const std::string& appName, VkInstance* instance, SDL_Window* window);
 	void DestroyInstance(VkInstance* instance);
-#ifndef NDEBUG
+#ifdef DEBUG
 	VkResult CreateDebugCallback(DebugCallbackData& debugData);
 	void DestroyDebugCallback(DebugCallbackData& debugData);
 #endif
