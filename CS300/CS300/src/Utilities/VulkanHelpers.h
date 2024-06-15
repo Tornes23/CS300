@@ -25,6 +25,15 @@ namespace VulkanHelpers
 
 	};
 
+	struct PhysicalDeviceData
+	{
+		VkPhysicalDevice m_physicalDevice;
+		std::vector<VkQueueFamilyProperties> m_queues;
+		std::optional<uint32_t> m_graphicsFamilyIndex;
+		int score = 0;
+
+	};
+
 #ifdef DEBUG
 	struct DebugCallbackData
 	{
@@ -53,7 +62,10 @@ namespace VulkanHelpers
 	bool GetValidationLayers(ValidationLayersData& layerData);
 	bool GetExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window);
 	
-	bool GetDevice();
+	bool GetPhysicalDevices(VkInstance* instance, std::vector<PhysicalDeviceData>& devices);
+	PhysicalDeviceData GetPhysicalDeviceDataWrapper(VkPhysicalDevice device);
+	void PopulateDeviceQueues(PhysicalDeviceData& device);
+	int GetDeviceScore(const VkPhysicalDevice& device) const;
 
 
 

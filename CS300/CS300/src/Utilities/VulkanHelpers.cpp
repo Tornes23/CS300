@@ -63,6 +63,44 @@ namespace VulkanHelpers
 		return CheckExtensions(extensionsData, window);
 	}
 
+	PhysicalDeviceData GetPhysicalDeviceDataWrapper(VkPhysicalDevice device)
+	{
+		PhysicalDeviceData deviceData;
+		deviceData.m_physicalDevice = device;
+		PopulateDeviceQueues(deviceData);
+		deviceData.score = GetDeviceScore(device);
+
+		return deviceData;
+	}
+
+	void PopulateDeviceQueues(PhysicalDeviceData& device)
+	{
+		
+	}
+
+	int GetDeviceScore(const VkPhysicalDevice& device) const
+	{
+		int score = 0;
+		VkPhysicalDeviceProperties deviceProperties;
+		VkPhysicalDeviceFeatures deviceFeatures;
+		vkGetPhysicalDeviceProperties(device, &deviceProperties);
+		vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+
+		// Discrete GPUs have a significant performance advantage
+		if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+			score += 1000;
+		}
+
+		// Maximum possible size of textures affects graphics quality
+		score += deviceProperties.limits.maxImageDimension2D;
+
+		// Application can't function without geometry shaders
+		if (deviceFeatures.geometryShader) {
+		}
+
+		return score;
+	}
 
 	void CreateInstance(const std::string& appName, VkInstance* instance, SDL_Window* window)
 	{
@@ -142,9 +180,26 @@ namespace VulkanHelpers
 		vkDestroyInstance(*instance, nullptr);
 	}
 
-	bool GetGPUDevice()
+	bool GetGPUDevice(VkInstance* instance, std::vector<PhysicalDeviceData>& devices)
 	{
+		uint32_t deviceCount = 0;
+		std::vector<VkPhysicalDevice> vulkanDevices;
+		vkEnumeratePhysicalDevices(*instance, &deviceCount, vulkanDevices.data());
 
+		if (deviceCount == 0) 
+		{
+			throw std::runtime_error("failed to find GPUs with Vulkan support!");
+		}
+
+		devices.resize(deviceCount);
+
+		for (int i = 0; i < vulkanDevices.size(); i++) 
+		{
+			devices[i] = GetPhysicalDeviceDataWrapper(vulkanDevices[i]);
+		}
+
+		devices.sort(devices.begin(), devices.end(), []() {});
+		
 	}
 
 #ifdef DEBUG

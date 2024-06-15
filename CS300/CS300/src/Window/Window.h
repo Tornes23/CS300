@@ -35,6 +35,7 @@ The functions included are:
 #endif
 #ifdef USE_VULKAN
 #include <vulkan/vulkan.h>
+#include "src/Utilities/VulkanHelpers.h"
 #endif
 #include <string>
 #include <vector>
@@ -47,17 +48,10 @@ public:
 #ifdef USE_VULKAN
 	struct VulkanInstanceData
 	{
-		struct VulkanPhysicalDeviceData
-		{
-			VkPhysicalDevice m_physicalDevice;
-			std::vector<VkQueueFamilyProperties> m_queues;
-			std::optional<uint32_t> m_graphicsFamilyIndex;
-
-		};
 		VkInstance m_instance;
 		VkSwapchainKHR m_swapchain;
 		VkDevice m_device;
-		std::vector<VulkanPhysicalDeviceData> m_physicalDevices;
+		std::vector<VulkanHelpers::PhysicalDeviceData> m_physicalDevices;
 #ifdef DEBUG
 		VkDebugUtilsMessengerEXT m_debugMessenger;
 #endif
