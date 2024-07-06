@@ -2,6 +2,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <optional>
 #include <vulkan/vulkan.h>
 
 struct SDL_Window;
@@ -31,6 +32,9 @@ namespace VulkanHelpers
 		std::vector<VkQueueFamilyProperties> m_queues;
 		std::optional<uint32_t> m_graphicsFamilyIndex;
 		int score = 0;
+
+		bool IsDeviceValidForRender();
+		//bool IsDeviceValidForRender();//in a future for memory or RTX operation for which I don't care of rendering capability
 
 	};
 
@@ -65,7 +69,7 @@ namespace VulkanHelpers
 	bool GetPhysicalDevices(VkInstance* instance, std::vector<PhysicalDeviceData>& devices);
 	PhysicalDeviceData GetPhysicalDeviceDataWrapper(VkPhysicalDevice device);
 	void PopulateDeviceQueues(PhysicalDeviceData& device);
-	int GetDeviceScore(const VkPhysicalDevice& device) const;
+	int GetDeviceScore(const VkPhysicalDevice& device);
 
 
 

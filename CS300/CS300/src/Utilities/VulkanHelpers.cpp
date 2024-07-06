@@ -1,6 +1,7 @@
 #ifdef USE_VULKAN
 #include <stdexcept>
 #include <iostream>
+#include <algorithm>
 #include <CustomDebug/VulkanDebug.h>
 #include "VulkanHelpers.h"
 #include <SDL_vulkan.h>
@@ -75,10 +76,21 @@ namespace VulkanHelpers
 
 	void PopulateDeviceQueues(PhysicalDeviceData& device)
 	{
-		
+		uint32_t queueFamilyCount = 0;
+		vkGetPhysicalDeviceQueueFamilyProperties(device.m_physicalDevice, &queueFamilyCount, nullptr);
+		vkGetPhysicalDeviceQueueFamilyProperties(device.m_physicalDevice, &queueFamilyCount, device.m_queues.data());
+
+		for (int i = 0; i < device.m_queues.size(); i++)
+		{
+			if (device.m_queues[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+			{
+				device.m_graphicsFamilyIndex = i;
+			}
+		}
+
 	}
 
-	int GetDeviceScore(const VkPhysicalDevice& device) const
+	int GetDeviceScore(const VkPhysicalDevice& device)
 	{
 		int score = 0;
 		VkPhysicalDeviceProperties deviceProperties;
@@ -97,6 +109,7 @@ namespace VulkanHelpers
 
 		// Application can't function without geometry shaders
 		if (deviceFeatures.geometryShader) {
+			score += 100;
 		}
 
 		return score;
@@ -180,26 +193,32 @@ namespace VulkanHelpers
 		vkDestroyInstance(*instance, nullptr);
 	}
 
-	bool GetGPUDevice(VkInstance* instance, std::vector<PhysicalDeviceData>& devices)
+	bool GetPhysicalDevices(VkInstance* instance, std::vector<PhysicalDeviceData>& devices)
 	{
 		uint32_t deviceCount = 0;
-		std::vector<VkPhysicalDevice> vulkanDevices;
+		vkEnumeratePhysicalDevices(*instance, &deviceCount, nullptr);
+		std::vector<VkPhysicalDevice> vulkanDevices(deviceCount);
 		vkEnumeratePhysicalDevices(*instance, &deviceCount, vulkanDevices.data());
 
-		if (deviceCount == 0) 
+		if (deviceCount == 0)
 		{
 			throw std::runtime_error("failed to find GPUs with Vulkan support!");
+			return false;
 		}
 
 		devices.resize(deviceCount);
 
-		for (int i = 0; i < vulkanDevices.size(); i++) 
+		for (int i = 0; i < vulkanDevices.size(); i++)
 		{
 			devices[i] = GetPhysicalDeviceDataWrapper(vulkanDevices[i]);
 		}
 
-		devices.sort(devices.begin(), devices.end(), []() {});
-		
+		std::sort(devices.begin(), devices.end(), [](PhysicalDeviceData a, PhysicalDeviceData b)
+													{
+														return a.score > b.score;
+													});
+
+		return true;
 	}
 
 #ifdef DEBUG
@@ -271,6 +290,16 @@ namespace VulkanHelpers
 	}
 
 #endif
+
+	bool PhysicalDeviceData::IsDeviceValidForRender()
+	{
+		if (!m_graphicsFamilyIndex.has_value())
+		{
+			return false;
+		}
+
+		return true;
+	}
 
 }
 #endif // USE_VULKAN

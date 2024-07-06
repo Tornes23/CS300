@@ -106,9 +106,10 @@ void Utils::InitVulkan(Window* window)
 	}
 #endif
 
-	//Vulkan Pick device
-	VulkanHelpers::GetPhysicalDevice();
-
+	//Vulkan Pick physical device
+	VulkanHelpers::GetPhysicalDevices(&context.m_instance, context.m_physicalDevices);
+	window->SelectVulkanDevice();
+	VulkanHelpers::GetLogicalDevices(&context.m_instance, context.m_physicalDevices);
 }
 #endif // USE_VULKAN
 

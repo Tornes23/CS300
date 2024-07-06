@@ -35,7 +35,7 @@ The functions included are:
 #endif
 #ifdef USE_VULKAN
 #include <vulkan/vulkan.h>
-#include "src/Utilities/VulkanHelpers.h"
+#include "Utilities/VulkanHelpers.h"
 #endif
 #include <string>
 #include <vector>
@@ -78,6 +78,7 @@ public:
 #ifdef USE_VULKAN
 	const Window::VulkanInstanceData& GetContext() const;
 	Window::VulkanInstanceData& GetMutableContext();
+	void SelectVulkanDevice();
 #endif // USE_VULKAN
 	void SetQuit(bool close);
 	void SwapBuffers();
