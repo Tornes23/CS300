@@ -29,13 +29,20 @@ namespace VulkanHelpers
 	struct PhysicalDeviceData
 	{
 		VkPhysicalDevice m_physicalDevice;
+		VkPhysicalDeviceProperties m_properties;//physical device properties
+		VkPhysicalDeviceFeatures m_features;//save physical device features
 		std::vector<VkQueueFamilyProperties> m_queues;
 		std::optional<uint32_t> m_graphicsFamilyIndex;
 		int score = 0;
 
 		bool IsDeviceValidForRender();
-		//bool IsDeviceValidForRender();//in a future for memory or RTX operation for which I don't care of rendering capability
+		//bool IsDeviceValidForRtx();//in a future for memory or RTX operation for which I don't care of rendering capability
 
+	};
+
+	struct LogicalDeviceData
+	{
+		VkDevice m_logicalDevice;
 	};
 
 #ifdef DEBUG
@@ -69,7 +76,11 @@ namespace VulkanHelpers
 	bool GetPhysicalDevices(VkInstance* instance, std::vector<PhysicalDeviceData>& devices);
 	PhysicalDeviceData GetPhysicalDeviceDataWrapper(VkPhysicalDevice device);
 	void PopulateDeviceQueues(PhysicalDeviceData& device);
-	int GetDeviceScore(const VkPhysicalDevice& device);
+	void GetDeviceScore(PhysicalDeviceData& deviceData);
+
+	bool GetLogicalDevices(SDL_Window* window, VkInstance* instance, std::vector<PhysicalDeviceData>& physicalDevices, std::vector<LogicalDeviceData>& logicalDevices);
+	void PopulateQueueCreateInfo(VkDeviceQueueCreateInfo& createInfo, uint32_t queueFamilyindex);
+	void PopulateLogicalDeviceCreateInfo(SDL_Window* window, VkDeviceCreateInfo& createInfo, uint32_t queueCount, VkDeviceQueueCreateInfo* queueCreateInfo, VkPhysicalDeviceFeatures* physicalDeviceFeatures);
 
 
 

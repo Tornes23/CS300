@@ -69,7 +69,7 @@ namespace VulkanHelpers
 		PhysicalDeviceData deviceData;
 		deviceData.m_physicalDevice = device;
 		PopulateDeviceQueues(deviceData);
-		deviceData.score = GetDeviceScore(device);
+		GetDeviceScore(deviceData);
 
 		return deviceData;
 	}
@@ -90,29 +90,95 @@ namespace VulkanHelpers
 
 	}
 
-	int GetDeviceScore(const VkPhysicalDevice& device)
+	void GetDeviceScore(PhysicalDeviceData& deviceData)
 	{
 		int score = 0;
-		VkPhysicalDeviceProperties deviceProperties;
-		VkPhysicalDeviceFeatures deviceFeatures;
-		vkGetPhysicalDeviceProperties(device, &deviceProperties);
-		vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+		vkGetPhysicalDeviceProperties(deviceData.m_physicalDevice, &deviceData.m_properties);
+		vkGetPhysicalDeviceFeatures(deviceData.m_physicalDevice, &deviceData.m_features);
 
 
 		// Discrete GPUs have a significant performance advantage
-		if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+		if (deviceData.m_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
 			score += 1000;
 		}
 
 		// Maximum possible size of textures affects graphics quality
-		score += deviceProperties.limits.maxImageDimension2D;
+		score += deviceData.m_properties.limits.maxImageDimension2D;
 
 		// Application can't function without geometry shaders
-		if (deviceFeatures.geometryShader) {
+		if (deviceData.m_features.geometryShader) {
 			score += 100;
 		}
 
-		return score;
+		deviceData.score = score;
+	}
+
+	bool GetLogicalDevices(SDL_Window* window, VkInstance* instance, std::vector<PhysicalDeviceData>& physicalDevices, std::vector<LogicalDeviceData>& logicalDevices)
+	{
+		logicalDevices.resize(physicalDevices.size());
+		for (int i = 0; i < physicalDevices.size(); i++)
+		{
+			if (physicalDevices[i].m_graphicsFamilyIndex.has_value())
+			{
+				VkDeviceQueueCreateInfo queueInfo;
+				PopulateQueueCreateInfo(queueInfo, physicalDevices[i].m_graphicsFamilyIndex.value());
+				VkDeviceCreateInfo createInfo;
+				PopulateLogicalDeviceCreateInfo(window, createInfo, 1, &queueInfo, &physicalDevices[i].m_features);
+
+				if (vkCreateDevice(physicalDevices[i].m_physicalDevice, &createInfo, nullptr, &logicalDevices[i].m_logicalDevice) != VK_SUCCESS) 
+				{
+					throw std::runtime_error("failed to create logical device!");
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	void PopulateQueueCreateInfo(VkDeviceQueueCreateInfo& createInfo, uint32_t queueFamilyindex)
+	{
+		float queuePriority = 1.0f;
+		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		createInfo.queueFamilyIndex = queueFamilyindex;
+		createInfo.queueCount = 1;
+		createInfo.pQueuePriorities = &queuePriority;
+
+	}
+
+	void PopulateLogicalDeviceCreateInfo(SDL_Window* window, VkDeviceCreateInfo& createInfo, uint32_t queueCount, VkDeviceQueueCreateInfo* queueCreateInfo, VkPhysicalDeviceFeatures* physicalDeviceFeatures)
+	{
+		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		createInfo.pQueueCreateInfos = queueCreateInfo;
+		createInfo.queueCreateInfoCount = queueCount;
+
+		createInfo.pEnabledFeatures = physicalDeviceFeatures;
+
+		ValidationLayersData layersData;
+		layersData.m_layerCount = 0;
+		ExtensionLayersData extensionsData;
+		extensionsData.m_extensionCount = 0;
+
+#ifdef DEBUG
+		if (!GetValidationLayers(layersData))
+		{
+			//throw exception
+			throw std::runtime_error("[VULKAN DEVICE CREATION] Validation layers requested, but not available!");
+		}
+#endif
+
+		if (!GetExtensionsLayers(extensionsData, window))
+		{
+			//throw exception
+			throw std::runtime_error("[VULKAN DEVICE CREATION] Extensions requested, but not available!");
+		}
+
+#ifdef DEBUG
+		createInfo.enabledLayerCount = (uint32_t)layersData.m_validationLayers.size();
+		createInfo.ppEnabledLayerNames = layersData.m_validationLayers.data();
+#endif
+		createInfo.enabledExtensionCount = (uint32_t)extensionsData.m_extensions.size();
+		createInfo.enabledExtensionCount = extensionsData.m_extensionCount;
+		createInfo.ppEnabledExtensionNames = extensionsData.m_extensions.data();
 	}
 
 	void CreateInstance(const std::string& appName, VkInstance* instance, SDL_Window* window)

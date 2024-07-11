@@ -108,8 +108,8 @@ void Utils::InitVulkan(Window* window)
 
 	//Vulkan Pick physical device
 	VulkanHelpers::GetPhysicalDevices(&context.m_instance, context.m_physicalDevices);
+	VulkanHelpers::GetLogicalDevices(window->GetSDLWindow(), &context.m_instance, context.m_physicalDevices, context.m_logicalDevices);
 	window->SelectVulkanDevice();
-	VulkanHelpers::GetLogicalDevices(&context.m_instance, context.m_physicalDevices);
 }
 #endif // USE_VULKAN
 

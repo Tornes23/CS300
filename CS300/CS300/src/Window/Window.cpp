@@ -281,7 +281,7 @@ Window::VulkanInstanceData& Window::GetMutableContext()
 }
 void Window::SelectVulkanDevice()
 {
-
+	//m_context.m_device = 
 }
 #endif // USE_VULKAN
 

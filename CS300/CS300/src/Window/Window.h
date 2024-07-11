@@ -50,8 +50,9 @@ public:
 	{
 		VkInstance m_instance;
 		VkSwapchainKHR m_swapchain;
-		VkDevice m_device;
+		VkDevice m_currentDevice;
 		std::vector<VulkanHelpers::PhysicalDeviceData> m_physicalDevices;
+		std::vector<VulkanHelpers::LogicalDeviceData> m_logicalDevices;
 #ifdef DEBUG
 		VkDebugUtilsMessengerEXT m_debugMessenger;
 #endif
