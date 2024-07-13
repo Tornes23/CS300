@@ -9,7 +9,13 @@ struct SDL_Window;
 
 namespace VulkanHelpers
 {
-#pragma region HELPER STRUCTURES
+#pragma region STATIC VARIABLES
+
+	static float s_queuePriority = 1.0f;
+
+#pragma endregion
+
+#pragma region HELPER STRUCTURES 
 
 	struct ValidationLayersData
 	{
@@ -46,7 +52,7 @@ namespace VulkanHelpers
 
 	struct LogicalDeviceData
 	{
-		VkDevice m_logicalDevice;
+		VkDevice m_logicalDevice{};
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
 	};
@@ -113,7 +119,7 @@ namespace VulkanHelpers
 	bool GetLogicalDevices(SDL_Window* window, VkInstance* instance, std::vector<PhysicalDeviceData>& physicalDevices, std::vector<LogicalDeviceData>& logicalDevices);
 	void PopulateQueueCreateInfo(VkDeviceQueueCreateInfo& createInfo, uint32_t queueFamilyindex);
 	void PopulateQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& createInfos, const std::vector <std::optional<uint32_t>>& queuesIndices);
-	void PopulateLogicalDeviceCreateInfo(SDL_Window* window, VkDeviceCreateInfo& createInfo, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, VkPhysicalDeviceFeatures* physicalDeviceFeatures);
+	void CreateLogicalDevice(SDL_Window* window, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, const PhysicalDeviceData& physicalDevice, LogicalDeviceData& logicalDevice);
 
 #pragma endregion
 

@@ -13,6 +13,7 @@
 
 namespace VulkanHelpers
 {
+
 #pragma region INSTANCE CREATION METHODS
 
 	void CreateInstance(const std::string& appName, VkInstance* instance, SDL_Window* window)
@@ -323,14 +324,7 @@ namespace VulkanHelpers
 		{
 			std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 			PopulateQueueCreateInfo(queueCreateInfos, physicalDevices[i].m_FamilyIndexes);
-			VkDeviceCreateInfo createInfo{};
-			PopulateLogicalDeviceCreateInfo(window, createInfo, queueCreateInfos, &physicalDevices[i].m_features);
-
-			if (vkCreateDevice(physicalDevices[i].m_physicalDevice, &createInfo, nullptr, &logicalDevices[i].m_logicalDevice) != VK_SUCCESS) 
-			{
-				throw std::runtime_error("failed to create logical device!");
-				return false;
-			}
+			CreateLogicalDevice(window, queueCreateInfos, physicalDevices[i], logicalDevices[i]);
 			
 			vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_graphicsFamilyIndex].value(), 0, &logicalDevices[i].m_graphicsQueue);
 			vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_presentFamilyIndex].value(), 0, &logicalDevices[i].m_graphicsQueue);
@@ -350,7 +344,6 @@ namespace VulkanHelpers
 
 	void PopulateQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& createInfos, const std::vector <std::optional<uint32_t>>& queueIndices)
 	{
-		float queuePriority = 1.0f;
 		for (int i = 0; i < queueIndices.size(); i++)
 		{
 			if (queueIndices[i].has_value())
@@ -359,19 +352,20 @@ namespace VulkanHelpers
 				createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 				createInfo.queueFamilyIndex = queueIndices[i].value();
 				createInfo.queueCount = 1;
-				createInfo.pQueuePriorities = &queuePriority;
+				createInfo.pQueuePriorities = &s_queuePriority;
 				createInfos.push_back(createInfo);
 			}
 		}
 	}
 
-	void PopulateLogicalDeviceCreateInfo(SDL_Window* window, VkDeviceCreateInfo& createInfo, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, VkPhysicalDeviceFeatures* physicalDeviceFeatures)
+	void CreateLogicalDevice(SDL_Window* window, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, const PhysicalDeviceData& physicalDevice, LogicalDeviceData& logicalDevice)
 	{
+		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 		createInfo.pQueueCreateInfos = queueCreateInfos.data();
 		createInfo.queueCreateInfoCount = (uint32_t)queueCreateInfos.size();
 
-		createInfo.pEnabledFeatures = physicalDeviceFeatures;
+		createInfo.pEnabledFeatures = &physicalDevice.m_features;
 
 		ValidationLayersData layersData;
 		layersData.m_layerCount = 0;
@@ -399,6 +393,11 @@ namespace VulkanHelpers
 		createInfo.enabledExtensionCount = (uint32_t)extensionsData.m_extensions.size();
 		createInfo.enabledExtensionCount = extensionsData.m_extensionCount;
 		createInfo.ppEnabledExtensionNames = extensionsData.m_extensions.data();
+
+		if (vkCreateDevice(physicalDevice.m_physicalDevice, &createInfo, nullptr, &logicalDevice.m_logicalDevice) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to create logical device!");
+		}
 	}
 
 #pragma endregion
