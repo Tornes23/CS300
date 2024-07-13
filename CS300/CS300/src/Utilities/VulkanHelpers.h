@@ -120,7 +120,7 @@ namespace VulkanHelpers
 	void PopulateQueueCreateInfo(VkDeviceQueueCreateInfo& createInfo, uint32_t queueFamilyindex);
 	void PopulateQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& createInfos, const std::vector <std::optional<uint32_t>>& queuesIndices);
 	void CreateLogicalDevice(SDL_Window* window, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, const PhysicalDeviceData& physicalDevice, LogicalDeviceData& logicalDevice);
-
+	void GetDeviceExtensions(ExtensionLayersData& extensionsData, const VkPhysicalDevice& device);
 #pragma endregion
 
 

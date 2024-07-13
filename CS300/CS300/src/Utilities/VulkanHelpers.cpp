@@ -60,7 +60,6 @@ namespace VulkanHelpers
 		createinfo.pNext = &debugCreateInfo;
 #endif
 		createinfo.enabledExtensionCount = (uint32_t)extensionsData.m_extensions.size();
-		createinfo.enabledExtensionCount = extensionsData.m_extensionCount;
 		createinfo.ppEnabledExtensionNames = extensionsData.m_extensions.data();
 
 		VkResult result = vkCreateInstance(&createinfo, nullptr, instance);
@@ -116,6 +115,7 @@ namespace VulkanHelpers
 		{
 			return false;
 		}
+		
 		extensionsData.m_extensions.resize(extensionsData.m_extensionCount);
 		SDL_Vulkan_GetInstanceExtensions(window, &extensionsData.m_extensionCount, extensionsData.m_extensions.data());
 #ifdef DEBUG
@@ -282,14 +282,17 @@ namespace VulkanHelpers
 			
 			if (presentSupport)
 			{
-				device.m_presentFamilyIndex = (int)device.m_FamilyIndexes.size();
-				device.m_FamilyIndexes.push_back(i);
+				if (i != device.m_graphicsFamilyIndex)
+				{
+					device.m_presentFamilyIndex = (int)device.m_FamilyIndexes.size();
+					device.m_FamilyIndexes.push_back(i);
+				}
 			}
 			
-			if (device.m_graphicsFamilyIndex >= 0 && device.m_presentFamilyIndex >= 0)
-			{
-				break;
-			}
+			//if (device.m_graphicsFamilyIndex >= 0 && device.m_presentFamilyIndex >= 0)
+			//{
+			//	break;
+			//}
 		}
 
 	}
@@ -346,15 +349,14 @@ namespace VulkanHelpers
 	{
 		for (int i = 0; i < queueIndices.size(); i++)
 		{
-			if (queueIndices[i].has_value())
-			{
-				VkDeviceQueueCreateInfo createInfo;
-				createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-				createInfo.queueFamilyIndex = queueIndices[i].value();
-				createInfo.queueCount = 1;
-				createInfo.pQueuePriorities = &s_queuePriority;
-				createInfos.push_back(createInfo);
-			}
+			VkDeviceQueueCreateInfo createInfo{};
+			createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			createInfo.pNext = nullptr;
+			createInfo.flags = 0;
+			createInfo.queueFamilyIndex = queueIndices[i].value();
+			createInfo.queueCount = 1;
+			createInfo.pQueuePriorities = &s_queuePriority;
+			createInfos.push_back(createInfo);
 		}
 	}
 
@@ -362,8 +364,8 @@ namespace VulkanHelpers
 	{
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		createInfo.pQueueCreateInfos = queueCreateInfos.data();
-		createInfo.queueCreateInfoCount = (uint32_t)queueCreateInfos.size();
 
 		createInfo.pEnabledFeatures = &physicalDevice.m_features;
 
@@ -379,25 +381,35 @@ namespace VulkanHelpers
 			throw std::runtime_error("[VULKAN DEVICE CREATION] Validation layers requested, but not available!");
 		}
 #endif
-
-		if (!GetExtensionsLayers(extensionsData, window))
-		{
-			//throw exception
-			throw std::runtime_error("[VULKAN DEVICE CREATION] Extensions requested, but not available!");
-		}
+		GetDeviceExtensions(extensionsData, physicalDevice.m_physicalDevice);
 
 #ifdef DEBUG
 		createInfo.enabledLayerCount = (uint32_t)layersData.m_validationLayers.size();
 		createInfo.ppEnabledLayerNames = layersData.m_validationLayers.data();
 #endif
 		createInfo.enabledExtensionCount = (uint32_t)extensionsData.m_extensions.size();
-		createInfo.enabledExtensionCount = extensionsData.m_extensionCount;
 		createInfo.ppEnabledExtensionNames = extensionsData.m_extensions.data();
 
 		if (vkCreateDevice(physicalDevice.m_physicalDevice, &createInfo, nullptr, &logicalDevice.m_logicalDevice) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create logical device!");
 		}
+	}
+
+	void GetDeviceExtensions(ExtensionLayersData& extensionsData, const VkPhysicalDevice& device)
+	{
+
+		//vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsData.m_extensionCount, nullptr);
+		//extensionsData.m_availableExtensions.resize(extensionsData.m_extensionCount);
+		//extensionsData.m_extensions.resize(extensionsData.m_extensionCount);
+		//vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsData.m_extensionCount, extensionsData.m_availableExtensions.data());
+		//
+		//for (int i = 0; i < extensionsData.m_extensionCount; i++)
+		//{
+		//	extensionsData.m_extensions[i] = extensionsData.m_availableExtensions[i].extensionName;
+		//}
+
+		extensionsData.m_extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 	}
 
 #pragma endregion
