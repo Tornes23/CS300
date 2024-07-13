@@ -13,6 +13,81 @@
 
 namespace VulkanHelpers
 {
+#pragma region INSTANCE CREATION METHODS
+
+	void CreateInstance(const std::string& appName, VkInstance* instance, SDL_Window* window)
+	{
+		ValidationLayersData layersData;
+		layersData.m_layerCount = 0;
+		ExtensionLayersData extensionsData;
+		extensionsData.m_extensionCount = 0;
+
+#ifdef DEBUG
+		if (!GetValidationLayers(layersData))
+		{
+			//throw exception
+			throw std::runtime_error("[VULKAN INSTANCE CREATION] Validation layers requested, but not available!");
+		}
+#endif
+
+		if (!GetExtensionsLayers(extensionsData, window))
+		{
+			//throw exception
+			throw std::runtime_error("[VULKAN INSTANCE CREATION] Extensions requested, but not available!");
+		}
+
+		VkApplicationInfo appInfo{};
+		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+		appInfo.pApplicationName = appName.c_str();
+		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+		appInfo.pEngineName = appName.c_str();
+		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+		appInfo.apiVersion = VK_API_VERSION_1_0;
+
+#ifdef DEBUG
+		VulkanHelpers::DebugCallbackData debugCallbackData;
+		debugCallbackData.Initialize();
+		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = debugCallbackData.GetCreateInfo();
+#endif
+
+		VkInstanceCreateInfo createinfo{};
+		createinfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+		createinfo.pApplicationInfo = &appInfo;
+#ifdef DEBUG
+		createinfo.enabledLayerCount = (uint32_t)layersData.m_validationLayers.size();
+		createinfo.ppEnabledLayerNames = layersData.m_validationLayers.data();
+		createinfo.pNext = &debugCreateInfo;
+#endif
+		createinfo.enabledExtensionCount = (uint32_t)extensionsData.m_extensions.size();
+		createinfo.enabledExtensionCount = extensionsData.m_extensionCount;
+		createinfo.ppEnabledExtensionNames = extensionsData.m_extensions.data();
+
+		VkResult result = vkCreateInstance(&createinfo, nullptr, instance);
+
+		if (result == VkResult::VK_ERROR_INCOMPATIBLE_DRIVER)
+		{
+			ERR_EXIT(
+				"Cannot find a compatible Vulkan installable client driver (ICD).\n\n"
+				"Please look at the Getting Started guide for additional information.\n",
+				"vkCreateInstance Failure");
+		}
+		else if (result == VkResult::VK_ERROR_EXTENSION_NOT_PRESENT)
+		{
+			ERR_EXIT(
+				"Cannot find a specified extension library.\n"
+				"Make sure your layers path is set appropriately.\n",
+				"vkCreateInstance Failure");
+		}
+		else if (result != VkResult::VK_SUCCESS)
+		{
+			ERR_EXIT(
+				"vkCreateInstance failed.\n\n"
+				"Do you have a compatible Vulkan installable client driver (ICD) installed?\n"
+				"Please look at the Getting Started guide for additional information.\n",
+				"vkCreateInstance Failure");
+		}
+	}
+
 	bool CheckLayers(ValidationLayersData& layersData)
 	{
 		for (const char* layerName : layersData.m_validationLayers) {
@@ -64,27 +139,155 @@ namespace VulkanHelpers
 		return CheckExtensions(extensionsData, window);
 	}
 
-	PhysicalDeviceData GetPhysicalDeviceDataWrapper(VkPhysicalDevice device)
+#ifdef DEBUG
+	VkResult CreateDebugCallback(DebugCallbackData& debugData)
+	{
+
+		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*debugData.m_instance, "vkCreateDebugUtilsMessengerEXT");
+		if (func != nullptr) {
+			return func(*debugData.m_instance, &debugData.m_createInfo, debugData.m_pAllocator, debugData.m_pDebugMessenger);
+		}
+		else {
+			return VK_ERROR_EXTENSION_NOT_PRESENT;
+		}
+
+	}
+
+	void DestroyDebugCallback(DebugCallbackData& debugData)
+	{
+		auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*debugData.m_instance, "vkDestroyDebugUtilsMessengerEXT");
+		if (func != nullptr)
+		{
+			func(*debugData.m_instance, *debugData.m_pDebugMessenger, debugData.m_pAllocator);
+		}
+	}
+
+	void DebugCallbackData::Initialize(VkInstance* instance,
+		const VkAllocationCallbacks* pAllocator,
+		VkDebugUtilsMessengerEXT* pDebugMessenger)
+	{
+		m_instance = instance;
+		m_pAllocator = pAllocator;
+		m_pDebugMessenger = pDebugMessenger;
+		PopulateCreateinfo();
+	}
+
+	VkDebugUtilsMessengerCreateInfoEXT DebugCallbackData::GetCreateInfo() const
+	{
+		return m_createInfo;
+	}
+
+	void DebugCallbackData::PopulateCreateinfo()
+	{
+		m_createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+		m_createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+
+		m_createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+			VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+
+		m_createInfo.pfnUserCallback = debugCallback;
+	}
+
+	void DebugCallbackData::Initialize()
+	{
+		PopulateCreateinfo();
+	}
+
+	VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+		VkDebugUtilsMessageTypeFlagsEXT messageType,
+		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+		void* pUserData)
+	{
+
+		ActualDebugPrint(messageSeverity, messageType, pCallbackData, pUserData);
+
+		return VK_FALSE;
+	}
+
+#endif
+
+#pragma endregion
+
+#pragma region DEVICE CREATION METHODS
+
+	bool GetPhysicalDevices(VkInstance* instance, const VkSurfaceKHR& surface, std::vector<PhysicalDeviceData>& devices)
+	{
+		uint32_t deviceCount = 0;
+		vkEnumeratePhysicalDevices(*instance, &deviceCount, nullptr);
+		std::vector<VkPhysicalDevice> vulkanDevices(deviceCount);
+		vkEnumeratePhysicalDevices(*instance, &deviceCount, vulkanDevices.data());
+
+		if (deviceCount == 0)
+		{
+			throw std::runtime_error("failed to find GPUs with Vulkan support!");
+			return false;
+		}
+
+		devices.resize(deviceCount);
+
+		for (int i = 0; i < vulkanDevices.size(); i++)
+		{
+			devices[i] = GetPhysicalDeviceDataWrapper(vulkanDevices[i], surface);
+		}
+
+		std::sort(devices.begin(), devices.end(), [](PhysicalDeviceData a, PhysicalDeviceData b)
+			{
+				return a.score > b.score;
+			});
+
+		return true;
+	}
+
+	bool PhysicalDeviceData::IsDeviceValidForRender()
+	{
+		if (m_graphicsFamilyIndex < 0 || m_presentFamilyIndex < 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	PhysicalDeviceData GetPhysicalDeviceDataWrapper(VkPhysicalDevice device, const VkSurfaceKHR& surface)
 	{
 		PhysicalDeviceData deviceData;
 		deviceData.m_physicalDevice = device;
-		PopulateDeviceQueues(deviceData);
+		PopulateDeviceQueues(deviceData, surface);
 		GetDeviceScore(deviceData);
 
 		return deviceData;
 	}
 
-	void PopulateDeviceQueues(PhysicalDeviceData& device)
+	void PopulateDeviceQueues(PhysicalDeviceData& device, const VkSurfaceKHR& surface)
 	{
 		uint32_t queueFamilyCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(device.m_physicalDevice, &queueFamilyCount, nullptr);
+		device.m_queues.resize(queueFamilyCount);
 		vkGetPhysicalDeviceQueueFamilyProperties(device.m_physicalDevice, &queueFamilyCount, device.m_queues.data());
 
 		for (int i = 0; i < device.m_queues.size(); i++)
 		{
 			if (device.m_queues[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
 			{
-				device.m_graphicsFamilyIndex = i;
+				device.m_graphicsFamilyIndex = (int)device.m_FamilyIndexes.size();
+				device.m_FamilyIndexes.push_back(i);
+			}
+
+			VkBool32 presentSupport = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(device.m_physicalDevice, i, surface, &presentSupport);
+			
+			if (presentSupport)
+			{
+				device.m_presentFamilyIndex = (int)device.m_FamilyIndexes.size();
+				device.m_FamilyIndexes.push_back(i);
+			}
+			
+			if (device.m_graphicsFamilyIndex >= 0 && device.m_presentFamilyIndex >= 0)
+			{
+				break;
 			}
 		}
 
@@ -118,19 +321,19 @@ namespace VulkanHelpers
 		logicalDevices.resize(physicalDevices.size());
 		for (int i = 0; i < physicalDevices.size(); i++)
 		{
-			if (physicalDevices[i].m_graphicsFamilyIndex.has_value())
-			{
-				VkDeviceQueueCreateInfo queueInfo;
-				PopulateQueueCreateInfo(queueInfo, physicalDevices[i].m_graphicsFamilyIndex.value());
-				VkDeviceCreateInfo createInfo;
-				PopulateLogicalDeviceCreateInfo(window, createInfo, 1, &queueInfo, &physicalDevices[i].m_features);
+			std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+			PopulateQueueCreateInfo(queueCreateInfos, physicalDevices[i].m_FamilyIndexes);
+			VkDeviceCreateInfo createInfo{};
+			PopulateLogicalDeviceCreateInfo(window, createInfo, queueCreateInfos, &physicalDevices[i].m_features);
 
-				if (vkCreateDevice(physicalDevices[i].m_physicalDevice, &createInfo, nullptr, &logicalDevices[i].m_logicalDevice) != VK_SUCCESS) 
-				{
-					throw std::runtime_error("failed to create logical device!");
-					return false;
-				}
+			if (vkCreateDevice(physicalDevices[i].m_physicalDevice, &createInfo, nullptr, &logicalDevices[i].m_logicalDevice) != VK_SUCCESS) 
+			{
+				throw std::runtime_error("failed to create logical device!");
+				return false;
 			}
+			
+			vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_graphicsFamilyIndex].value(), 0, &logicalDevices[i].m_graphicsQueue);
+			vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_presentFamilyIndex].value(), 0, &logicalDevices[i].m_graphicsQueue);
 		}
 		return true;
 	}
@@ -145,11 +348,28 @@ namespace VulkanHelpers
 
 	}
 
-	void PopulateLogicalDeviceCreateInfo(SDL_Window* window, VkDeviceCreateInfo& createInfo, uint32_t queueCount, VkDeviceQueueCreateInfo* queueCreateInfo, VkPhysicalDeviceFeatures* physicalDeviceFeatures)
+	void PopulateQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& createInfos, const std::vector <std::optional<uint32_t>>& queueIndices)
+	{
+		float queuePriority = 1.0f;
+		for (int i = 0; i < queueIndices.size(); i++)
+		{
+			if (queueIndices[i].has_value())
+			{
+				VkDeviceQueueCreateInfo createInfo;
+				createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+				createInfo.queueFamilyIndex = queueIndices[i].value();
+				createInfo.queueCount = 1;
+				createInfo.pQueuePriorities = &queuePriority;
+				createInfos.push_back(createInfo);
+			}
+		}
+	}
+
+	void PopulateLogicalDeviceCreateInfo(SDL_Window* window, VkDeviceCreateInfo& createInfo, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, VkPhysicalDeviceFeatures* physicalDeviceFeatures)
 	{
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		createInfo.pQueueCreateInfos = queueCreateInfo;
-		createInfo.queueCreateInfoCount = queueCount;
+		createInfo.pQueueCreateInfos = queueCreateInfos.data();
+		createInfo.queueCreateInfoCount = (uint32_t)queueCreateInfos.size();
 
 		createInfo.pEnabledFeatures = physicalDeviceFeatures;
 
@@ -181,191 +401,35 @@ namespace VulkanHelpers
 		createInfo.ppEnabledExtensionNames = extensionsData.m_extensions.data();
 	}
 
-	void CreateInstance(const std::string& appName, VkInstance* instance, SDL_Window* window)
-	{
-		ValidationLayersData layersData;
-		layersData.m_layerCount = 0;
-		ExtensionLayersData extensionsData;
-		extensionsData.m_extensionCount = 0;
+#pragma endregion
 
-#ifdef DEBUG
-		if (!GetValidationLayers(layersData))
+#pragma region SURFACE CREATION METHODS
+
+	void CreateVulkanSurface(SDL_Window* window, VulkanData& context)
+	{
+		SDL_Vulkan_CreateSurface(window, context.m_instance, &context.m_surface);
+	}
+
+#pragma endregion
+
+#pragma region CLEAN UP METHODS
+
+	void CleanUp(VulkanData& context)
+	{
+		for (int i = 0; i < context.m_logicalDevices.size(); i++)
 		{
-			//throw exception
-			throw std::runtime_error("[VULKAN INSTANCE CREATION] Validation layers requested, but not available!");
-		}
-#endif
-
-		if (!GetExtensionsLayers(extensionsData, window))
-		{
-			//throw exception
-			throw std::runtime_error("[VULKAN INSTANCE CREATION] Extensions requested, but not available!");
+			LogicalDeviceData deviceData = context.m_logicalDevices[i];
+			vkDestroyDevice(deviceData.m_logicalDevice, nullptr);
 		}
 
-		VkApplicationInfo appInfo{};
-		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-		appInfo.pApplicationName = appName.c_str();
-		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-		appInfo.pEngineName = appName.c_str();
-		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-		appInfo.apiVersion = VK_API_VERSION_1_0;
+		vkDestroySurfaceKHR(context.m_instance, context.m_surface, nullptr);
+		vkDestroyInstance(context.m_instance, nullptr);
 
-#ifdef DEBUG
-		VulkanHelpers::DebugCallbackData debugCallbackData;
-		debugCallbackData.Initialize();
-		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = debugCallbackData.GetCreateInfo();
-#endif
-
-		VkInstanceCreateInfo createinfo{};
-		createinfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-		createinfo.pApplicationInfo = &appInfo;
-#ifdef DEBUG
-		createinfo.enabledLayerCount = (uint32_t)layersData.m_validationLayers.size();
-		createinfo.ppEnabledLayerNames  = layersData.m_validationLayers.data();
-		createinfo.pNext = &debugCreateInfo;
-#endif
-		createinfo.enabledExtensionCount = (uint32_t)extensionsData.m_extensions.size();
-		createinfo.enabledExtensionCount = extensionsData.m_extensionCount;
-		createinfo.ppEnabledExtensionNames = extensionsData.m_extensions.data();
-
-		VkResult result = vkCreateInstance(&createinfo, nullptr, instance);
-
-		if (result == VkResult::VK_ERROR_INCOMPATIBLE_DRIVER)
-		{
-			ERR_EXIT(
-				"Cannot find a compatible Vulkan installable client driver (ICD).\n\n"
-				"Please look at the Getting Started guide for additional information.\n",
-				"vkCreateInstance Failure");
-		}
-		else if (result == VkResult::VK_ERROR_EXTENSION_NOT_PRESENT)
-		{
-			ERR_EXIT(
-				"Cannot find a specified extension library.\n"
-				"Make sure your layers path is set appropriately.\n",
-				"vkCreateInstance Failure");
-		}
-		else if (result != VkResult::VK_SUCCESS)
-		{
-			ERR_EXIT(
-				"vkCreateInstance failed.\n\n"
-				"Do you have a compatible Vulkan installable client driver (ICD) installed?\n"
-				"Please look at the Getting Started guide for additional information.\n",
-				"vkCreateInstance Failure");
-		}
 	}
 
-	void DestroyInstance(VkInstance* instance)
-	{
-		vkDestroyInstance(*instance, nullptr);
-	}
+#pragma endregion
 
-	bool GetPhysicalDevices(VkInstance* instance, std::vector<PhysicalDeviceData>& devices)
-	{
-		uint32_t deviceCount = 0;
-		vkEnumeratePhysicalDevices(*instance, &deviceCount, nullptr);
-		std::vector<VkPhysicalDevice> vulkanDevices(deviceCount);
-		vkEnumeratePhysicalDevices(*instance, &deviceCount, vulkanDevices.data());
 
-		if (deviceCount == 0)
-		{
-			throw std::runtime_error("failed to find GPUs with Vulkan support!");
-			return false;
-		}
-
-		devices.resize(deviceCount);
-
-		for (int i = 0; i < vulkanDevices.size(); i++)
-		{
-			devices[i] = GetPhysicalDeviceDataWrapper(vulkanDevices[i]);
-		}
-
-		std::sort(devices.begin(), devices.end(), [](PhysicalDeviceData a, PhysicalDeviceData b)
-													{
-														return a.score > b.score;
-													});
-
-		return true;
-	}
-
-#ifdef DEBUG
-	VkResult CreateDebugCallback(DebugCallbackData& debugData)
-	{
-		
-		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*debugData.m_instance, "vkCreateDebugUtilsMessengerEXT");
-		if (func != nullptr) {
-			return func(*debugData.m_instance, &debugData.m_createInfo, debugData.m_pAllocator, debugData.m_pDebugMessenger);
-		}
-		else {
-			return VK_ERROR_EXTENSION_NOT_PRESENT;
-		}
-		
-	}
-
-	void DestroyDebugCallback(DebugCallbackData& debugData)
-	{
-		auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(*debugData.m_instance, "vkDestroyDebugUtilsMessengerEXT");
-		if (func != nullptr) 
-		{
-			func(*debugData.m_instance, *debugData.m_pDebugMessenger, debugData.m_pAllocator);
-		}
-	}
-
-	void DebugCallbackData::Initialize(VkInstance* instance,
-									   const VkAllocationCallbacks* pAllocator,
-									   VkDebugUtilsMessengerEXT* pDebugMessenger)
-	{
-		m_instance = instance;
-		m_pAllocator = pAllocator;
-		m_pDebugMessenger = pDebugMessenger;
-		PopulateCreateinfo();
-	}
-
-	VkDebugUtilsMessengerCreateInfoEXT DebugCallbackData::GetCreateInfo() const
-	{
-		return m_createInfo;
-	}
-
-	void DebugCallbackData::PopulateCreateinfo()
-	{
-		m_createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-		m_createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-			VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-			VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-
-		m_createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-			VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-			VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-
-		m_createInfo.pfnUserCallback = debugCallback;
-	}
-
-	void DebugCallbackData::Initialize()
-	{
-		PopulateCreateinfo();
-	}
-
-	VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
-												 VkDebugUtilsMessageTypeFlagsEXT messageType, 
-												 const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, 
-												 void* pUserData)
-	{
-	
-		ActualDebugPrint(messageSeverity, messageType, pCallbackData, pUserData);
-	
-		return VK_FALSE;
-	}
-
-#endif
-
-	bool PhysicalDeviceData::IsDeviceValidForRender()
-	{
-		if (!m_graphicsFamilyIndex.has_value())
-		{
-			return false;
-		}
-
-		return true;
-	}
 
 }
 #endif // USE_VULKAN

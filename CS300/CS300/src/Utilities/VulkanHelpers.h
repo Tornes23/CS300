@@ -9,6 +9,8 @@ struct SDL_Window;
 
 namespace VulkanHelpers
 {
+#pragma region HELPER STRUCTURES
+
 	struct ValidationLayersData
 	{
 		uint32_t m_layerCount = 0;
@@ -32,7 +34,9 @@ namespace VulkanHelpers
 		VkPhysicalDeviceProperties m_properties;//physical device properties
 		VkPhysicalDeviceFeatures m_features;//save physical device features
 		std::vector<VkQueueFamilyProperties> m_queues;
-		std::optional<uint32_t> m_graphicsFamilyIndex;
+		std::vector <std::optional<uint32_t>> m_FamilyIndexes;
+		int m_graphicsFamilyIndex = -1;
+		int m_presentFamilyIndex = -1;//index to the queue to present images to the surface we created
 		int score = 0;
 
 		bool IsDeviceValidForRender();
@@ -43,6 +47,21 @@ namespace VulkanHelpers
 	struct LogicalDeviceData
 	{
 		VkDevice m_logicalDevice;
+		VkQueue m_graphicsQueue;
+		VkQueue m_presentQueue;
+	};
+
+	struct VulkanData
+	{
+		VkInstance m_instance;
+		VkDevice m_currentDevice;
+		VkSurfaceKHR m_surface;
+		VkSwapchainKHR m_swapchain;
+		std::vector<VulkanHelpers::PhysicalDeviceData> m_physicalDevices;
+		std::vector<VulkanHelpers::LogicalDeviceData> m_logicalDevices;
+#ifdef DEBUG
+		VkDebugUtilsMessengerEXT m_debugMessenger;
+#endif
 	};
 
 #ifdef DEBUG
@@ -62,8 +81,11 @@ namespace VulkanHelpers
 	};
 #endif
 
+#pragma endregion
+
+#pragma region INSTANCE CREATION METHODS
+
 	void CreateInstance(const std::string& appName, VkInstance* instance, SDL_Window* window);
-	void DestroyInstance(VkInstance* instance);
 #ifdef DEBUG
 	VkResult CreateDebugCallback(DebugCallbackData& debugData);
 	void DestroyDebugCallback(DebugCallbackData& debugData);
@@ -73,14 +95,34 @@ namespace VulkanHelpers
 	bool GetValidationLayers(ValidationLayersData& layerData);
 	bool GetExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window);
 	
-	bool GetPhysicalDevices(VkInstance* instance, std::vector<PhysicalDeviceData>& devices);
-	PhysicalDeviceData GetPhysicalDeviceDataWrapper(VkPhysicalDevice device);
-	void PopulateDeviceQueues(PhysicalDeviceData& device);
+#pragma endregion
+
+#pragma region SURFACE CREATION METHODS
+
+	void CreateVulkanSurface(SDL_Window* window, VulkanData& context);
+
+#pragma endregion
+
+#pragma region DEVICE CREATION METHODS
+
+	bool GetPhysicalDevices(VkInstance* instance, const VkSurfaceKHR& surface, std::vector<PhysicalDeviceData>& devices);
+	PhysicalDeviceData GetPhysicalDeviceDataWrapper(VkPhysicalDevice device, const VkSurfaceKHR& surface);
+	void PopulateDeviceQueues(PhysicalDeviceData& device, const VkSurfaceKHR& surface);
 	void GetDeviceScore(PhysicalDeviceData& deviceData);
 
 	bool GetLogicalDevices(SDL_Window* window, VkInstance* instance, std::vector<PhysicalDeviceData>& physicalDevices, std::vector<LogicalDeviceData>& logicalDevices);
 	void PopulateQueueCreateInfo(VkDeviceQueueCreateInfo& createInfo, uint32_t queueFamilyindex);
-	void PopulateLogicalDeviceCreateInfo(SDL_Window* window, VkDeviceCreateInfo& createInfo, uint32_t queueCount, VkDeviceQueueCreateInfo* queueCreateInfo, VkPhysicalDeviceFeatures* physicalDeviceFeatures);
+	void PopulateQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& createInfos, const std::vector <std::optional<uint32_t>>& queuesIndices);
+	void PopulateLogicalDeviceCreateInfo(SDL_Window* window, VkDeviceCreateInfo& createInfo, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, VkPhysicalDeviceFeatures* physicalDeviceFeatures);
+
+#pragma endregion
+
+
+#pragma region CLEAN UP METHODS
+
+	void CleanUp(VulkanData& context);
+
+#pragma endregion
 
 
 

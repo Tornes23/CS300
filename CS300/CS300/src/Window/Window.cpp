@@ -63,7 +63,7 @@ Window::Window(int width, int height, const char * title)
 	mWindow = SDL_CreateWindow("CS300", 100, 100, width, height, SDL_WINDOW_OPENGL);
 #endif
 #ifdef USE_VULKAN
-	mWindow = SDL_CreateWindow("CS300", 100, 100, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN);
+	mWindow = SDL_CreateWindow("CS300_Vulkan", 100, 100, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN);
 #endif
 	//if is invalid
 	if (mWindow == nullptr)
@@ -191,7 +191,7 @@ void Window::DeleteContext()
 	SDL_GL_DeleteContext(mContext);
 #endif
 #ifdef USE_VULKAN
-	vkDestroyInstance(m_context.m_instance, nullptr);
+	VulkanHelpers::CleanUp(m_context);
 #endif
 }
 
@@ -269,12 +269,12 @@ SDL_GLContext Window::GetContext() const
 #endif // USE_OPENGL
 
 #ifdef USE_VULKAN
-const Window::VulkanInstanceData& Window::GetContext() const
+const VulkanHelpers::VulkanData& Window::GetContext() const
 {
 	//returning the vulkan context
 	return m_context;
 }
-Window::VulkanInstanceData& Window::GetMutableContext()
+VulkanHelpers::VulkanData& Window::GetMutableContext()
 {
 	//returning the vulkan context
 	return m_context;

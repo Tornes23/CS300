@@ -94,7 +94,7 @@ void Utils::InitGL(Window* window)
 #ifdef USE_VULKAN
 void Utils::InitVulkan(Window* window)
 {
-	Window::VulkanInstanceData context = window->GetMutableContext();
+	VulkanHelpers::VulkanData context = window->GetMutableContext();
 	VulkanHelpers::CreateInstance(window->GetTitle(), &context.m_instance, window->GetSDLWindow());
 
 #ifdef DEBUG	
@@ -106,8 +106,11 @@ void Utils::InitVulkan(Window* window)
 	}
 #endif
 
-	//Vulkan Pick physical device
-	VulkanHelpers::GetPhysicalDevices(&context.m_instance, context.m_physicalDevices);
+	//createSurface
+	VulkanHelpers::CreateVulkanSurface(window->GetSDLWindow(),context);
+
+	//Vulkan Create physical & logical devices
+	VulkanHelpers::GetPhysicalDevices(&context.m_instance, context.m_surface, context.m_physicalDevices);
 	VulkanHelpers::GetLogicalDevices(window->GetSDLWindow(), &context.m_instance, context.m_physicalDevices, context.m_logicalDevices);
 	window->SelectVulkanDevice();
 }

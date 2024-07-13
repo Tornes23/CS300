@@ -45,20 +45,6 @@ class Window
 {
 public:
 
-#ifdef USE_VULKAN
-	struct VulkanInstanceData
-	{
-		VkInstance m_instance;
-		VkSwapchainKHR m_swapchain;
-		VkDevice m_currentDevice;
-		std::vector<VulkanHelpers::PhysicalDeviceData> m_physicalDevices;
-		std::vector<VulkanHelpers::LogicalDeviceData> m_logicalDevices;
-#ifdef DEBUG
-		VkDebugUtilsMessengerEXT m_debugMessenger;
-#endif
-	};
-#endif // USE_VULKAN
-
 	//constructor
 	Window(int width = 1280, int height = 720, const char* title = "CS300");
 
@@ -77,8 +63,8 @@ public:
 	SDL_GLContext GetContext() const;
 #endif // USE_OPENGL
 #ifdef USE_VULKAN
-	const Window::VulkanInstanceData& GetContext() const;
-	Window::VulkanInstanceData& GetMutableContext();
+	const VulkanHelpers::VulkanData& GetContext() const;
+	VulkanHelpers::VulkanData& GetMutableContext();
 	void SelectVulkanDevice();
 #endif // USE_VULKAN
 	void SetQuit(bool close);
@@ -91,7 +77,7 @@ private:
 	SDL_GLContext mContext;
 #endif // USE_OPENGL
 #ifdef USE_VULKAN
-	VulkanInstanceData m_context;
+	VulkanHelpers::VulkanData m_context;
 #endif // USE_VULKAN
 	std::string mTitle;
 	glm::ivec2 mSize;
