@@ -329,8 +329,12 @@ namespace VulkanHelpers
 			PopulateQueueCreateInfo(queueCreateInfos, physicalDevices[i].m_FamilyIndexes);
 			CreateLogicalDevice(window, queueCreateInfos, physicalDevices[i], logicalDevices[i]);
 			
-			vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_graphicsFamilyIndex].value(), 0, &logicalDevices[i].m_graphicsQueue);
-			vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_presentFamilyIndex].value(), 0, &logicalDevices[i].m_graphicsQueue);
+			vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_graphicsFamilyIndex.value()].value(), 0, &logicalDevices[i].m_graphicsQueue);
+
+			if (!logicalDevices[i].m_unifiedPresentAndGraphics)
+			{
+				vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_presentFamilyIndex.value()].value(), 0, &logicalDevices[i].m_presentQueue);
+			}
 		}
 		return true;
 	}
@@ -360,8 +364,14 @@ namespace VulkanHelpers
 		}
 	}
 
-	void CreateLogicalDevice(SDL_Window* window, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, const PhysicalDeviceData& physicalDevice, LogicalDeviceData& logicalDevice)
+	void CreateLogicalDevice(SDL_Window* window, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, PhysicalDeviceData& physicalDevice, LogicalDeviceData& logicalDevice)
 	{
+		if (!physicalDevice.m_presentFamilyIndex.has_value() && physicalDevice.m_graphicsFamilyIndex.has_value())
+		{
+			physicalDevice.m_presentFamilyIndex = physicalDevice.m_graphicsFamilyIndex.value();
+			logicalDevice.m_unifiedPresentAndGraphics = true;
+		}
+
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());

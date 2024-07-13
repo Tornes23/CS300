@@ -41,8 +41,8 @@ namespace VulkanHelpers
 		VkPhysicalDeviceFeatures m_features;//save physical device features
 		std::vector<VkQueueFamilyProperties> m_queues;
 		std::vector <std::optional<uint32_t>> m_FamilyIndexes;
-		int m_graphicsFamilyIndex = -1;
-		int m_presentFamilyIndex = -1;//index to the queue to present images to the surface we created
+		std::optional<uint32_t> m_graphicsFamilyIndex;
+		std::optional<uint32_t> m_presentFamilyIndex;//index to the queue to present images to the surface we created
 		int score = 0;
 
 		bool IsDeviceValidForRender();
@@ -55,6 +55,7 @@ namespace VulkanHelpers
 		VkDevice m_logicalDevice{};
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
+		bool m_unifiedPresentAndGraphics = false;
 	};
 
 	struct VulkanData
@@ -119,7 +120,7 @@ namespace VulkanHelpers
 	bool GetLogicalDevices(SDL_Window* window, VkInstance* instance, std::vector<PhysicalDeviceData>& physicalDevices, std::vector<LogicalDeviceData>& logicalDevices);
 	void PopulateQueueCreateInfo(VkDeviceQueueCreateInfo& createInfo, uint32_t queueFamilyindex);
 	void PopulateQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& createInfos, const std::vector <std::optional<uint32_t>>& queuesIndices);
-	void CreateLogicalDevice(SDL_Window* window, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, const PhysicalDeviceData& physicalDevice, LogicalDeviceData& logicalDevice);
+	void CreateLogicalDevice(SDL_Window* window, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, PhysicalDeviceData& physicalDevice, LogicalDeviceData& logicalDevice);
 	void GetDeviceExtensions(ExtensionLayersData& extensionsData, const VkPhysicalDevice& device);
 #pragma endregion
 
