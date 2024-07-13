@@ -330,11 +330,7 @@ namespace VulkanHelpers
 			CreateLogicalDevice(window, queueCreateInfos, physicalDevices[i], logicalDevices[i]);
 			
 			vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_graphicsFamilyIndex.value()].value(), 0, &logicalDevices[i].m_graphicsQueue);
-
-			if (!logicalDevices[i].m_unifiedPresentAndGraphics)
-			{
-				vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_presentFamilyIndex.value()].value(), 0, &logicalDevices[i].m_presentQueue);
-			}
+			vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_presentFamilyIndex.value()].value(), 0, &logicalDevices[i].m_presentQueue);
 		}
 		return true;
 	}
