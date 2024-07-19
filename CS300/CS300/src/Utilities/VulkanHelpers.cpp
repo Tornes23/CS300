@@ -1,5 +1,6 @@
 #ifdef USE_VULKAN
 #include <stdexcept>
+#include <set>
 #include <iostream>
 #include <algorithm>
 #include <CustomDebug/VulkanDebug.h>
@@ -10,6 +11,14 @@
 #define VK_KHR_win32_surface 1
 #define VK_KHR_WIN32_SURFACE_SPEC_VERSION 6
 #define VK_KHR_WIN32_SURFACE_EXTENSION_NAME "VK_KHR_win32_surface"
+
+#pragma region STATIC VARIABLES
+
+const float VulkanHelpers::VulkanStaticVariables::s_queuePriority = 1.0f;
+
+std::vector<std::string> VulkanHelpers::VulkanStaticVariables::s_requiredDeviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+
+#pragma endregion
 
 namespace VulkanHelpers
 {
@@ -355,7 +364,7 @@ namespace VulkanHelpers
 			createInfo.flags = 0;
 			createInfo.queueFamilyIndex = queueIndices[i].value();
 			createInfo.queueCount = 1;
-			createInfo.pQueuePriorities = &s_queuePriority;
+			createInfo.pQueuePriorities = &VulkanStaticVariables::s_queuePriority;
 			createInfos.push_back(createInfo);
 		}
 	}
@@ -389,6 +398,11 @@ namespace VulkanHelpers
 #endif
 		GetDeviceExtensions(extensionsData, physicalDevice.m_physicalDevice);
 
+		if (!HasRequiredExtensions(extensionsData))
+		{
+			throw std::runtime_error("Physical device doesn't have required extensions for rendering!");
+		}
+
 #ifdef DEBUG
 		createInfo.enabledLayerCount = (uint32_t)layersData.m_validationLayers.size();
 		createInfo.ppEnabledLayerNames = layersData.m_validationLayers.data();
@@ -405,17 +419,26 @@ namespace VulkanHelpers
 	void GetDeviceExtensions(ExtensionLayersData& extensionsData, const VkPhysicalDevice& device)
 	{
 
-		//vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsData.m_extensionCount, nullptr);
-		//extensionsData.m_availableExtensions.resize(extensionsData.m_extensionCount);
-		//extensionsData.m_extensions.resize(extensionsData.m_extensionCount);
-		//vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsData.m_extensionCount, extensionsData.m_availableExtensions.data());
-		//
-		//for (int i = 0; i < extensionsData.m_extensionCount; i++)
-		//{
-		//	extensionsData.m_extensions[i] = extensionsData.m_availableExtensions[i].extensionName;
-		//}
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsData.m_extensionCount, nullptr);
+		extensionsData.m_availableExtensions.resize(extensionsData.m_extensionCount);
+		extensionsData.m_extensions.resize(extensionsData.m_extensionCount);
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsData.m_extensionCount, extensionsData.m_availableExtensions.data());
+		
+		for (int i = 0; i < extensionsData.m_extensionCount; i++)
+		{
+			extensionsData.m_extensions[i] = extensionsData.m_availableExtensions[i].extensionName;
+		}
+	}
 
-		extensionsData.m_extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+	bool HasRequiredExtensions(const ExtensionLayersData& extensionsData)
+	{
+		std::set<std::string> requiredExtensions(VulkanStaticVariables::s_requiredDeviceExtensions.begin(), VulkanStaticVariables::s_requiredDeviceExtensions.end());
+		
+		for (const auto& extension : extensionsData.m_extensions) {
+			requiredExtensions.erase(extension);
+		}
+		
+		return requiredExtensions.empty();
 	}
 
 #pragma endregion

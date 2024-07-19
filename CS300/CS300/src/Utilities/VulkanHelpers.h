@@ -10,8 +10,13 @@ struct SDL_Window;
 namespace VulkanHelpers
 {
 #pragma region STATIC VARIABLES
+	struct VulkanStaticVariables
+	{
+		static const float s_queuePriority;
 
-	static float s_queuePriority = 1.0f;
+		static std::vector<std::string> s_requiredDeviceExtensions;
+	};
+
 
 #pragma endregion
 
@@ -122,6 +127,7 @@ namespace VulkanHelpers
 	void PopulateQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& createInfos, const std::vector <std::optional<uint32_t>>& queuesIndices);
 	void CreateLogicalDevice(SDL_Window* window, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, PhysicalDeviceData& physicalDevice, LogicalDeviceData& logicalDevice);
 	void GetDeviceExtensions(ExtensionLayersData& extensionsData, const VkPhysicalDevice& device);
+	bool HasRequiredExtensions(const ExtensionLayersData& extensionsData);
 #pragma endregion
 
 
