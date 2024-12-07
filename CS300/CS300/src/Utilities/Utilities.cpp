@@ -113,6 +113,7 @@ void Utils::InitVulkan(Window* window)
 	VulkanHelpers::GetPhysicalDevices(&context.m_instance, context.m_surface, context.m_physicalDevices);
 	VulkanHelpers::GetLogicalDevices(window->GetSDLWindow(), &context.m_instance, context.m_physicalDevices, context.m_logicalDevices);
 	window->SelectVulkanDevice();
+	VulkanHelpers::CreateSwapChain(context.m_swapchain, context.m_selectedDevice.m_physicalDevice, context.m_surface, window->GetViewport());
 }
 #endif // USE_VULKAN
 

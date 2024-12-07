@@ -149,6 +149,29 @@ namespace VulkanHelpers
 		return CheckExtensions(extensionsData, window);
 	}
 
+	void CreateSwapChain(SwapChainData& swapChainData, const VkPhysicalDevice& device, const VkSurfaceKHR& surface, const glm::ivec2& viewPort)
+	{
+		PopulateSwapChainData(swapChainData, device, surface);
+		swapChainData.SetSwapExtent(viewPort);
+
+		uint32_t imageCount = swapChainData.m_capabilities.minImageCount + 1;
+
+		if (swapChainData.m_capabilities.maxImageCount > 0 && imageCount > swapChainData.m_capabilities.maxImageCount) {
+			imageCount = swapChainData.m_capabilities.maxImageCount;
+		}
+
+		//actual create
+		VkSwapchainCreateInfoKHR createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+		createInfo.surface = surface;
+		createInfo.minImageCount = imageCount;
+		createInfo.imageFormat = swapChainData.m_selectedFormat.format;
+		createInfo.imageColorSpace = swapChainData.m_selectedFormat.colorSpace;
+		createInfo.imageExtent = swapChainData.m_swapExtent;
+		createInfo.imageArrayLayers = 1;
+		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	}
+
 #ifdef DEBUG
 	VkResult CreateDebugCallback(DebugCallbackData& debugData)
 	{
@@ -297,11 +320,36 @@ namespace VulkanHelpers
 					device.m_FamilyIndexes.push_back(i);
 				}
 			}
-			
-			//if (device.m_graphicsFamilyIndex >= 0 && device.m_presentFamilyIndex >= 0)
-			//{
-			//	break;
-			//}
+		}
+
+	}
+
+	void PopulateSwapChainData(SwapChainData& swapChainData, const VkPhysicalDevice& device, const VkSurfaceKHR& surface)
+	{
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &swapChainData.m_capabilities);
+
+		uint32_t formatCount;
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+
+		if (formatCount != 0) {
+			swapChainData.m_formats.resize(formatCount);
+			vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, swapChainData.m_formats.data());
+		}
+		else
+		{
+			throw std::runtime_error("failed to get any surface format modes!");
+		}
+
+		uint32_t presentModeCount;
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
+
+		if (presentModeCount != 0) {
+			swapChainData.m_presentModes.resize(presentModeCount);
+			vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, swapChainData.m_presentModes.data());
+		}
+		else
+		{
+			throw std::runtime_error("failed to get any present modes!");
 		}
 
 	}
@@ -335,7 +383,7 @@ namespace VulkanHelpers
 		for (int i = 0; i < physicalDevices.size(); i++)
 		{
 			std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-			PopulateQueueCreateInfo(queueCreateInfos, physicalDevices[i].m_FamilyIndexes);
+			PopulateQueueCreateInfos(queueCreateInfos, physicalDevices[i].m_FamilyIndexes);
 			CreateLogicalDevice(window, queueCreateInfos, physicalDevices[i], logicalDevices[i]);
 			
 			vkGetDeviceQueue(logicalDevices[i].m_logicalDevice, physicalDevices[i].m_FamilyIndexes[physicalDevices[i].m_graphicsFamilyIndex.value()].value(), 0, &logicalDevices[i].m_graphicsQueue);
@@ -354,7 +402,7 @@ namespace VulkanHelpers
 
 	}
 
-	void PopulateQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& createInfos, const std::vector <std::optional<uint32_t>>& queueIndices)
+	void PopulateQueueCreateInfos(std::vector<VkDeviceQueueCreateInfo>& createInfos, const std::vector <std::optional<uint32_t>>& queueIndices)
 	{
 		for (int i = 0; i < queueIndices.size(); i++)
 		{
@@ -409,8 +457,8 @@ namespace VulkanHelpers
 #endif
 		createInfo.enabledExtensionCount = (uint32_t)extensionsData.m_extensions.size();
 		createInfo.ppEnabledExtensionNames = extensionsData.m_extensions.data();
-
-		if (vkCreateDevice(physicalDevice.m_physicalDevice, &createInfo, nullptr, &logicalDevice.m_logicalDevice) != VK_SUCCESS)
+		logicalDevice.m_physicalDevice = physicalDevice.m_physicalDevice;
+		if (vkCreateDevice(logicalDevice.m_physicalDevice, &createInfo, nullptr, &logicalDevice.m_logicalDevice) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create logical device!");
 		}
@@ -424,7 +472,7 @@ namespace VulkanHelpers
 		extensionsData.m_extensions.resize(extensionsData.m_extensionCount);
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsData.m_extensionCount, extensionsData.m_availableExtensions.data());
 		
-		for (int i = 0; i < extensionsData.m_extensionCount; i++)
+		for (unsigned int i = 0; i < extensionsData.m_extensionCount; i++)
 		{
 			extensionsData.m_extensions[i] = extensionsData.m_availableExtensions[i].extensionName;
 		}
@@ -470,6 +518,95 @@ namespace VulkanHelpers
 #pragma endregion
 
 
+#pragma region HELPER DATA STRUCT FUNCTIONS
+	
+	bool SwapChainData::IsValid() const
+	{
+		return !m_formats.empty() && !m_presentModes.empty();
+	}
+
+	/*The format member specifies the color channels and types.For example, VK_FORMAT_B8G8R8A8_SRGB means
+	that we store the B, G, R and alpha channels in that order with an 8 bit unsigned integer for a
+	total of 32 bits per pixel.The colorSpace member indicates if the SRGB color space is supported
+	or not using the VK_COLOR_SPACE_SRGB_NONLINEAR_KHR flag.*/
+	void SwapChainData::SelectFormat()
+	{
+		if (m_formats.empty())
+		{
+			return;
+		}
+
+		m_selectedFormat = m_formats[0];
+		
+		for (unsigned int i = 0; i < m_formats.size(); i ++)
+		{
+			if (m_formats[i].format == VK_FORMAT_B8G8R8A8_SRGB && m_formats[i].colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+			{
+				m_selectedFormat = m_formats[i];
+				break;
+			}
+		}
+	}
+
+	/*The presentation mode is arguably the most important setting for the swap chain,
+	because it represents the actual conditions for showing images to the screen.
+	There are four possible modes available in Vulkan :
+	
+	- VK_PRESENT_MODE_IMMEDIATE_KHR: Images submitted by your application are transferred
+		to the screen right away, which may result in tearing.
+
+	- VK_PRESENT_MODE_FIFO_KHR : The swap chain is a queue where the display takes an
+		image from the front of the queue when the display is refreshed and the program inserts 
+		rendered images at the back of the queue.If the queue is full then the program has to wait.
+		This is most similar to vertical sync as found in modern games.The moment that the display 
+		is refreshed is known as "vertical blank".
+
+	- VK_PRESENT_MODE_FIFO_RELAXED_KHR : This mode only differs from the previous one if the 
+		application is late and the queue was empty at the last vertical blank.Instead of waiting
+		for the next vertical blank, the image is transferred right away when it finally arrives.
+		This may result in visible tearing.
+
+	- VK_PRESENT_MODE_MAILBOX_KHR : This is another variation of the second mode.Instead of blocking
+		the application when the queue is full, the images that are already queued are simply replaced 
+		with the newer ones.This mode can be used to render frames as fast as possible while still avoiding 
+		tearing, resulting in fewer latency issues than standard vertical sync.This is commonly known as 
+		"triple buffering", although the existence of three buffers alone does not necessarily mean that the 
+		framerate is unlocked.
+
+	Only the VK_PRESENT_MODE_FIFO_KHR mode is guaranteed to be available, but for energy efficiency VK_PRESENT_MODE_MAILBOX_KHR works just as well
+	we'll again have to write a function that looks for the best mode that is available:*/
+	void SwapChainData::SelectPresentMode()
+	{
+		if (m_presentModes.empty())
+		{
+			return;
+		}
+
+		m_selectedPresentMode = VK_PRESENT_MODE_FIFO_KHR;
+
+		for (unsigned int i = 0; i < m_presentModes.size(); i++)
+		{
+			if (m_presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
+			{
+				m_selectedPresentMode = m_presentModes[i];
+			}
+		}
+	}
+
+	void SwapChainData::SetSwapExtent(const glm::ivec2& extentSize)
+	{
+		m_swapExtent.width = extentSize.x;
+		m_swapExtent.height = extentSize.y;
+	}
+
+
+	void VulkanData::SelectDevice()
+	{
+		//go through all devices
+		//IsDeviceValidForRender
+		//m_selectedDevice = 
+	}
+#pragma endregion
 
 }
 #endif // USE_VULKAN

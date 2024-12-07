@@ -4,6 +4,7 @@
 #include <vector>
 #include <optional>
 #include <vulkan/vulkan.h>
+#include "GLM/vec2.hpp"
 
 struct SDL_Window;
 
@@ -39,6 +40,23 @@ namespace VulkanHelpers
 
 	};
 
+	struct SwapChainData
+	{
+		VkSwapchainKHR m_swapchain;
+		VkSurfaceFormatKHR m_selectedFormat;
+		VkPresentModeKHR m_selectedPresentMode;
+		VkExtent2D m_swapExtent;
+
+		VkSurfaceCapabilitiesKHR m_capabilities;
+		std::vector<VkSurfaceFormatKHR> m_formats;
+		std::vector<VkPresentModeKHR> m_presentModes;
+
+		bool IsValid() const;
+		void SelectFormat();
+		void SelectPresentMode();
+		void SetSwapExtent(const glm::ivec2& extentSize);
+	};
+
 	struct PhysicalDeviceData
 	{
 		VkPhysicalDevice m_physicalDevice;
@@ -58,6 +76,7 @@ namespace VulkanHelpers
 	struct LogicalDeviceData
 	{
 		VkDevice m_logicalDevice{};
+		VkPhysicalDevice m_physicalDevice;
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
 		bool m_unifiedPresentAndGraphics = false;
@@ -66,14 +85,16 @@ namespace VulkanHelpers
 	struct VulkanData
 	{
 		VkInstance m_instance;
-		VkDevice m_currentDevice;
+		VulkanHelpers::LogicalDeviceData m_selectedDevice;
 		VkSurfaceKHR m_surface;
-		VkSwapchainKHR m_swapchain;
+		VulkanHelpers::SwapChainData m_swapchain;
 		std::vector<VulkanHelpers::PhysicalDeviceData> m_physicalDevices;
 		std::vector<VulkanHelpers::LogicalDeviceData> m_logicalDevices;
 #ifdef DEBUG
 		VkDebugUtilsMessengerEXT m_debugMessenger;
 #endif
+
+		void SelectDevice();
 	};
 
 #ifdef DEBUG
@@ -106,6 +127,8 @@ namespace VulkanHelpers
 	bool CheckExtensions(ExtensionLayersData& extensionsData, SDL_Window* window);
 	bool GetValidationLayers(ValidationLayersData& layerData);
 	bool GetExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window);
+	void CreateSwapChain(SwapChainData& swapChainData, const VkPhysicalDevice& device, const VkSurfaceKHR& surface, const glm::ivec2& viewPort);
+	void PopulateSwapChainData(SwapChainData& swapChainData, const VkPhysicalDevice& device, const VkSurfaceKHR& surface);
 	
 #pragma endregion
 
@@ -124,7 +147,7 @@ namespace VulkanHelpers
 
 	bool GetLogicalDevices(SDL_Window* window, VkInstance* instance, std::vector<PhysicalDeviceData>& physicalDevices, std::vector<LogicalDeviceData>& logicalDevices);
 	void PopulateQueueCreateInfo(VkDeviceQueueCreateInfo& createInfo, uint32_t queueFamilyindex);
-	void PopulateQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& createInfos, const std::vector <std::optional<uint32_t>>& queuesIndices);
+	void PopulateQueueCreateInfos(std::vector<VkDeviceQueueCreateInfo>& createInfos, const std::vector <std::optional<uint32_t>>& queuesIndices);
 	void CreateLogicalDevice(SDL_Window* window, const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos, PhysicalDeviceData& physicalDevice, LogicalDeviceData& logicalDevice);
 	void GetDeviceExtensions(ExtensionLayersData& extensionsData, const VkPhysicalDevice& device);
 	bool HasRequiredExtensions(const ExtensionLayersData& extensionsData);
