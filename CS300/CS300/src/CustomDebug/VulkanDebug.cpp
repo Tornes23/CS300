@@ -41,7 +41,7 @@ and you can have as many of them as you want.
 			// Message is important enough to show
 		}
 		
-		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+		std::cerr << "\nValidation layer: " << pCallbackData->pMessage << std::endl << std::endl;
 	}
 }
 #endif

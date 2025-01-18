@@ -42,7 +42,7 @@ namespace VulkanHelpers
 
 	struct SwapChainData
 	{
-		VkSwapchainKHR m_swapchain;
+		VkSwapchainKHR m_vulkanSwapchain;
 		VkSurfaceFormatKHR m_selectedFormat;
 		VkPresentModeKHR m_selectedPresentMode;
 		VkExtent2D m_swapExtent;
@@ -76,7 +76,7 @@ namespace VulkanHelpers
 	struct LogicalDeviceData
 	{
 		VkDevice m_logicalDevice{};
-		VkPhysicalDevice m_physicalDevice;
+		PhysicalDeviceData m_physicalDeviceData;
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
 		bool m_unifiedPresentAndGraphics = false;
@@ -127,7 +127,7 @@ namespace VulkanHelpers
 	bool CheckExtensions(ExtensionLayersData& extensionsData, SDL_Window* window);
 	bool GetValidationLayers(ValidationLayersData& layerData);
 	bool GetExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window);
-	void CreateSwapChain(SwapChainData& swapChainData, const VkPhysicalDevice& device, const VkSurfaceKHR& surface, const glm::ivec2& viewPort);
+	void CreateSwapChain(SwapChainData& swapChainData, const VulkanHelpers::LogicalDeviceData& deviceData, const VkSurfaceKHR& surface, const glm::ivec2& viewPort);
 	void PopulateSwapChainData(SwapChainData& swapChainData, const VkPhysicalDevice& device, const VkSurfaceKHR& surface);
 	
 #pragma endregion

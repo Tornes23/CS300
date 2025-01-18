@@ -52,7 +52,7 @@ namespace VulkanHelpers
 		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.pEngineName = appName.c_str();
 		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-		appInfo.apiVersion = VK_API_VERSION_1_0;
+		appInfo.apiVersion = VK_API_VERSION_1_3;
 
 #ifdef DEBUG
 		VulkanHelpers::DebugCallbackData debugCallbackData;
@@ -149,9 +149,9 @@ namespace VulkanHelpers
 		return CheckExtensions(extensionsData, window);
 	}
 
-	void CreateSwapChain(SwapChainData& swapChainData, const VkPhysicalDevice& device, const VkSurfaceKHR& surface, const glm::ivec2& viewPort)
+	void CreateSwapChain(SwapChainData& swapChainData, const VulkanHelpers::LogicalDeviceData& deviceData, const VkSurfaceKHR& surface, const glm::ivec2& viewPort)
 	{
-		PopulateSwapChainData(swapChainData, device, surface);
+		PopulateSwapChainData(swapChainData, deviceData.m_physicalDeviceData.m_physicalDevice, surface);
 		swapChainData.SetSwapExtent(viewPort);
 
 		uint32_t imageCount = swapChainData.m_capabilities.minImageCount + 1;
@@ -170,6 +170,31 @@ namespace VulkanHelpers
 		createInfo.imageExtent = swapChainData.m_swapExtent;
 		createInfo.imageArrayLayers = 1;
 		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+		uint32_t graphicsFamilyIndex = deviceData.m_physicalDeviceData.m_graphicsFamilyIndex.value();
+		uint32_t presentFamilyIndex = deviceData.m_physicalDeviceData.m_presentFamilyIndex.value();
+		uint32_t queueFamilyIndices[] = { graphicsFamilyIndex, presentFamilyIndex };
+
+		if ( graphicsFamilyIndex != presentFamilyIndex) {
+			createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+			createInfo.queueFamilyIndexCount = 2;
+			createInfo.pQueueFamilyIndices = queueFamilyIndices;
+		}
+		else {
+			createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+			createInfo.queueFamilyIndexCount = 0; // Optional
+			createInfo.pQueueFamilyIndices = nullptr; // Optional
+		}
+
+		createInfo.preTransform = swapChainData.m_capabilities.currentTransform;
+		createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+		createInfo.presentMode = swapChainData.m_selectedPresentMode;
+		createInfo.clipped = VK_TRUE;
+		createInfo.oldSwapchain = VK_NULL_HANDLE;
+
+		if (vkCreateSwapchainKHR(deviceData.m_logicalDevice, &createInfo, nullptr, &swapChainData.m_vulkanSwapchain) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create swap chain!");
+		}
 	}
 
 #ifdef DEBUG
@@ -259,11 +284,15 @@ namespace VulkanHelpers
 			return false;
 		}
 
-		devices.resize(deviceCount);
-
 		for (int i = 0; i < vulkanDevices.size(); i++)
 		{
-			devices[i] = GetPhysicalDeviceDataWrapper(vulkanDevices[i], surface);
+			PhysicalDeviceData deviceData = GetPhysicalDeviceDataWrapper(vulkanDevices[i], surface);
+			VkBool32 isValid = 0;
+			vkGetPhysicalDeviceSurfaceSupportKHR(deviceData.m_physicalDevice, deviceData.m_graphicsFamilyIndex.value(), surface, &isValid);
+			if(isValid)
+			{
+				devices.push_back(deviceData);
+			}
 		}
 
 		std::sort(devices.begin(), devices.end(), [](PhysicalDeviceData a, PhysicalDeviceData b)
@@ -457,8 +486,8 @@ namespace VulkanHelpers
 #endif
 		createInfo.enabledExtensionCount = (uint32_t)extensionsData.m_extensions.size();
 		createInfo.ppEnabledExtensionNames = extensionsData.m_extensions.data();
-		logicalDevice.m_physicalDevice = physicalDevice.m_physicalDevice;
-		if (vkCreateDevice(logicalDevice.m_physicalDevice, &createInfo, nullptr, &logicalDevice.m_logicalDevice) != VK_SUCCESS)
+		logicalDevice.m_physicalDeviceData = physicalDevice;
+		if (vkCreateDevice(logicalDevice.m_physicalDeviceData.m_physicalDevice, &createInfo, nullptr, &logicalDevice.m_logicalDevice) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create logical device!");
 		}
@@ -467,7 +496,7 @@ namespace VulkanHelpers
 	void GetDeviceExtensions(ExtensionLayersData& extensionsData, const VkPhysicalDevice& device)
 	{
 
-		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsData.m_extensionCount, nullptr);
+		vkEnumerateDeviceExtensionProperties (device, nullptr, &extensionsData.m_extensionCount, nullptr);
 		extensionsData.m_availableExtensions.resize(extensionsData.m_extensionCount);
 		extensionsData.m_extensions.resize(extensionsData.m_extensionCount);
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsData.m_extensionCount, extensionsData.m_availableExtensions.data());
@@ -512,6 +541,7 @@ namespace VulkanHelpers
 
 		vkDestroySurfaceKHR(context.m_instance, context.m_surface, nullptr);
 		vkDestroyInstance(context.m_instance, nullptr);
+		vkDestroySwapchainKHR(context.m_selectedDevice.m_logicalDevice, context.m_swapchain.m_vulkanSwapchain, nullptr);
 
 	}
 
@@ -602,6 +632,9 @@ namespace VulkanHelpers
 
 	void VulkanData::SelectDevice()
 	{
+		//placeholder code need to make a proper device selection algorithm
+		m_selectedDevice = m_logicalDevices[0];
+
 		//go through all devices
 		//IsDeviceValidForRender
 		//m_selectedDevice = 
