@@ -23,7 +23,7 @@ namespace VulkanHelpers
 
 #pragma region HELPER STRUCTURES 
 
-	struct ValidationLayersData
+	struct InstanceValidationLayersData
 	{
 		uint32_t m_layerCount = 0;
 		std::vector<VkLayerProperties> m_availableLayers;
@@ -37,24 +37,6 @@ namespace VulkanHelpers
 		uint32_t m_extensionCount;
 		std::vector<VkExtensionProperties> m_availableExtensions;
 		std::vector<const char*> m_extensions;
-
-	};
-
-	struct SwapChainData
-	{
-		VkSwapchainKHR m_vulkanSwapchain;
-		VkSurfaceFormatKHR m_selectedFormat;
-		VkPresentModeKHR m_selectedPresentMode;
-		VkExtent2D m_swapExtent;
-
-		VkSurfaceCapabilitiesKHR m_capabilities;
-		std::vector<VkSurfaceFormatKHR> m_formats;
-		std::vector<VkPresentModeKHR> m_presentModes;
-
-		bool IsValid() const;
-		void SelectFormat();
-		void SelectPresentMode();
-		void SetSwapExtent(const glm::ivec2& extentSize);
 	};
 
 	struct PhysicalDeviceData
@@ -80,6 +62,26 @@ namespace VulkanHelpers
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
 		bool m_unifiedPresentAndGraphics = false;
+	};
+
+
+	struct SwapChainData
+	{
+		VkSwapchainKHR m_vulkanSwapchain;
+		VkSurfaceFormatKHR m_selectedFormat;
+		VkPresentModeKHR m_selectedPresentMode;
+		VkExtent2D m_swapExtent;
+		std::vector<VkImage> m_swapChainImages;
+
+		VkSurfaceCapabilitiesKHR m_capabilities;
+		std::vector<VkSurfaceFormatKHR> m_formats;
+		std::vector<VkPresentModeKHR> m_presentModes;
+
+		bool IsValid() const;
+		void SelectFormat();
+		void SelectPresentMode();
+		void SetSwapExtent(const glm::ivec2& extentSize);
+		void GetSwapChainImages(const VulkanHelpers::LogicalDeviceData& logicalDevice);
 	};
 
 	struct VulkanData
@@ -123,10 +125,10 @@ namespace VulkanHelpers
 	VkResult CreateDebugCallback(DebugCallbackData& debugData);
 	void DestroyDebugCallback(DebugCallbackData& debugData);
 #endif
-	bool CheckLayers(ValidationLayersData& layerData);
-	bool CheckExtensions(ExtensionLayersData& extensionsData, SDL_Window* window);
-	bool GetValidationLayers(ValidationLayersData& layerData);
-	bool GetExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window);
+	bool CheckInstanceLayers(InstanceValidationLayersData& layerData);
+	bool CheckInstanceExtensions(ExtensionLayersData& extensionsData, SDL_Window* window);
+	bool GetInstanceValidationLayers(InstanceValidationLayersData& layerData);
+	bool GetInstanceExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window);
 	void CreateSwapChain(SwapChainData& swapChainData, const VulkanHelpers::LogicalDeviceData& deviceData, const VkSurfaceKHR& surface, const glm::ivec2& viewPort);
 	void PopulateSwapChainData(SwapChainData& swapChainData, const VkPhysicalDevice& device, const VkSurfaceKHR& surface);
 	

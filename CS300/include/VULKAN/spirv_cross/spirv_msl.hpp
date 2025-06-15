@@ -516,6 +516,30 @@ public:
 		// transformed.
 		bool agx_manual_cube_grad_fixup = false;
 
+		// Metal will discard fragments with side effects under certain circumstances prematurely.
+		// Example: CTS test dEQP-VK.fragment_operations.early_fragment.discard_no_early_fragment_tests_depth
+		// Test will render a full screen quad with varying depth [0,1] for each fragment.
+		// Each fragment will do an operation with side effects, modify the depth value and
+		// discard the fragment. The test expects the fragment to be run due to:
+		// https://registry.khronos.org/vulkan/specs/1.0-extensions/html/vkspec.html#fragops-shader-depthreplacement
+		// which states that the fragment shader must be run due to replacing the depth in shader.
+		// However, Metal may prematurely discards fragments without executing them
+		// (I believe this to be due to a greedy optimization on their end) making the test fail.
+		// This option enforces fragment execution for such cases where the fragment has operations
+		// with side effects. Provided as an option hoping Metal will fix this issue in the future.
+		bool force_fragment_with_side_effects_execution = false;
+
+		// If set, adds a depth pass through statement to circumvent the following issue:
+		// When the same depth/stencil is used as input and depth/stencil attachment, we need to
+		// force Metal to perform the depth/stencil write after fragment execution. Otherwise,
+		// Metal will write to the depth attachment before fragment execution. This happens
+		// if the fragment does not modify the depth value.
+		bool input_attachment_is_ds_attachment = false;
+
+		// If BuiltInPosition is not written, automatically disable rasterization.
+		// The result can be queried with get_is_rasterization_disabled.
+		bool auto_disable_rasterization = false;
+
 		bool is_ios() const
 		{
 			return platform == iOS;
@@ -736,6 +760,11 @@ public:
 	void set_combined_sampler_suffix(const char *suffix);
 	const char *get_combined_sampler_suffix() const;
 
+	// Information about specialization constants that are translated into MSL macros
+	// instead of using function constant
+	// These must only be called after a successful call to CompilerMSL::compile().
+	bool specialization_constant_is_macro(uint32_t constant_id) const;
+
 protected:
 	// An enum of SPIR-V functions that are implemented in additional
 	// source code that is added to the shader if necessary.
@@ -764,14 +793,15 @@ protected:
 		SPVFuncImplInverse4x4,
 		SPVFuncImplInverse3x3,
 		SPVFuncImplInverse2x2,
-		// It is very important that this come before *Swizzle and ChromaReconstruct*, to ensure it's
-		// emitted before them.
-		SPVFuncImplForwardArgs,
-		// Likewise, this must come before *Swizzle.
+		// It is very important that this come before *Swizzle, to ensure it's emitted before them.
 		SPVFuncImplGetSwizzle,
 		SPVFuncImplTextureSwizzle,
+		SPVFuncImplGatherReturn,
+		SPVFuncImplGatherCompareReturn,
 		SPVFuncImplGatherSwizzle,
 		SPVFuncImplGatherCompareSwizzle,
+		SPVFuncImplGatherConstOffsets,
+		SPVFuncImplGatherCompareConstOffsets,
 		SPVFuncImplSubgroupBroadcast,
 		SPVFuncImplSubgroupBroadcastFirst,
 		SPVFuncImplSubgroupBallot,
@@ -816,7 +846,10 @@ protected:
 		SPVFuncImplPaddedStd140,
 		SPVFuncImplReduceAdd,
 		SPVFuncImplImageFence,
-		SPVFuncImplTextureCast
+		SPVFuncImplTextureCast,
+		SPVFuncImplMulExtended,
+		SPVFuncImplSetMeshOutputsEXT,
+		SPVFuncImplAssume,
 	};
 
 	// If the underlying resource has been used for comparison then duplicate loads of that resource must be too
@@ -845,9 +878,13 @@ protected:
 	std::string type_to_glsl(const SPIRType &type, uint32_t id, bool member);
 	std::string type_to_glsl(const SPIRType &type, uint32_t id = 0) override;
 	void emit_block_hints(const SPIRBlock &block) override;
+	void emit_mesh_entry_point();
+	void emit_mesh_outputs();
+	void emit_mesh_tasks(SPIRBlock &block) override;
+	void emit_workgroup_initialization(const SPIRVariable &var) override;
 
 	// Allow Metal to use the array<T> template to make arrays a value type
-	std::string type_to_array_glsl(const SPIRType &type) override;
+	std::string type_to_array_glsl(const SPIRType &type, uint32_t variable_id) override;
 	std::string constant_op_expression(const SPIRConstantOp &cop) override;
 
 	bool variable_decl_is_remapped_storage(const SPIRVariable &variable, spv::StorageClass storage) const override;
@@ -896,6 +933,7 @@ protected:
 
 	bool is_tesc_shader() const;
 	bool is_tese_shader() const;
+	bool is_mesh_shader() const;
 
 	void preprocess_op_codes();
 	void localize_global_variables();
@@ -910,6 +948,7 @@ protected:
 	                                            std::unordered_set<uint32_t> &processed_func_ids);
 	uint32_t add_interface_block(spv::StorageClass storage, bool patch = false);
 	uint32_t add_interface_block_pointer(uint32_t ib_var_id, spv::StorageClass storage);
+	uint32_t add_meshlet_block(bool per_primitive);
 
 	struct InterfaceBlockMeta
 	{
@@ -956,6 +995,7 @@ protected:
 	void add_tess_level_input_to_interface_block(const std::string &ib_var_ref, SPIRType &ib_type, SPIRVariable &var);
 	void add_tess_level_input(const std::string &base_ref, const std::string &mbr_name, SPIRVariable &var);
 
+	void ensure_struct_members_valid_vecsizes(SPIRType &struct_type, uint32_t &location);
 	void fix_up_interface_member_indices(spv::StorageClass storage, uint32_t ib_type_id);
 
 	void mark_location_as_used_by_shader(uint32_t location, const SPIRType &type,
@@ -1005,6 +1045,8 @@ protected:
 	                                                        uint32_t type_id, uint32_t index, uint32_t *comp = nullptr);
 
 	uint32_t get_physical_tess_level_array_size(spv::BuiltIn builtin) const;
+
+	uint32_t get_physical_type_stride(const SPIRType &type) const override;
 
 	// MSL packing rules. These compute the effective packing rules as observed by the MSL compiler in the MSL output.
 	// These values can change depending on various extended decorations which control packing rules.
@@ -1079,11 +1121,17 @@ protected:
 	uint32_t builtin_stage_input_size_id = 0;
 	uint32_t builtin_local_invocation_index_id = 0;
 	uint32_t builtin_workgroup_size_id = 0;
+	uint32_t builtin_mesh_primitive_indices_id = 0;
+	uint32_t builtin_mesh_sizes_id = 0;
+	uint32_t builtin_task_grid_id = 0;
+	uint32_t builtin_frag_depth_id = 0;
 	uint32_t swizzle_buffer_id = 0;
 	uint32_t buffer_size_buffer_id = 0;
 	uint32_t view_mask_buffer_id = 0;
 	uint32_t dynamic_offsets_buffer_id = 0;
 	uint32_t uint_type_id = 0;
+	uint32_t shared_uint_type_id = 0;
+	uint32_t meshlet_type_id = 0;
 	uint32_t argument_buffer_padding_buffer_type_id = 0;
 	uint32_t argument_buffer_padding_image_type_id = 0;
 	uint32_t argument_buffer_padding_sampler_type_id = 0;
@@ -1096,6 +1144,7 @@ protected:
 	void emit_store_statement(uint32_t lhs_expression, uint32_t rhs_expression) override;
 
 	void analyze_sampled_image_usage();
+	void analyze_workgroup_variables();
 
 	bool access_chain_needs_stage_io_builtin_translation(uint32_t base) override;
 	bool prepare_access_chain_for_scalar_access(std::string &expr, const SPIRType &type, spv::StorageClass storage,
@@ -1130,6 +1179,7 @@ protected:
 	std::set<std::string> pragma_lines;
 	std::set<std::string> typedef_lines;
 	SmallVector<uint32_t> vars_needing_early_declaration;
+	std::unordered_set<uint32_t> constant_macro_ids;
 
 	std::unordered_map<StageSetBinding, std::pair<MSLResourceBinding, bool>, InternalHasher> resource_bindings;
 	std::unordered_map<StageSetBinding, uint32_t, InternalHasher> resource_arg_buff_idx_to_binding_number;
@@ -1148,6 +1198,8 @@ protected:
 	VariableID stage_out_ptr_var_id = 0;
 	VariableID tess_level_inner_var_id = 0;
 	VariableID tess_level_outer_var_id = 0;
+	VariableID mesh_out_per_vertex = 0;
+	VariableID mesh_out_per_primitive = 0;
 	VariableID stage_out_masked_builtin_type_id = 0;
 
 	// Handle HLSL-style 0-based vertex/instance index.
@@ -1175,6 +1227,8 @@ protected:
 	bool needs_subgroup_size = false;
 	bool needs_sample_id = false;
 	bool needs_helper_invocation = false;
+	bool needs_workgroup_zero_init = false;
+	bool writes_to_depth = false;
 	std::string qual_pos_var_name;
 	std::string stage_in_var_name = "in";
 	std::string stage_out_var_name = "out";
@@ -1223,7 +1277,7 @@ protected:
 
 	void analyze_argument_buffers();
 	bool descriptor_set_is_argument_buffer(uint32_t desc_set) const;
-	MSLResourceBinding &get_argument_buffer_resource(uint32_t desc_set, uint32_t arg_idx);
+	const MSLResourceBinding &get_argument_buffer_resource(uint32_t desc_set, uint32_t arg_idx) const;
 	void add_argument_buffer_padding_buffer_type(SPIRType &struct_type, uint32_t &mbr_idx, uint32_t &arg_buff_index, MSLResourceBinding &rez_bind);
 	void add_argument_buffer_padding_image_type(SPIRType &struct_type, uint32_t &mbr_idx, uint32_t &arg_buff_index, MSLResourceBinding &rez_bind);
 	void add_argument_buffer_padding_sampler_type(SPIRType &struct_type, uint32_t &mbr_idx, uint32_t &arg_buff_index, MSLResourceBinding &rez_bind);
@@ -1236,6 +1290,7 @@ protected:
 
 	bool suppress_missing_prototypes = false;
 	bool suppress_incompatible_pointer_types_discard_qualifiers = false;
+	bool suppress_sometimes_unitialized = false;
 
 	void add_spv_func_and_recompile(SPVFuncImpl spv_func);
 

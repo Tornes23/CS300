@@ -1,16 +1,16 @@
 #ifdef USE_VULKAN
+#include <limits>
 #include <stdexcept>
 #include <set>
 #include <iostream>
 #include <algorithm>
 #include <CustomDebug/VulkanDebug.h>
+#include <vulkan/vk_sdk_platform.h>
 #include "VulkanHelpers.h"
 #include <SDL_vulkan.h>
+#include <glm/glm.hpp>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
-#define VK_KHR_win32_surface 1
-#define VK_KHR_WIN32_SURFACE_SPEC_VERSION 6
-#define VK_KHR_WIN32_SURFACE_EXTENSION_NAME "VK_KHR_win32_surface"
 
 #pragma region STATIC VARIABLES
 
@@ -27,20 +27,20 @@ namespace VulkanHelpers
 
 	void CreateInstance(const std::string& appName, VkInstance* instance, SDL_Window* window)
 	{
-		ValidationLayersData layersData;
+		InstanceValidationLayersData layersData;
 		layersData.m_layerCount = 0;
 		ExtensionLayersData extensionsData;
 		extensionsData.m_extensionCount = 0;
 
 #ifdef DEBUG
-		if (!GetValidationLayers(layersData))
+		if (!GetInstanceValidationLayers(layersData))
 		{
 			//throw exception
 			throw std::runtime_error("[VULKAN INSTANCE CREATION] Validation layers requested, but not available!");
 		}
 #endif
 
-		if (!GetExtensionsLayers(extensionsData, window))
+		if (!GetInstanceExtensionsLayers(extensionsData, window))
 		{
 			//throw exception
 			throw std::runtime_error("[VULKAN INSTANCE CREATION] Extensions requested, but not available!");
@@ -97,7 +97,7 @@ namespace VulkanHelpers
 		}
 	}
 
-	bool CheckLayers(ValidationLayersData& layersData)
+	bool CheckInstanceLayers(InstanceValidationLayersData& layersData)
 	{
 		for (const char* layerName : layersData.m_validationLayers) {
 			bool layerFound = false;
@@ -117,7 +117,7 @@ namespace VulkanHelpers
 		return true;
 	}
 
-	bool CheckExtensions(ExtensionLayersData& extensionsData, SDL_Window* window)
+	bool CheckInstanceExtensions(ExtensionLayersData& extensionsData, SDL_Window* window)
 	{
 		/* Look for instance extensions */
 		if (!SDL_Vulkan_GetInstanceExtensions(window, &extensionsData.m_extensionCount, nullptr))
@@ -135,18 +135,18 @@ namespace VulkanHelpers
 		return true;
 	}
 
-	bool GetValidationLayers(ValidationLayersData& layersData)
+	bool GetInstanceValidationLayers(InstanceValidationLayersData& layersData)
 	{
 		vkEnumerateInstanceLayerProperties(&layersData.m_layerCount, nullptr);
 		layersData.m_availableLayers.resize(layersData.m_layerCount);
 		vkEnumerateInstanceLayerProperties(&layersData.m_layerCount, layersData.m_availableLayers.data());
 
-		return CheckLayers(layersData);
+		return CheckInstanceLayers(layersData);
 	}
 
-	bool GetExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window)
+	bool GetInstanceExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window)
 	{
-		return CheckExtensions(extensionsData, window);
+		return CheckInstanceExtensions(extensionsData, window);
 	}
 
 	void CreateSwapChain(SwapChainData& swapChainData, const VulkanHelpers::LogicalDeviceData& deviceData, const VkSurfaceKHR& surface, const glm::ivec2& viewPort)
@@ -195,6 +195,8 @@ namespace VulkanHelpers
 		if (vkCreateSwapchainKHR(deviceData.m_logicalDevice, &createInfo, nullptr, &swapChainData.m_vulkanSwapchain) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create swap chain!");
 		}
+
+		swapChainData.GetSwapChainImages(deviceData);
 	}
 
 #ifdef DEBUG
@@ -286,12 +288,17 @@ namespace VulkanHelpers
 
 		for (int i = 0; i < vulkanDevices.size(); i++)
 		{
-			PhysicalDeviceData deviceData = GetPhysicalDeviceDataWrapper(vulkanDevices[i], surface);
-			VkBool32 isValid = 0;
-			vkGetPhysicalDeviceSurfaceSupportKHR(deviceData.m_physicalDevice, deviceData.m_graphicsFamilyIndex.value(), surface, &isValid);
-			if(isValid)
+			VkPhysicalDeviceProperties properties;
+			vkGetPhysicalDeviceProperties(vulkanDevices[i], &properties);
+			if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU || properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 			{
-				devices.push_back(deviceData);
+				PhysicalDeviceData deviceData = GetPhysicalDeviceDataWrapper(vulkanDevices[i], surface);
+				VkBool32 isValid = 0;
+				vkGetPhysicalDeviceSurfaceSupportKHR(deviceData.m_physicalDevice, deviceData.m_graphicsFamilyIndex.value(), surface, &isValid);
+				if (isValid)
+				{
+					devices.push_back(deviceData);
+				}
 			}
 		}
 
@@ -363,6 +370,7 @@ namespace VulkanHelpers
 		if (formatCount != 0) {
 			swapChainData.m_formats.resize(formatCount);
 			vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, swapChainData.m_formats.data());
+			swapChainData.SelectFormat();
 		}
 		else
 		{
@@ -375,6 +383,7 @@ namespace VulkanHelpers
 		if (presentModeCount != 0) {
 			swapChainData.m_presentModes.resize(presentModeCount);
 			vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, swapChainData.m_presentModes.data());
+			swapChainData.SelectPresentMode();;
 		}
 		else
 		{
@@ -461,13 +470,13 @@ namespace VulkanHelpers
 
 		createInfo.pEnabledFeatures = &physicalDevice.m_features;
 
-		ValidationLayersData layersData;
+		InstanceValidationLayersData layersData;
 		layersData.m_layerCount = 0;
 		ExtensionLayersData extensionsData;
 		extensionsData.m_extensionCount = 0;
 
 #ifdef DEBUG
-		if (!GetValidationLayers(layersData))
+		if (!GetInstanceValidationLayers(layersData))
 		{
 			//throw exception
 			throw std::runtime_error("[VULKAN DEVICE CREATION] Validation layers requested, but not available!");
@@ -498,13 +507,19 @@ namespace VulkanHelpers
 
 		vkEnumerateDeviceExtensionProperties (device, nullptr, &extensionsData.m_extensionCount, nullptr);
 		extensionsData.m_availableExtensions.resize(extensionsData.m_extensionCount);
-		extensionsData.m_extensions.resize(extensionsData.m_extensionCount);
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsData.m_extensionCount, extensionsData.m_availableExtensions.data());
 		
 		for (unsigned int i = 0; i < extensionsData.m_extensionCount; i++)
 		{
-			extensionsData.m_extensions[i] = extensionsData.m_availableExtensions[i].extensionName;
+			if (std::strcmp(extensionsData.m_availableExtensions[i].extensionName , "VK_EXT_full_screen_exclusive") == 0 ||
+				std::strcmp(extensionsData.m_availableExtensions[i].extensionName , VK_EXT_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME) == 0)
+			{
+				continue;
+			}
+			extensionsData.m_extensions.push_back(extensionsData.m_availableExtensions[i].extensionName);
 		}
+		extensionsData.m_extensions.shrink_to_fit();
+		extensionsData.m_extensions;
 	}
 
 	bool HasRequiredExtensions(const ExtensionLayersData& extensionsData)
@@ -623,10 +638,31 @@ namespace VulkanHelpers
 		}
 	}
 
+#undef max
 	void SwapChainData::SetSwapExtent(const glm::ivec2& extentSize)
 	{
-		m_swapExtent.width = extentSize.x;
-		m_swapExtent.height = extentSize.y;
+		if (m_capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+		{
+			m_swapExtent.width = m_capabilities.currentExtent.width;
+			m_swapExtent.height = m_capabilities.currentExtent.height;
+		}
+		else
+		{
+			const int minWidth = m_capabilities.minImageExtent.width;
+			const int minHeight = m_capabilities.minImageExtent.height;
+			const int maxWidth = m_capabilities.maxImageExtent.width;
+			const int maxHeight = m_capabilities.maxImageExtent.height;
+			m_swapExtent.width = glm::clamp(extentSize.x, minWidth, maxWidth);
+			m_swapExtent.height = glm::clamp(extentSize.y, minHeight, maxHeight);
+		}
+	}
+
+	void SwapChainData::GetSwapChainImages(const VulkanHelpers::LogicalDeviceData& logicalDevice)
+	{
+		unsigned int imageCount = 0;
+		vkGetSwapchainImagesKHR(logicalDevice.m_logicalDevice, m_vulkanSwapchain, &imageCount, nullptr);
+		m_swapChainImages.resize(imageCount);
+		vkGetSwapchainImagesKHR(logicalDevice.m_logicalDevice, m_vulkanSwapchain, &imageCount, m_swapChainImages.data());
 	}
 
 
