@@ -68,10 +68,12 @@ namespace VulkanHelpers
 	struct SwapChainData
 	{
 		VkSwapchainKHR m_vulkanSwapchain;
-		VkSurfaceFormatKHR m_selectedFormat;
+		VkSurfaceFormatKHR m_selectedSurfaceFormat;
 		VkPresentModeKHR m_selectedPresentMode;
 		VkExtent2D m_swapExtent;
 		std::vector<VkImage> m_swapChainImages;
+		std::vector<VkImageView> m_swapChainImageViewers;
+		VkFormat m_selectedSwapchainFormat;
 
 		VkSurfaceCapabilitiesKHR m_capabilities;
 		std::vector<VkSurfaceFormatKHR> m_formats;
@@ -82,6 +84,11 @@ namespace VulkanHelpers
 		void SelectPresentMode();
 		void SetSwapExtent(const glm::ivec2& extentSize);
 		void GetSwapChainImages(const VulkanHelpers::LogicalDeviceData& logicalDevice);
+
+		void CreateImageViewers(const VulkanHelpers::LogicalDeviceData& deviceData);
+		void PopulateImageViewCreateData(const VkImage& image, VkImageViewCreateInfo& createInfo);
+		void ClearImageViewers(const VulkanHelpers::LogicalDeviceData& deviceData);
+
 	};
 
 	struct VulkanData
@@ -129,8 +136,7 @@ namespace VulkanHelpers
 	bool CheckInstanceExtensions(ExtensionLayersData& extensionsData, SDL_Window* window);
 	bool GetInstanceValidationLayers(InstanceValidationLayersData& layerData);
 	bool GetInstanceExtensionsLayers(ExtensionLayersData& extensionsData, SDL_Window* window);
-	void CreateSwapChain(SwapChainData& swapChainData, const VulkanHelpers::LogicalDeviceData& deviceData, const VkSurfaceKHR& surface, const glm::ivec2& viewPort);
-	void PopulateSwapChainData(SwapChainData& swapChainData, const VkPhysicalDevice& device, const VkSurfaceKHR& surface);
+	
 	
 #pragma endregion
 
@@ -155,6 +161,10 @@ namespace VulkanHelpers
 	bool HasRequiredExtensions(const ExtensionLayersData& extensionsData);
 #pragma endregion
 
+#pragma region SWAPCHAIN CREATION METHODS
+	void CreateSwapChain(SwapChainData& swapChainData, const VulkanHelpers::LogicalDeviceData& deviceData, const VkSurfaceKHR& surface, const glm::ivec2& viewPort);
+	void PopulateSwapChainData(SwapChainData& swapChainData, const VkPhysicalDevice& device, const VkSurfaceKHR& surface);
+#pragma endregion
 
 #pragma region CLEAN UP METHODS
 

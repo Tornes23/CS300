@@ -49,6 +49,10 @@ private:
 	GLenum mType;
 	GLuint mHandle;
 #endif
+
+#ifdef USE_VULKAN
+	//culkan handles and other shit I may need
+#endif
 };
 
 class ShaderProgram
